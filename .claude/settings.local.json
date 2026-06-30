@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/admin/.claude/plugins/cache/claude-plugins-official/superpowers/6.0.3/skills/subagent-driven-development/scripts/**)",
+      "Read(//Users/admin/.claude/plugins/cache/claude-plugins-official/superpowers/6.0.3/skills/subagent-driven-development/**)",
+      "Bash(npm install *)",
+      "Bash(node -e \"const m = require\\('/Users/admin/dev/fitness-tracker/node_modules/@sveltejs/vite-plugin-svelte'\\); console.log\\(Object.keys\\(m\\)\\);\")",
+      "Bash(node --input-type=module -e \"import\\('/Users/admin/dev/fitness-tracker/node_modules/@sveltejs/vite-plugin-svelte'\\).then\\(m => console.log\\(Object.keys\\(m\\)\\)\\)\")",
+      "Bash(git *)"
+    ]
+  }
+}
