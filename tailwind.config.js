@@ -7,10 +7,11 @@ export default {
     extend: {
       colors: {
         gb: {
-          bg:     '#282828',
-          bg1:    '#3c3836',
-          bg2:    '#504945',
-          bg3:    '#665c54',
+          bg:     '#1d2021',
+          bg0:    '#161819',
+          bg1:    '#282828',
+          bg2:    '#3c3836',
+          bg3:    '#504945',
           fg:     '#ebdbb2',
           fg2:    '#d5c4a1',
           fg3:    '#bdae93',

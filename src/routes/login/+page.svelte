@@ -15,7 +15,7 @@
 
 <div class="min-h-screen flex items-center justify-center bg-gb-bg">
   <div class="bg-gb-bg1 rounded-lg p-10 flex flex-col items-center gap-6 shadow-xl">
-    <h1 class="text-gb-yellow text-3xl font-bold tracking-wide">Fitness Tracker</h1>
+    <h1 class="text-gb-green text-3xl font-bold tracking-wide">Fitness Tracker</h1>
     <p class="text-gb-fg3 text-sm">Track your training progress</p>
     <button
       on:click={handleSignIn}

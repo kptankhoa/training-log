@@ -5,11 +5,11 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 export const globalNote = writable<string>('');
 
 export function initNote(userId: string): () => void {
-  return onSnapshot(doc(db, 'users', userId, 'meta'), (snap) => {
+  return onSnapshot(doc(db, 'users', userId, 'meta', 'global'), (snap) => {
     globalNote.set(snap.exists() ? (snap.data()?.globalNote ?? '') : '');
   });
 }
 
 export async function saveNote(userId: string, content: string): Promise<void> {
-  await setDoc(doc(db, 'users', userId, 'meta'), { globalNote: content }, { merge: true });
+  await setDoc(doc(db, 'users', userId, 'meta', 'global'), { globalNote: content }, { merge: true });
 }

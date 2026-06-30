@@ -63,10 +63,11 @@
   />
 
   <div class="flex flex-col gap-2" on:focusout={scheduleNoteSave}>
-    <h3 class="text-gb-fg3 text-xs uppercase tracking-wider">Notepad</h3>
     <MarkdownEditor
       bind:value={$globalNote}
       placeholder="Training schedule, weekly goals, quotes…"
+      initialMode="preview"
+      label="Notepad"
     />
   </div>
 </div>

@@ -3,14 +3,21 @@
 
   export let value: string = '';
   export let placeholder: string = '';
+  export let initialMode: 'edit' | 'preview' = 'edit';
+  export let label: string = '';
 
-  let mode: 'edit' | 'preview' = 'edit';
+  let mode: 'edit' | 'preview' = initialMode;
 
   $: rendered = marked(value) as string;
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex justify-end">
+  <div class="flex items-center justify-between">
+    {#if label}
+      <span class="text-gb-fg3 text-xs uppercase tracking-wider">{label}</span>
+    {:else}
+      <span />
+    {/if}
     <button
       type="button"
       on:click={() => (mode = mode === 'edit' ? 'preview' : 'edit')}
@@ -31,10 +38,14 @@
   {:else}
     <div
       class="prose prose-invert max-w-none min-h-[8rem] bg-gb-bg2 rounded-md p-3
-             text-gb-fg text-sm [&_h1]:text-gb-yellow [&_h2]:text-gb-yellow
-             [&_h3]:text-gb-yellow [&_strong]:text-gb-orange [&_a]:text-gb-blue"
+             text-gb-fg text-sm [&_h1]:text-gb-green [&_h2]:text-gb-green
+             [&_h3]:text-gb-green [&_strong]:text-gb-orange [&_a]:text-gb-blue"
     >
-      {@html rendered}
+      {#if value}
+        {@html rendered}
+      {:else}
+        <span class="text-gb-fg3">{placeholder}</span>
+      {/if}
     </div>
   {/if}
 </div>

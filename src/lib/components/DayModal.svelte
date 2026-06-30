@@ -54,7 +54,7 @@
               rounded-t-2xl md:rounded-xl shadow-2xl p-6 flex flex-col gap-5">
 
     <div class="flex items-start justify-between">
-      <h2 id="modal-title" class="text-gb-yellow font-semibold text-lg leading-tight">{heading}</h2>
+      <h2 id="modal-title" class="text-gb-green font-semibold text-lg leading-tight">{heading}</h2>
       <button
         type="button"
         on:click={() => dispatch('close')}

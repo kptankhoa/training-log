@@ -9,8 +9,12 @@ import {
 } from 'firebase/auth';
 
 export const user = writable<User | null>(null);
+export const authReady = writable<boolean>(false);
 
-onAuthStateChanged(auth, (u) => user.set(u));
+onAuthStateChanged(auth, (u) => {
+  user.set(u);
+  authReady.set(true);
+});
 
 export async function signInWithGoogle(): Promise<void> {
   const provider = new GoogleAuthProvider();

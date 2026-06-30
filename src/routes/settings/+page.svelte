@@ -40,7 +40,7 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-10">
-  <h1 class="text-gb-yellow text-2xl font-bold">Settings</h1>
+  <h1 class="text-gb-green text-2xl font-bold">Settings</h1>
 
   <!-- Training types -->
   <section class="flex flex-col gap-4">
