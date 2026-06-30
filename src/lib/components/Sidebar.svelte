@@ -24,7 +24,7 @@
 
 <!-- Desktop left rail -->
 <nav class="hidden md:flex flex-col w-64 min-h-screen bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
-  <div class="text-gb-green font-bold text-lg mb-6 px-2 glow-green">Fitness Tracker</div>
+  <div class="text-gb-green font-bold text-lg mb-6 px-2 glow-green">Training Log</div>
   {#each nav as item}
     <a
       href={item.href}

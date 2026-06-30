@@ -44,14 +44,14 @@
 </script>
 
 <div
-  class="fixed inset-0 bg-black/60 z-40 flex items-end md:items-center justify-center"
+  class="fixed inset-0 bg-black/60 z-60 flex items-end md:items-center justify-center"
   on:click|self={() => dispatch('close')}
   role="dialog"
   aria-modal="true"
   aria-labelledby="modal-title"
 >
-  <div class="bg-gb-bg1 w-full md:w-[520px] md:max-h-[85vh] overflow-y-auto
-              rounded-t-2xl md:rounded-xl shadow-2xl p-6 flex flex-col gap-5">
+  <div class="bg-gb-bg1 w-full md:w-[520px] max-h-[85vh] overflow-y-auto
+              rounded-t-2xl md:rounded-xl shadow-2xl p-6 pb-24 md:pb-6 flex flex-col gap-5">
 
     <div class="flex items-start justify-between">
       <h2 id="modal-title" class="text-gb-green font-semibold text-lg leading-tight glow-green">{heading}</h2>

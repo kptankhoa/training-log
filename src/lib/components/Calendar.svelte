@@ -20,14 +20,22 @@
     const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun
     const leading = (firstDow + 6) % 7; // shift so Mon=0
     const count = new Date(year, month, 0).getDate();
-    return [...Array(leading).fill(null), ...Array.from({ length: count }, (_, i) => i + 1)] as (number | null)[];
+    const tailing = (7 - (leading + count) % 7) % 7;
+    return [
+      ...Array(leading).fill(null),
+      ...Array.from({ length: count }, (_, i) => i + 1),
+      ...Array(tailing).fill(null)
+    ] as (number | null)[];
   })();
 
   function key(d: number) {
     return `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
   }
 
-  type CellData = { null: true } | { num: number; colors: string[]; label: string; hasNote: boolean };
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  type CellData = { null: true } | { num: number; colors: string[]; label: string; hasNote: boolean; isToday: boolean };
 
   $: cellData = gridCells.map((cell): CellData => {
     if (cell === null) return { null: true };
@@ -37,6 +45,7 @@
       colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
+      isToday: key(cell) === todayKey,
     };
   });
 
@@ -61,16 +70,18 @@
   <div class="grid grid-cols-7 gap-px bg-gb-bg2 border border-gb-bg2 rounded-lg overflow-hidden">
     {#each cellData as cell}
       {#if 'null' in cell}
-        <div class="bg-gb-bg2 min-h-[4.5rem]"></div>
+        <div class="bg-gb-bg3 min-h-[4.5rem]"></div>
       {:else}
         <button
           type="button"
           on:click={() => dispatch('selectDay', key(cell.num))}
-          class="bg-gb-bg hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
-                 flex flex-col items-start gap-0.5 text-left"
+          class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
+                 flex flex-col items-start gap-0.5 text-left
+                 {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}"
+          style={cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
         >
           <div class="flex items-center gap-1">
-            <span class="text-xs text-gb-fg2 font-medium leading-none">{cell.num}</span>
+            <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
             {#if cell.hasNote}
               <span class="w-1.5 h-1.5 rounded-full bg-gb-gray shrink-0" title="Has note"></span>
             {/if}
@@ -94,4 +105,15 @@
     <span class="text-gb-green font-semibold glow-green">{trainedCount}</span>
     <span class="text-gb-fg3">day{trainedCount !== 1 ? 's' : ''} trained this month</span>
   </div>
+
+  {#if tags.filter((t) => !t.deleted).length > 0}
+    <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
+      {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
+        <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
+          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
+          {tag.name}
+        </span>
+      {/each}
+    </div>
+  {/if}
 </div>
