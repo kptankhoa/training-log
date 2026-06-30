@@ -42,7 +42,7 @@
   <div class="flex items-center justify-between mb-3 px-1">
     <button aria-label="Previous month" on:click={() => dispatch('prevMonth')}
       class="text-gb-fg2 hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-bg2 transition text-xl leading-none">‹</button>
-    <h2 class="text-gb-green font-semibold text-lg">{MONTHS[month - 1]} {year}</h2>
+    <h2 class="text-gb-green font-semibold text-lg glow-green">{MONTHS[month - 1]} {year}</h2>
     <button aria-label="Next month" on:click={() => dispatch('nextMonth')}
       class="text-gb-fg2 hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-bg2 transition text-xl leading-none">›</button>
   </div>
@@ -85,4 +85,5 @@
       {/if}
     {/each}
   </div>
+
 </div>

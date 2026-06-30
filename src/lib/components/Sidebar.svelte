@@ -23,14 +23,14 @@
 </script>
 
 <!-- Desktop left rail -->
-<nav class="hidden md:flex flex-col w-52 min-h-screen bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
-  <div class="text-gb-green font-bold text-lg mb-6 px-2">Fitness Tracker</div>
+<nav class="hidden md:flex flex-col w-64 min-h-screen bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
+  <div class="text-gb-green font-bold text-lg mb-6 px-2 glow-green">Fitness Tracker</div>
   {#each nav as item}
     <a
       href={item.href}
       class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors
              {path === item.href
-               ? 'bg-gb-bg2 text-gb-green font-semibold'
+               ? 'bg-gb-bg2 text-gb-green font-semibold glow-green'
                : 'text-gb-fg2 hover:text-gb-fg hover:bg-gb-bg2'}"
     >
       <span class="shrink-0">{@html item.icon}</span>
@@ -45,7 +45,7 @@
     <a
       href={item.href}
       class="flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors
-             {path === item.href ? 'text-gb-green' : 'text-gb-fg3'}"
+             {path === item.href ? 'text-gb-green glow-green' : 'text-gb-fg3'}"
     >
       <span class="leading-none">{@html item.icon}</span>
       {item.label}

@@ -5,6 +5,7 @@
 @layer base {
   html, body {
     @apply bg-gb-bg text-gb-fg min-h-screen;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   }
 
   /* Grain overlay */
@@ -22,7 +23,26 @@
     background-repeat: repeat;
   }
 
-  /* Ensure content sits above grain */
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+  }
+
+  /* Ensure content sits above overlays */
   #svelte, nav, main, dialog, [role="dialog"] {
     position: relative;
     z-index: 1;
@@ -34,4 +54,31 @@
   ::-webkit-scrollbar-thumb:hover { @apply bg-gb-gray; }
 
   ::selection { @apply bg-gb-green text-gb-bg; }
+
+  /* Retro pixel cursors */
+  html, body {
+    cursor: url('/cursors/arrow.svg') 3 1, default;
+  }
+  button, a, [role='button'], label, select {
+    cursor: url('/cursors/pointer.svg') 10 2, pointer !important;
+  }
+
+  /* Sharp corners everywhere */
+  *, *::before, *::after {
+    border-radius: 0 !important;
+  }
+
+  /* Green block caret on inputs */
+  input, textarea {
+    caret-color: #b8bb26;
+    caret-shape: block;
+  }
+}
+
+@layer utilities {
+  .glow-green {
+    text-shadow:
+      0 0 8px rgba(184, 187, 38, 0.7),
+      0 0 20px rgba(184, 187, 38, 0.3);
+  }
 }

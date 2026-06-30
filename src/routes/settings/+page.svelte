@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
   import { activeTags, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
   import { globalNote, initNote, saveNote } from '$lib/stores/note';
@@ -12,12 +12,18 @@
   let unsubTags: (() => void) | null = null;
   let unsubNote: (() => void) | null = null;
 
-  $: if (userId) {
-    unsubTags?.(); unsubTags = initTags(userId);
-    unsubNote?.(); unsubNote = initNote(userId);
-  }
-
-  onDestroy(() => { unsubTags?.(); unsubNote?.(); });
+  onMount(() => {
+    const unsubUser = user.subscribe((u) => {
+      if (!u) return;
+      unsubTags?.(); unsubTags = initTags(u.uid);
+      unsubNote?.(); unsubNote = initNote(u.uid);
+    });
+    return () => {
+      unsubUser();
+      unsubTags?.();
+      unsubNote?.();
+    };
+  });
 
   let newTagName = '';
 
@@ -40,7 +46,7 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-10">
-  <h1 class="text-gb-green text-2xl font-bold">Settings</h1>
+  <h1 class="text-gb-green text-2xl font-bold glow-green">Settings</h1>
 
   <!-- Training types -->
   <section class="flex flex-col gap-4">
@@ -92,6 +98,7 @@
       <MarkdownEditor
         bind:value={$globalNote}
         placeholder="Training schedule, weekly goals, quotes…"
+        initialMode="preview"
       />
     </div>
   </section>

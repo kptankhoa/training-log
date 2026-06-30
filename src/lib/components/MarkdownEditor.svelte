@@ -31,7 +31,7 @@
     <textarea
       bind:value
       {placeholder}
-      rows="6"
+      rows="24"
       class="w-full bg-gb-bg2 text-gb-fg font-mono text-sm rounded-md p-3 resize-y
              border border-gb-bg3 focus:outline-none focus:border-gb-blue"
     ></textarea>
@@ -39,7 +39,8 @@
     <div
       class="prose prose-invert max-w-none min-h-[8rem] bg-gb-bg2 rounded-md p-3
              text-gb-fg text-sm [&_h1]:text-gb-green [&_h2]:text-gb-green
-             [&_h3]:text-gb-green [&_strong]:text-gb-orange [&_a]:text-gb-blue"
+             [&_h3]:text-gb-green [&_strong]:text-gb-orange [&_a]:text-gb-blue
+             min-h-[24rem]"
     >
       {#if value}
         {@html rendered}

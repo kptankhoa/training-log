@@ -1,6 +1,6 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { db } from '$lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, doc, query } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { nextColor } from '$lib/gruvbox';
 import type { TrainingTag, GruvboxColor } from '$lib/types';
 
@@ -10,17 +10,13 @@ export const tags = { subscribe: _tags.subscribe };
 export const activeTags = derived(_tags, ($t) => $t.filter((t) => !t.deleted));
 
 export function initTags(userId: string): () => void {
-  const q = query(collection(db, 'users', userId, 'tags'));
-  return onSnapshot(q, (snap) => {
+  return onSnapshot(collection(db, 'users', userId, 'tags'), (snap) => {
     _tags.set(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<TrainingTag, 'id'>) })));
   });
 }
 
 export async function addTag(userId: string, name: string): Promise<void> {
-  const current = await new Promise<TrainingTag[]>((resolve) => {
-    const unsub = _tags.subscribe((v) => { resolve(v); unsub(); });
-  });
-  const color = nextColor(current.filter((t) => !t.deleted).map((t) => t.color));
+  const color = nextColor(get(activeTags).map((t) => t.color));
   await addDoc(collection(db, 'users', userId, 'tags'), { name, color, deleted: false });
 }
 

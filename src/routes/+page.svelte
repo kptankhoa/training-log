@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
   import { tags, activeTags, initTags } from '$lib/stores/tags';
   import { days, initDays } from '$lib/stores/days';
@@ -18,26 +18,36 @@
 
   $: userId = $user?.uid ?? '';
 
-  $: if (userId) {
-    unsubTags?.(); unsubTags = initTags(userId);
-    unsubNote?.(); unsubNote = initNote(userId);
-  }
+  onMount(() => {
+    const unsubUser = user.subscribe((u) => {
+      if (!u) return;
+      unsubTags?.(); unsubTags = initTags(u.uid);
+      unsubNote?.(); unsubNote = initNote(u.uid);
+      unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
+    });
+    return () => {
+      unsubUser();
+      unsubTags?.();
+      unsubDays?.();
+      unsubNote?.();
+    };
+  });
 
-  $: if (userId && (viewYear || viewMonth)) {
-    unsubDays?.();
-    unsubDays = initDays(userId, viewYear, viewMonth);
+  function resubscribeDays() {
+    const uid = get(user)?.uid;
+    if (uid) { unsubDays?.(); unsubDays = initDays(uid, viewYear, viewMonth); }
   }
-
-  onDestroy(() => { unsubTags?.(); unsubDays?.(); unsubNote?.(); });
 
   function prevMonth() {
     if (viewMonth === 1) { viewMonth = 12; viewYear -= 1; }
     else viewMonth -= 1;
+    resubscribeDays();
   }
 
   function nextMonth() {
     if (viewMonth === 12) { viewMonth = 1; viewYear += 1; }
     else viewMonth += 1;
+    resubscribeDays();
   }
 
   $: selectedEntry = selectedDate
