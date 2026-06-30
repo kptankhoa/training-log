@@ -9,13 +9,17 @@ export const days = { subscribe: _days.subscribe };
 
 export function initDays(userId: string, year: number, month: number): () => void {
   const prefix = `${year}-${String(month).padStart(2, '0')}-`;
-  return onSnapshot(collection(db, 'users', userId, 'days'), (snap) => {
-    const entries: Record<string, DayEntry> = {};
-    snap.docs.forEach((d) => {
-      if (d.id.startsWith(prefix)) entries[d.id] = d.data() as DayEntry;
-    });
-    _days.set(entries);
-  });
+  return onSnapshot(
+    collection(db, 'users', userId, 'days'),
+    (snap) => {
+      const entries: Record<string, DayEntry> = {};
+      snap.docs.forEach((d) => {
+        if (d.id.startsWith(prefix)) entries[d.id] = d.data() as DayEntry;
+      });
+      _days.set(entries);
+    },
+    (err) => console.error('[initDays] error:', err)
+  );
 }
 
 export async function saveDay(userId: string, dateKey: string, entry: DayEntry): Promise<void> {

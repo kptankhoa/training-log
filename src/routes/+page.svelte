@@ -34,8 +34,7 @@
   });
 
   function resubscribeDays() {
-    const uid = get(user)?.uid;
-    if (uid) { unsubDays?.(); unsubDays = initDays(uid, viewYear, viewMonth); }
+    if (userId) { unsubDays?.(); unsubDays = initDays(userId, viewYear, viewMonth); }
   }
 
   function prevMonth() {
