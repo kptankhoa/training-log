@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/svelte';
+import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent } from '@testing-library/svelte';
 import TagChip from './TagChip.svelte';
+import TagChipTest from './TagChipTest.svelte';
 import type { TrainingTag } from '$lib/types';
 
 const tag: TrainingTag = { id: 'tag1', name: 'Boxing', color: 'red', deleted: false };
@@ -9,6 +10,21 @@ describe('TagChip', () => {
   it('renders tag name', () => {
     const { getByText } = render(TagChip, { props: { tag, selected: false } });
     expect(getByText('Boxing')).toBeInTheDocument();
+  });
+
+  it('emits toggle event with tagId on click', async () => {
+    const { getByText, getByTestId } = render(TagChipTest, { props: { tag, selected: false } });
+    const button = getByText('Boxing') as HTMLButtonElement;
+
+    // Click the button to trigger the toggle event
+    await fireEvent.click(button);
+
+    // Check that the event was dispatched with correct detail
+    const eventCount = getByTestId('event-count');
+    const eventDetail = getByTestId('event-detail');
+
+    expect(eventCount.textContent).toBe('1');
+    expect(eventDetail.textContent).toBe('tag1');
   });
 
   it('applies background color when selected', () => {
