@@ -15,7 +15,7 @@
 </script>
 
 <!-- Desktop left rail -->
-<nav class="hidden md:flex flex-col w-64 min-h-screen bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
+<nav class="hidden md:flex flex-col w-64 min-h-dvh bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
   <div class="text-gb-green font-bold text-lg mb-6 px-2 glow-green flex items-center gap-2">
     {@html icons.dumbbell}
     Training Log

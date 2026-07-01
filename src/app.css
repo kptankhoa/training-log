@@ -4,7 +4,7 @@
 
 @layer base {
   html, body {
-    @apply bg-gb-bg text-gb-fg min-h-screen;
+    @apply bg-gb-bg text-gb-fg min-h-dvh;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   }
 
