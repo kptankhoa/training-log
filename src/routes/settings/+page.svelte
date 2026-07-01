@@ -26,15 +26,17 @@
   let newTaskName = '';
 
   async function handleAdd() {
-    if (!newTagName.trim()) return;
-    await addTag(userId, newTagName.trim());
+    const name = newTagName.trim();
+    if (!name) return;
     newTagName = '';
+    await addTag(userId, name);
   }
 
   async function handleAddTask() {
-    if (!newTaskName.trim()) return;
-    await addTask(userId, newTaskName.trim());
+    const name = newTaskName.trim();
+    if (!name) return;
     newTaskName = '';
+    await addTask(userId, name);
   }
 
   function cycleColor(tagId: string, current: GruvboxColor) {
