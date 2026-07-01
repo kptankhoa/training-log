@@ -209,7 +209,7 @@
     {#if $exercisesLoading}
       <Spinner />
     {:else}
-      <ul class="flex flex-col gap-2">
+      <ul class="max-h-96 overflow-y-auto flex flex-col gap-2 pr-1">
         {#each $activeExercises as exercise (exercise.id)}
           <li class="flex flex-col bg-gb-bg1">
             <div class="flex items-center gap-3 px-4 py-3">
@@ -237,7 +237,7 @@
                 {#if $notes.length === 0}
                   <p class="text-gb-fg3 text-xs italic">No splits yet — add one in Split Design.</p>
                 {:else}
-                  <div class="max-h-40 overflow-y-auto flex flex-wrap gap-2 pr-1">
+                  <div class="flex flex-wrap gap-2">
                     {#each $notes as split (split.id)}
                       <button
                         type="button"
