@@ -296,6 +296,16 @@ describe('DayDetail — editing behavior', () => {
     expect(photosSection?.className).toContain('hidden');
   });
 
+  it('does not hide other sections when hideOtherSectionsWhileEditingNote is false', async () => {
+    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
+    const { getByText } = await renderInEditMode({
+      dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1',
+      hideOtherSectionsWhileEditingNote: false
+    });
+    const trainingTypesSection = getByText('Training types').closest('div');
+    expect(trainingTypesSection?.className).not.toContain('hidden');
+  });
+
   it('shows other sections once the note is switched out of edit mode', async () => {
     // startEdit always opens the note in edit mode, so switch to Preview first
     const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });

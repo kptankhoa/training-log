@@ -60,7 +60,14 @@
     </div>
 
     {#if userId}
-      <DayDetail dateKey={todayKey} {entry} activeTags={$activeTags} activeTasks={$activeTasks} {userId} />
+      <DayDetail
+        dateKey={todayKey}
+        {entry}
+        activeTags={$activeTags}
+        activeTasks={$activeTasks}
+        {userId}
+        hideOtherSectionsWhileEditingNote={false}
+      />
     {/if}
   {/if}
 </div>

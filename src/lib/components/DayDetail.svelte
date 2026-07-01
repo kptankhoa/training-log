@@ -15,6 +15,9 @@
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
   export let userId: string;
+  // Only useful in a height-constrained modal sheet — the inline Home page
+  // has no such constraint, so it opts out.
+  export let hideOtherSectionsWhileEditingNote = true;
 
   const dispatch = createEventDispatcher<{ saved: void }>();
 
@@ -29,7 +32,7 @@
   let savedResetTimeout: ReturnType<typeof setTimeout> | null = null;
   let noteMode: 'edit' | 'preview' = note ? 'preview' : 'edit';
 
-  $: noteEditing = noteMode === 'edit';
+  $: noteEditing = hideOtherSectionsWhileEditingNote && noteMode === 'edit';
 
   // Photos: uploads commit to Storage immediately (need a real ref to preview),
   // but removals only take effect on Save, so discarding edits still works.
