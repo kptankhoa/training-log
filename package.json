@@ -1,39 +1,41 @@
 {
-	"name": "fitness-tracker",
-	"private": true,
-	"version": "0.0.1",
-	"type": "module",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"deploy": "npm run build && wrangler pages deploy build",
-		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"test:run": "vitest run"
-	},
-	"devDependencies": {
-		"wrangler": "^4.106.0",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.63.0",
-		"@sveltejs/vite-plugin-svelte": "^7.1.2",
-		"@tailwindcss/typography": "^0.5.20",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/svelte": "^5.4.2",
-		"autoprefixer": "^10.5.2",
-		"jsdom": "^29.1.1",
-		"postcss": "^8.5.16",
-		"svelte": "^5.56.1",
-		"svelte-check": "^4.6.0",
-		"tailwindcss": "^3.4.19",
-		"typescript": "^6.0.3",
-		"vite": "^8.0.16",
-		"vitest": "^4.1.9"
-	},
-	"dependencies": {
-		"firebase": "^12.15.0",
-		"marked": "^18.0.5"
-	}
+  "name": "fitness-tracker",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "npm run build && wrangler pages dev .svelte-kit/cloudflare",
+    "deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "gen": "wrangler types",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@sveltejs/kit": "^2.63.0",
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@tailwindcss/typography": "^0.5.20",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/svelte": "^5.4.2",
+    "autoprefixer": "^10.5.2",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.5.16",
+    "svelte": "^5.56.1",
+    "svelte-check": "^4.6.0",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9",
+    "wrangler": "^4.97.0"
+  },
+  "dependencies": {
+    "firebase": "^12.15.0",
+    "marked": "^18.0.5"
+  }
 }

@@ -3,17 +3,14 @@
   import { user, authReady } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   import Sidebar from '$lib/components/Sidebar.svelte';
 
-  onMount(() => {
-    return user.subscribe((u) => {
-      if (!$authReady) return;
-      if (u === null && $page.url.pathname !== '/login') goto('/login');
-    });
-  });
+  $: if (browser && $authReady && $user === null && $page.url.pathname !== '/login') {
+    goto('/login');
+  }
 
-  $: showShell = $authReady && $page.url.pathname !== '/login';
+  $: showShell = $authReady && $user !== null && $page.url.pathname !== '/login';
   $: loading = !$authReady;
 </script>
 

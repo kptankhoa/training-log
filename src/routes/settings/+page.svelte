@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { user } from '$lib/stores/auth';
+  import { user, signOut } from '$lib/stores/auth';
   import { activeTags, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import type { GruvboxColor } from '$lib/types';
@@ -73,5 +73,22 @@
         class="bg-gb-blue text-gb-bg font-semibold px-4 py-2 hover:opacity-90 transition text-sm"
       >Add</button>
     </div>
+  </section>
+
+  <section class="md:hidden flex flex-col gap-2">
+    <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2">Account</h2>
+    <button
+      type="button"
+      on:click={signOut}
+      class="flex items-center gap-3 px-4 py-3 bg-gb-bg1 text-gb-fg3
+             hover:text-gb-red hover:bg-gb-bg2 transition-colors text-sm w-full text-left"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Sign out
+    </button>
   </section>
 </div>

@@ -1,6 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "training-log",
-  "compatibility_date": "2026-01-20",
-  "pages_build_output_dir": "./build"
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "pages_build_output_dir": ".svelte-kit/cloudflare",
+  "observability": {
+    "enabled": true
+  }
 }
