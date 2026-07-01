@@ -143,13 +143,15 @@
             stroke-dashoffset={dashOffset}
           />
         </svg>
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span class="text-2xl font-bold tabular-nums {finished ? 'text-gb-red' : running ? 'text-gb-green glow-green' : 'text-gb-fg'}">{displayTime}</span>
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
           {#if finished}
-            <span class="text-xs text-gb-red uppercase tracking-widest mt-0.5">Go!</span>
+            <span class="text-xs font-semibold uppercase tracking-widest" style="color:#fb4934">Go!</span>
           {:else if running}
-            <span class="text-xs text-gb-fg3 uppercase tracking-widest mt-0.5">Rest</span>
+            <span class="text-xs uppercase tracking-widest" style="color:#a89984">Rest</span>
+          {:else}
+            <span class="text-xs uppercase tracking-widest opacity-0">·</span>
           {/if}
+          <span class="text-2xl font-bold tabular-nums" style="color:{finished ? '#fb4934' : running ? '#b8bb26' : '#ebdbb2'}">{displayTime}</span>
         </div>
       </div>
 
