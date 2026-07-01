@@ -139,8 +139,8 @@
     <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Rest Timer</h2>
 
     <!-- Ring + time display -->
-    <div class="flex flex-col items-center gap-4">
-      <div class="relative w-36 h-36">
+    <div class="flex flex-col items-center gap-6">
+      <div class="relative w-[10.5rem] h-[10.5rem]">
         <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
           <circle cx="60" cy="60" r={R} fill="none" stroke="currentColor" class="text-gb-bg2" stroke-width="8"/>
           <circle

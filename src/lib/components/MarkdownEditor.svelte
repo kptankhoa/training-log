@@ -6,8 +6,7 @@
   export let initialMode: 'edit' | 'preview' = 'edit';
   export let label: string = '';
   export let rows: number = 24;
-
-  let mode: 'edit' | 'preview' = initialMode;
+  export let mode: 'edit' | 'preview' = initialMode;
 
   $: rendered = marked(value) as string;
 </script>

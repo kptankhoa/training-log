@@ -192,4 +192,39 @@ describe('DayModal', () => {
       expect(deletePhoto).toHaveBeenCalledWith('users/user1/days/2026-06-10/existing.jpg');
     });
   });
+
+  it('hides other sections (mobile only) while the note is empty and in edit mode', () => {
+    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
+    const { getByText } = render(DayModal, {
+      props: { dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1' }
+    });
+    const trainingTypesSection = getByText('Training types').closest('div');
+    const labelSection = getByText('Label').closest('div');
+    const photosSection = getByText('Progress photos').closest('div');
+    expect(trainingTypesSection?.className).toContain('hidden');
+    expect(labelSection?.className).toContain('hidden');
+    expect(photosSection?.className).toContain('hidden');
+  });
+
+  it('shows other sections when the note is not in edit mode', () => {
+    const { getByText } = render(DayModal, {
+      props: { dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' }
+    });
+    const trainingTypesSection = getByText('Training types').closest('div');
+    expect(trainingTypesSection?.className).not.toContain('hidden');
+  });
+
+  it('reveals other sections again after switching the note out of edit mode', async () => {
+    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
+    const { getByText } = render(DayModal, {
+      props: { dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1' }
+    });
+    let trainingTypesSection = getByText('Training types').closest('div');
+    expect(trainingTypesSection?.className).toContain('hidden');
+
+    await fireEvent.click(getByText('Preview'));
+
+    trainingTypesSection = getByText('Training types').closest('div');
+    expect(trainingTypesSection?.className).not.toContain('hidden');
+  });
 });

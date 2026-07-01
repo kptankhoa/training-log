@@ -24,6 +24,9 @@
   let addingTag = false;
   let saving = false;
   let saved = false;
+  let noteMode: 'edit' | 'preview' = note ? 'preview' : 'edit';
+
+  $: noteEditing = noteMode === 'edit';
 
   // Photos: uploads commit to Storage immediately (need a real ref to preview),
   // but removals only take effect on Save, so Close still fully discards them.
@@ -148,7 +151,7 @@
     </div>
 
     <!-- Training types -->
-    <div class="flex flex-col gap-2">
+    <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
       <span class="text-xs text-gb-fg3 uppercase tracking-wider">Training types</span>
       <div class="flex flex-wrap gap-2">
         {#each activeTags as tag (tag.id)}
@@ -178,7 +181,7 @@
     </div>
 
     <!-- Label -->
-    <div class="flex flex-col gap-1">
+    <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-1">
       <label for="day-label" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
       <input
         id="day-label"
@@ -192,7 +195,7 @@
 
     <!-- Daily tasks -->
     {#if activeTasks.length > 0}
-      <div class="flex flex-col gap-2">
+      <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
         <span class="text-xs text-gb-fg3 uppercase tracking-wider">Daily tasks</span>
         <div class="flex flex-col gap-1.5">
           {#each activeTasks as task (task.id)}
@@ -213,11 +216,11 @@
     <!-- Notes -->
     <div class="flex flex-col gap-1">
       <span class="text-xs text-gb-fg3 uppercase tracking-wider">Notes</span>
-      <MarkdownEditor bind:value={note} placeholder="Bodyweight, PRs, observations…" initialMode={note ? 'preview' : 'edit'} rows={6} />
+      <MarkdownEditor bind:value={note} bind:mode={noteMode} placeholder="Bodyweight, PRs, observations…" rows={6} />
     </div>
 
     <!-- Progress photos -->
-    <div class="flex flex-col gap-2">
+    <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
       <span class="text-xs text-gb-fg3 uppercase tracking-wider">Progress photos</span>
       <div class="flex flex-wrap gap-2">
         {#each photoPaths as path (path)}
