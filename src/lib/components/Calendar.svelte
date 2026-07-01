@@ -112,12 +112,12 @@
           data-has-photos={cell.hasPhotos ? '' : undefined}
           data-today={cell.isToday ? '' : undefined}
           class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
-                 flex flex-col items-start gap-0.5 text-left
+                 flex flex-col items-start gap-1 text-left
                  {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}"
           style={cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
         >
+          <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
           <div class="flex items-center gap-1.5">
-            <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
             {#if cell.hasNote}
               <span class="text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
             {/if}
