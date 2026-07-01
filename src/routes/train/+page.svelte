@@ -174,7 +174,7 @@
           on:click={startStop}
           disabled={totalInput === 0}
           class="px-6 py-2 font-semibold text-sm transition
-                 {running ? 'bg-gb-orange text-gb-bg' : 'bg-gb-green text-gb-bg'}
+                 {running ? 'bg-gb-orange text-white' : 'bg-gb-green text-gb-bg'}
                  hover:opacity-90 disabled:opacity-40"
         >
           {running ? 'Pause' : remaining > 0 && !finished ? 'Resume' : 'Start'}
