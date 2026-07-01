@@ -26,8 +26,11 @@
     { key: 'bfp',        label: 'Body Fat %',  unit: '%',   color: '#fb4934' },
     { key: 'score',      label: 'Score',       unit: '',    color: '#d3869b' },
   ];
-  type TabKey = MetricKey | 'all' | 'photos';
-  let activeMetric: TabKey = 'all';
+  type Section = 'measurements' | 'photos';
+  let activeSection: Section = 'measurements';
+
+  type MetricTabKey = MetricKey | 'all';
+  let activeMetric: MetricTabKey = 'all';
   $: activeMetricInfo = metrics.find((m) => m.key === activeMetric);
 
   function formatLabel(dateKey: string): string {
@@ -78,37 +81,51 @@
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
   <h1 class="text-gb-green text-2xl font-bold glow-green">Stats</h1>
 
-  <!-- Tabs -->
-  <div class="flex gap-2 overflow-x-auto pb-1">
+  <!-- Section tabs -->
+  <div class="flex gap-2">
     <button
       type="button"
-      on:click={() => (activeMetric = 'all')}
+      on:click={() => (activeSection = 'measurements')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeMetric === 'all' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeSection === 'measurements' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
     >
-      All
+      Measurements
     </button>
-    {#each metrics as m (m.key)}
-      <button
-        type="button"
-        on:click={() => (activeMetric = m.key)}
-        class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-               {activeMetric === m.key ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
-      >
-        {m.label}
-      </button>
-    {/each}
     <button
       type="button"
-      on:click={() => (activeMetric = 'photos')}
+      on:click={() => (activeSection = 'photos')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeMetric === 'photos' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeSection === 'photos' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
     >
       Photos
     </button>
   </div>
 
-  {#if activeMetric === 'photos'}
+  {#if activeSection === 'measurements'}
+    <!-- Metric tabs -->
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button
+        type="button"
+        on:click={() => (activeMetric = 'all')}
+        class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
+               {activeMetric === 'all' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+      >
+        All
+      </button>
+      {#each metrics as m (m.key)}
+        <button
+          type="button"
+          on:click={() => (activeMetric = m.key)}
+          class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
+                 {activeMetric === m.key ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+        >
+          {m.label}
+        </button>
+      {/each}
+    </div>
+  {/if}
+
+  {#if activeSection === 'photos'}
     <PhotoTimeline days={$allDays} />
   {:else if $measurementsLoading}
     <Spinner />
@@ -149,7 +166,7 @@
   {/if}
 
   <!-- Add entry -->
-  <section class="flex flex-col gap-3 {activeMetric === 'photos' ? 'hidden' : ''}">
+  <section class="flex flex-col gap-3 {activeSection === 'photos' ? 'hidden' : ''}">
     <button
       type="button"
       on:click={() => (showAddForm = !showAddForm)}
