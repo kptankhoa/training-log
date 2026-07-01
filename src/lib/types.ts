@@ -20,3 +20,12 @@ export interface PlanNote {
   content: string;
   color: GruvboxColor;
 }
+
+export interface BodyMeasurement {
+  id: string; // date key YYYY-MM-DD
+  weight: number;
+  muscleMass: number;
+  fatMass: number;
+  bfp: number;
+  score: number;
+}
