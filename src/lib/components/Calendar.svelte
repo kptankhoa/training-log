@@ -2,12 +2,13 @@
   import { createEventDispatcher } from 'svelte';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import { icons } from '$lib/icons';
-  import type { TrainingTag, DayEntry } from '$lib/types';
+  import type { TrainingTag, PlanNote, DayEntry } from '$lib/types';
 
   export let year: number;
   export let month: number; // 1–12
   export let days: Record<string, DayEntry> = {};
   export let tags: TrainingTag[] = [];
+  export let splits: PlanNote[] = [];
 
   const dispatch = createEventDispatcher<{ selectDay: string; prevMonth: void; nextMonth: void }>();
 
@@ -16,6 +17,7 @@
   const DAY_HEADERS = ['Mo','Tu','We','Th','Fr','Sa','Su'];
 
   $: tagMap = Object.fromEntries(tags.map((t) => [t.id, t]));
+  $: splitMap = Object.fromEntries(splits.map((s) => [s.id, s]));
 
   $: gridCells = (() => {
     const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun
@@ -36,7 +38,10 @@
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-  type CellData = { null: true } | { num: number; colors: string[]; label: string; hasNote: boolean; hasPhotos: boolean; isToday: boolean };
+  type CellData = { null: true } | {
+    num: number; colors: string[]; splitColors: string[]; label: string;
+    hasNote: boolean; hasPhotos: boolean; isToday: boolean;
+  };
 
   $: cellData = gridCells.map((cell): CellData => {
     if (cell === null) return { null: true };
@@ -44,6 +49,7 @@
     return {
       num: cell,
       colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
+      splitColors: (entry?.splitIds ?? []).map((id) => splitMap[id]).filter(Boolean).map((s) => GRUVBOX_COLORS[s.color ?? 'blue']),
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
       hasPhotos: !!(entry?.photos?.length),
@@ -130,10 +136,17 @@
             <span class="text-[10px] text-gb-fg3 leading-tight truncate w-full">{cell.label}</span>
           {/if}
 
-          <div class="flex flex-wrap gap-0.5 mt-auto">
-            {#each cell.colors as color}
-              <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
-            {/each}
+          <div class="flex items-center justify-between w-full mt-auto">
+            <div class="flex flex-wrap gap-0.5">
+              {#each cell.colors as color}
+                <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
+              {/each}
+            </div>
+            <div class="flex flex-wrap gap-0.5">
+              {#each cell.splitColors as color}
+                <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
+              {/each}
+            </div>
           </div>
         </button>
       {/if}
@@ -147,6 +160,17 @@
           <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
           {tag.name}
           <span class="text-gb-fg4 font-medium">{tagCounts[tag.id] ?? 0}x</span>
+        </span>
+      {/each}
+    </div>
+  {/if}
+
+  {#if splits.length > 0}
+    <div class="mt-2 px-1 flex flex-wrap justify-end gap-x-4 gap-y-1">
+      {#each splits as split (split.id)}
+        <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
+          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
+          {split.label || 'Untitled'}
         </span>
       {/each}
     </div>

@@ -74,6 +74,7 @@
       month={viewMonth}
       days={$days}
       tags={$tags}
+      splits={$notes}
       on:selectDay={(e) => (selectedDate = e.detail)}
       on:prevMonth={prevMonth}
       on:nextMonth={nextMonth}

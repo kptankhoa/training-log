@@ -101,6 +101,34 @@ describe('Calendar', () => {
     expect(queryByText('Old Sport')).not.toBeInTheDocument();
   });
 
+  it('shows split legend with labels and no count', () => {
+    const splits = [
+      { id: 'split1', label: 'Push Day', sortOrder: 1, content: '', color: 'blue' as const },
+      { id: 'split2', label: 'Pull Day', sortOrder: 2, content: '', color: 'red' as const },
+    ];
+    const { getByText, queryByText } = render(Calendar, {
+      props: { year: 2026, month: 6, days: {}, tags: [], splits }
+    });
+    expect(getByText('Push Day')).toBeInTheDocument();
+    expect(getByText('Pull Day')).toBeInTheDocument();
+    expect(queryByText(/\dx/)).not.toBeInTheDocument(); // no "Nx" count like the tag legend
+  });
+
+  it('renders a dot for each split selected on a day', () => {
+    const splits = [{ id: 'split1', label: 'Push Day', sortOrder: 1, content: '', color: 'blue' as const }];
+    const withSplit: Record<string, DayEntry> = {
+      '2026-06-10': { tags: [], label: '', note: '', splitIds: ['split1'] },
+      '2026-06-11': { tags: [], label: '', note: '' },
+    };
+    const { getByText } = render(Calendar, {
+      props: { year: 2026, month: 6, days: withSplit, tags: [], splits }
+    });
+    const dayWithSplit = getByText('10', { exact: true }).closest('button');
+    const dayWithoutSplit = getByText('11', { exact: true }).closest('button');
+    expect(dayWithSplit?.querySelectorAll('span.rounded-full').length).toBeGreaterThan(0);
+    expect(dayWithoutSplit?.querySelectorAll('span.rounded-full').length).toBe(0);
+  });
+
   it('marks today with data-today and correct date number', () => {
     const today = new Date();
     const year = today.getFullYear();
