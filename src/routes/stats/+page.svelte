@@ -21,7 +21,7 @@
     { key: 'score',      label: 'Score',       unit: '',    color: '#d3869b' },
   ];
   type TabKey = MetricKey | 'all';
-  let activeMetric: TabKey = 'weight';
+  let activeMetric: TabKey = 'all';
   $: activeMetricInfo = metrics.find((m) => m.key === activeMetric);
 
   function formatLabel(dateKey: string): string {
