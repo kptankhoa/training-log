@@ -114,6 +114,22 @@
     photoPaths = photoPaths.filter((p) => p !== path);
   }
 
+  // "Click again to confirm" delete pattern — arms for 3s, then auto-reverts.
+  let confirmingPhotoPath: string | null = null;
+  let confirmPhotoTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function handleRemovePhotoClick(path: string) {
+    if (confirmingPhotoPath === path) {
+      if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
+      confirmingPhotoPath = null;
+      removePhoto(path);
+      return;
+    }
+    confirmingPhotoPath = path;
+    if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
+    confirmPhotoTimeout = setTimeout(() => { confirmingPhotoPath = null; }, 3000);
+  }
+
   async function handleSave() {
     if (saving || saved) return;
     saving = true;
@@ -255,11 +271,12 @@
             </button>
             <button
               type="button"
-              on:click={() => removePhoto(path)}
-              aria-label="Remove photo"
-              class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center
-                     bg-gb-red text-white text-xs leading-none"
-            >✕</button>
+              on:click={() => handleRemovePhotoClick(path)}
+              aria-label={confirmingPhotoPath === path ? 'Confirm remove photo' : 'Remove photo'}
+              class="absolute -top-1.5 -right-1.5 flex items-center justify-center
+                     bg-gb-red text-white leading-none transition-all
+                     {confirmingPhotoPath === path ? 'px-1.5 h-5 text-[10px] font-semibold' : 'w-5 h-5 text-xs'}"
+            >{confirmingPhotoPath === path ? 'Sure?' : '✕'}</button>
           </div>
         {/each}
 

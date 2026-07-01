@@ -157,7 +157,19 @@ describe('DayModal', () => {
     expect(await findByAltText('Training day snapshot')).toBeInTheDocument();
   });
 
-  it('removing a photo does not call deletePhoto until Save', async () => {
+  it('a single click on the remove button arms confirmation without removing', async () => {
+    const { findByAltText, getByLabelText, queryByAltText } = render(DayModal, {
+      props: { dateKey: '2026-06-10', entry: { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] }, activeTags, userId: 'user1' }
+    });
+
+    await findByAltText('Training day snapshot');
+    await fireEvent.click(getByLabelText('Remove photo'));
+
+    expect(queryByAltText('Training day snapshot')).toBeInTheDocument();
+    expect(getByLabelText('Confirm remove photo')).toBeInTheDocument();
+  });
+
+  it('removing a photo (after confirm) does not call deletePhoto until Save', async () => {
     const { deletePhoto } = await import('$lib/stores/photos');
     const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
     const { getByLabelText, findByAltText, queryByAltText } = render(DayModal, {
@@ -166,12 +178,13 @@ describe('DayModal', () => {
 
     await findByAltText('Training day snapshot');
     await fireEvent.click(getByLabelText('Remove photo'));
+    await fireEvent.click(getByLabelText('Confirm remove photo'));
 
     expect(queryByAltText('Training day snapshot')).not.toBeInTheDocument();
     expect(deletePhoto).not.toHaveBeenCalled();
   });
 
-  it('deletes removed photos and saves remaining paths on Save', async () => {
+  it('deletes confirmed-removed photos and saves remaining paths on Save', async () => {
     const { saveDay } = await import('$lib/stores/days');
     const { deletePhoto } = await import('$lib/stores/photos');
     const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
@@ -181,6 +194,7 @@ describe('DayModal', () => {
 
     await findByAltText('Training day snapshot');
     await fireEvent.click(getByLabelText('Remove photo'));
+    await fireEvent.click(getByLabelText('Confirm remove photo'));
     await fireEvent.click(getByText('Save'));
 
     expect(saveDay).toHaveBeenCalledWith(
