@@ -163,7 +163,7 @@
           type="number" min="1" max="3600"
           bind:value={inputSeconds}
           on:change={reset}
-          disabled={running}
+          disabled={running || (remaining > 0 && !finished)}
           class="w-16 text-center bg-gb-bg1 border border-gb-bg3 text-gb-fg px-2 py-1
                  focus:outline-none focus:border-gb-blue disabled:opacity-40"
         />
