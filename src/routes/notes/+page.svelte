@@ -3,14 +3,21 @@
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
   import { notes, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
+  import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
-  import type { PlanNote } from '$lib/types';
+  import type { PlanNote, GruvboxColor } from '$lib/types';
+
+  function cycleColor() {
+    if (!draft) return;
+    const idx = COLOR_ORDER.indexOf(draft.color);
+    draft.color = COLOR_ORDER[(idx + 1) % COLOR_ORDER.length];
+  }
 
   $: userId = $user?.uid ?? '';
 
   let expandedId: string | null = null;
   let editingId: string | null = null;
-  let draft: { label: string; sortOrder: number; content: string } | null = null;
+  let draft: { label: string; sortOrder: number; content: string; color: GruvboxColor } | null = null;
 
   function toggle(note: PlanNote) {
     if (expandedId === note.id) {
@@ -26,7 +33,7 @@
 
   function startEdit(note: PlanNote) {
     editingId = note.id;
-    draft = { label: note.label, sortOrder: note.sortOrder, content: note.content };
+    draft = { label: note.label, sortOrder: note.sortOrder, content: note.content, color: note.color ?? 'blue' };
   }
 
   function cancelEdit() {
@@ -85,10 +92,11 @@
         <button
           type="button"
           on:click={() => toggle(note)}
-          class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gb-bg2 transition"
+          class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gb-bg2 transition"
         >
-          <span class="font-semibold text-gb-fg text-sm">{note.label || 'Untitled'}</span>
-          <span class="text-gb-fg3 text-xs ml-4 shrink-0">{expandedId === note.id ? '▲' : '▼'}</span>
+          <span class="w-2 h-4 shrink-0" style="background-color:{GRUVBOX_COLORS[note.color ?? 'blue']}"></span>
+          <span class="font-semibold text-gb-fg text-sm flex-1">{note.label || 'Untitled'}</span>
+          <span class="text-gb-fg3 text-xs shrink-0">{expandedId === note.id ? '▲' : '▼'}</span>
         </button>
 
         {#if expandedId === note.id}
@@ -97,7 +105,14 @@
             {#if editingId === note.id && draft}
               <!-- Edit mode -->
               <div class="px-4 py-4 flex flex-col gap-4">
-                <div class="flex gap-3">
+                <div class="flex gap-3 items-end">
+                  <button
+                    type="button"
+                    on:click|stopPropagation={cycleColor}
+                    style="background-color:{GRUVBOX_COLORS[draft.color]}"
+                    title="Click to change color"
+                    class="w-4 h-9 shrink-0 mb-0 hover:opacity-80 transition-opacity self-end"
+                  ></button>
                   <div class="flex flex-col gap-1 flex-1">
                     <label for="label-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
                     <input

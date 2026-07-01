@@ -18,4 +18,5 @@ export interface PlanNote {
   label: string;
   sortOrder: number;
   content: string;
+  color: GruvboxColor;
 }
