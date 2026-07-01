@@ -182,7 +182,7 @@
                   {#if $activeExercises.length === 0}
                     <p class="text-gb-fg3 text-xs italic">No exercises yet — add some in Settings.</p>
                   {:else}
-                    <div class="max-h-40 overflow-y-auto flex flex-wrap gap-2 pr-1">
+                    <div class="flex flex-wrap gap-2">
                       {#each $activeExercises as exercise (exercise.id)}
                         <button
                           type="button"

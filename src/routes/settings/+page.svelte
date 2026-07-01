@@ -237,7 +237,7 @@
                 {#if $notes.length === 0}
                   <p class="text-gb-fg3 text-xs italic">No splits yet — add one in Split Design.</p>
                 {:else}
-                  <div class="flex flex-wrap gap-2">
+                  <div class="max-h-40 overflow-y-auto flex flex-wrap gap-2 pr-1">
                     {#each $notes as split (split.id)}
                       <button
                         type="button"
