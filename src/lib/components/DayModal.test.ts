@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/svelte';
+import { render, fireEvent, waitFor } from '@testing-library/svelte';
 import DayModal from './DayModal.svelte';
 import DayModalTest from './DayModalTest.svelte';
 import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
@@ -55,9 +55,31 @@ describe('DayModal', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
     });
     await fireEvent.click(getByText('Save'));
-    // saveDay resolves — verify close event was emitted
-    const count = getByTestId('close-count');
-    expect(Number(count.textContent)).toBeGreaterThanOrEqual(1);
+    // saveDay resolves, then a brief "Saved" state shows before close fires
+    await waitFor(() => {
+      expect(Number(getByTestId('close-count').textContent)).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  it('shows a Saving then Saved state before closing', async () => {
+    const { saveDay } = await import('$lib/stores/days');
+    let resolveSave = () => {};
+    (saveDay as ReturnType<typeof vi.fn>).mockImplementationOnce(
+      () => new Promise<void>((resolve) => { resolveSave = resolve; })
+    );
+
+    const { getByText, getByTestId } = render(DayModalTest, {
+      props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
+    });
+
+    await fireEvent.click(getByText('Save'));
+    expect(getByText('Saving…')).toBeInTheDocument();
+
+    resolveSave();
+    await waitFor(() => expect(getByText('✓ Saved')).toBeInTheDocument());
+    await waitFor(() => {
+      expect(Number(getByTestId('close-count').textContent)).toBeGreaterThanOrEqual(1);
+    });
   });
 
   it('emits close when X button clicked', async () => {

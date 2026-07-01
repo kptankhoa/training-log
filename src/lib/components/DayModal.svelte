@@ -20,6 +20,8 @@
   let note = entry.note;
   let newTagName = '';
   let addingTag = false;
+  let saving = false;
+  let saved = false;
 
   $: [yr, mo, dy] = dateKey.split('-').map(Number);
   $: heading = new Date(yr, mo - 1, dy).toLocaleDateString('en-US', {
@@ -46,8 +48,17 @@
   }
 
   async function handleSave() {
-    await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds] });
-    dispatch('close');
+    if (saving || saved) return;
+    saving = true;
+    try {
+      await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds] });
+      saving = false;
+      saved = true;
+      setTimeout(() => dispatch('close'), 450);
+    } catch (err) {
+      saving = false;
+      console.error('[DayModal] save failed:', err);
+    }
   }
 
   function handleKeydown(e: KeyboardEvent) {
@@ -155,10 +166,19 @@
     <button
       type="button"
       on:click={handleSave}
+      disabled={saving || saved}
       class="w-full bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
-             hover:opacity-90 transition"
+             transition-transform hover:opacity-90 active:scale-[0.98]
+             disabled:opacity-90 flex items-center justify-center gap-2"
     >
-      Save
+      {#if saved}
+        <span>✓ Saved</span>
+      {:else if saving}
+        <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
+        <span>Saving…</span>
+      {:else}
+        <span>Save</span>
+      {/if}
     </button>
   </div>
 </div>
