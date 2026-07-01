@@ -4,6 +4,7 @@
   import { activeTags, tagsLoading, initTags } from '$lib/stores/tags';
   import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
   import { activeTasks, initTasks } from '$lib/stores/tasks';
+  import { exercises, initExercises } from '$lib/stores/exercises';
   import { computeStreaks } from '$lib/streaks';
   import DayDetail from '$lib/components/DayDetail.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -17,6 +18,7 @@
   let unsubTags: (() => void) | null = null;
   let unsubDays: (() => void) | null = null;
   let unsubTasks: (() => void) | null = null;
+  let unsubExercises: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -26,12 +28,14 @@
       unsubTags?.(); unsubTags = initTags(u.uid);
       unsubDays?.(); unsubDays = initDays(u.uid, today.getFullYear(), today.getMonth() + 1);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
+      unsubExercises?.(); unsubExercises = initExercises(u.uid);
     });
     return () => {
       unsubUser();
       unsubTags?.();
       unsubDays?.();
       unsubTasks?.();
+      unsubExercises?.();
     };
   });
 
@@ -65,6 +69,8 @@
         {entry}
         activeTags={$activeTags}
         activeTasks={$activeTasks}
+        exercises={$exercises}
+        allDays={$allDays}
         {userId}
         hideOtherSectionsWhileEditingNote={false}
       />

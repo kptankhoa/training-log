@@ -3,17 +3,20 @@
   import { marked } from 'marked';
   import TagChip from './TagChip.svelte';
   import MarkdownEditor from './MarkdownEditor.svelte';
+  import ExerciseEditor from './ExerciseEditor.svelte';
   import { saveDay } from '$lib/stores/days';
   import { addTag } from '$lib/stores/tags';
   import { uploadPhoto, getPhotoUrl, deletePhoto } from '$lib/stores/photos';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import { icons } from '$lib/icons';
-  import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
+  export let exercises: Exercise[] = []; // full list (incl. deleted) so old logs still resolve names
+  export let allDays: Record<string, DayEntry> = {};
   export let userId: string;
   // Only useful in a height-constrained modal sheet — the inline Home page
   // has no such constraint, so it opts out.
@@ -34,6 +37,14 @@
 
   $: noteEditing = hideOtherSectionsWhileEditingNote && noteMode === 'edit';
 
+  $: exerciseNameById = Object.fromEntries(exercises.map((e) => [e.id, e.name]));
+
+  function cloneExerciseEntries(list: ExerciseEntry[] | undefined): ExerciseEntry[] {
+    return (list ?? []).map((e) => ({ exerciseId: e.exerciseId, sets: e.sets.map((s) => ({ ...s })) }));
+  }
+
+  let exerciseEntries: ExerciseEntry[] = cloneExerciseEntries(entry.exercises);
+
   // Photos: uploads commit to Storage immediately (need a real ref to preview),
   // but removals only take effect on Save, so discarding edits still works.
   const originalPhotoPaths = entry.photos ?? [];
@@ -45,7 +56,8 @@
   let lightboxUrl: string | null = null;
 
   function hasAnyContent(): boolean {
-    return selectedIds.size > 0 || !!label.trim() || !!note.trim() || completedTaskIds.size > 0 || photoPaths.length > 0;
+    return selectedIds.size > 0 || !!label.trim() || !!note.trim() || completedTaskIds.size > 0
+      || photoPaths.length > 0 || exerciseEntries.length > 0;
   }
 
   // View mode by default for a day that already has something logged —
@@ -144,6 +156,7 @@
     note = entry.note;
     noteMode = note ? 'preview' : 'edit';
     photoPaths = [...originalPhotoPaths];
+    exerciseEntries = cloneExerciseEntries(entry.exercises);
     addingTag = false;
     newTagName = '';
     if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
@@ -156,7 +169,9 @@
     saving = true;
     try {
       const removedPaths = originalPhotoPaths.filter((p) => !photoPaths.includes(p));
-      await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds], photos: photoPaths });
+      await saveDay(userId, dateKey, {
+        tags: [...selectedIds], label, note, tasks: [...completedTaskIds], photos: photoPaths, exercises: exerciseEntries
+      });
       await Promise.all(
         removedPaths.map((p) => deletePhoto(p).catch((err) => console.error('[DayDetail] failed to delete photo:', err)))
       );
@@ -202,6 +217,24 @@
       <div class="flex flex-col gap-1">
         <span class="text-xs text-gb-fg3 uppercase tracking-wider">Label</span>
         <p class="text-sm text-gb-fg">{label}</p>
+      </div>
+    {/if}
+
+    {#if exerciseEntries.length > 0}
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
+        <div class="flex flex-col gap-1">
+          {#each exerciseEntries as ex (ex.exerciseId)}
+            <p class="text-sm text-gb-fg">
+              <span class="font-medium">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
+              {#if ex.sets.length > 0}
+                <span class="text-gb-fg3"> — {ex.sets.map((s) => `${s.weight}×${s.reps}`).join(', ')}</span>
+              {:else}
+                <span class="text-gb-fg3 italic"> — no sets logged</span>
+              {/if}
+            </p>
+          {/each}
+        </div>
       </div>
     {/if}
 
@@ -289,6 +322,12 @@
         >+ Add</button>
       {/if}
     </div>
+  </div>
+
+  <!-- Exercises -->
+  <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
+    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
+    <ExerciseEditor {exercises} {allDays} {dateKey} {userId} bind:entries={exerciseEntries} />
   </div>
 
   <!-- Label -->

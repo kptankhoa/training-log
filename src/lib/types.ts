@@ -13,6 +13,23 @@ export interface DayEntry {
   note: string;
   tasks?: string[]; // completed daily task ids for the day
   photos?: string[]; // Storage paths for progress photos taken this day
+  exercises?: ExerciseEntry[];
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  deleted: boolean;
+}
+
+export interface ExerciseSet {
+  weight: number;
+  reps: number;
+}
+
+export interface ExerciseEntry {
+  exerciseId: string;
+  sets: ExerciseSet[];
 }
 
 export interface DailyTask {

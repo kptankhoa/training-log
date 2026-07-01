@@ -1,12 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import DayDetail from './DayDetail.svelte';
-  import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
+  export let exercises: Exercise[] = [];
+  export let allDays: Record<string, DayEntry> = {};
   export let userId: string;
 
   const dispatch = createEventDispatcher<{ close: void }>();
@@ -66,6 +68,6 @@
       >×</button>
     </div>
 
-    <DayDetail {dateKey} {entry} {activeTags} {activeTasks} {userId} on:saved={handleSaved} />
+    <DayDetail {dateKey} {entry} {activeTags} {activeTasks} {exercises} {allDays} {userId} on:saved={handleSaved} />
   </div>
 </div>

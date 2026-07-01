@@ -12,6 +12,9 @@ vi.mock('$lib/stores/photos', () => ({
   getPhotoUrl: vi.fn().mockResolvedValue('https://example.com/photo.jpg'),
   deletePhoto: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock('$lib/stores/exercises', () => ({
+  addExercise: vi.fn().mockResolvedValue('new-ex-id'),
+}));
 vi.mock('marked', () => ({ marked: (s: string) => s }));
 
 const activeTags: TrainingTag[] = [
@@ -21,6 +24,9 @@ const activeTags: TrainingTag[] = [
 const activeTasks: DailyTask[] = [
   { id: 'task1', name: 'Stretch', deleted: false },
   { id: 'task2', name: 'Drink water', deleted: false },
+];
+const exercises = [
+  { id: 'bench', name: 'Bench Press', deleted: false },
 ];
 const entry: DayEntry = { tags: ['tag1'], label: 'Leg day', note: '# PR', tasks: ['task1'] };
 const emptyEntry: DayEntry = { tags: [], label: '', note: '' };
@@ -324,5 +330,57 @@ describe('DayDetail — editing behavior', () => {
 
     trainingTypesSection = getByText('Training types').closest('div');
     expect(trainingTypesSection?.className).not.toContain('hidden');
+  });
+});
+
+describe('DayDetail — exercises integration', () => {
+  it('shows logged exercises with sets in view mode', () => {
+    const withExercises: DayEntry = {
+      ...entry,
+      exercises: [{ exerciseId: 'bench', sets: [{ weight: 80, reps: 8 }, { weight: 80, reps: 6 }] }]
+    };
+    const { getByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry: withExercises, activeTags, exercises, userId: 'user1' }
+    });
+    expect(getByText('Bench Press')).toBeInTheDocument();
+    expect(getByText(/80×8, 80×6/)).toBeInTheDocument();
+  });
+
+  it('renders the exercise editor in edit mode', async () => {
+    const { getByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    expect(getByText('+ Bench Press')).toBeInTheDocument();
+  });
+
+  it('includes logged exercises in the saveDay call', async () => {
+    const { saveDay } = await import('$lib/stores/days');
+    const { getByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('+ Bench Press'));
+    await fireEvent.click(getByText('Log Set'));
+    await fireEvent.click(getByText('Save'));
+
+    expect(saveDay).toHaveBeenCalledWith(
+      'user1',
+      '2026-06-10',
+      expect.objectContaining({
+        exercises: [{ exerciseId: 'bench', sets: [{ weight: 20, reps: 8 }] }]
+      })
+    );
+  });
+
+  it('Cancel discards exercise changes made during the edit session', async () => {
+    const { getByText, queryByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('+ Bench Press'));
+    await fireEvent.click(getByText('Cancel'));
+
+    expect(queryByText('Bench Press')).not.toBeInTheDocument();
   });
 });

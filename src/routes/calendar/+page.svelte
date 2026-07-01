@@ -4,6 +4,7 @@
   import { tags, activeTags, tagsLoading, initTags } from '$lib/stores/tags';
   import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
   import { activeTasks, initTasks } from '$lib/stores/tasks';
+  import { exercises, initExercises } from '$lib/stores/exercises';
   import { computeStreaks } from '$lib/streaks';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
@@ -16,6 +17,7 @@
   let unsubTags: (() => void) | null = null;
   let unsubDays: (() => void) | null = null;
   let unsubTasks: (() => void) | null = null;
+  let unsubExercises: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -25,12 +27,14 @@
       unsubTags?.(); unsubTags = initTags(u.uid);
       unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
+      unsubExercises?.(); unsubExercises = initExercises(u.uid);
     });
     return () => {
       unsubUser();
       unsubTags?.();
       unsubDays?.();
       unsubTasks?.();
+      unsubExercises?.();
     };
   });
 
@@ -90,6 +94,8 @@
     entry={selectedEntry}
     activeTags={$activeTags}
     activeTasks={$activeTasks}
+    exercises={$exercises}
+    allDays={$allDays}
     {userId}
     on:close={() => (selectedDate = null)}
   />
