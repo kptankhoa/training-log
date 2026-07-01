@@ -37,12 +37,26 @@
   let photoError = false;
   let fileInput: HTMLInputElement;
 
+  // position: fixed sizes against the layout viewport, which doesn't shrink when
+  // the mobile keyboard opens — track the visual viewport so the sheet resizes
+  // to stay above the keyboard instead of being covered by it.
+  let viewportHeight = '100dvh';
+
+  function updateViewportHeight() {
+    if (window.visualViewport) viewportHeight = `${window.visualViewport.height}px`;
+  }
+
   onMount(() => {
+    updateViewportHeight();
+    window.visualViewport?.addEventListener('resize', updateViewportHeight);
+
     photoPaths.forEach((path) => {
       getPhotoUrl(path)
         .then((url) => { photoUrls[path] = url; photoUrls = photoUrls; })
         .catch((err) => console.error('[DayModal] failed to load photo:', err));
     });
+
+    return () => window.visualViewport?.removeEventListener('resize', updateViewportHeight);
   });
 
   $: [yr, mo, dy] = dateKey.split('-').map(Number);
@@ -130,14 +144,15 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-  class="fixed inset-0 bg-black/60 z-60 flex items-end md:items-center justify-center"
+  class="fixed top-0 left-0 right-0 bg-black/60 z-60 flex items-end md:items-center justify-center"
+  style="height: {viewportHeight};"
   on:click|self={() => dispatch('close')}
   role="dialog"
   aria-modal="true"
   aria-labelledby="modal-title"
   tabindex="-1"
 >
-  <div class="bg-gb-bg1 w-full md:w-[520px] max-h-[85vh] overflow-y-auto
+  <div class="bg-gb-bg1 w-full md:w-[520px] max-h-[85%] overflow-y-auto
               rounded-t-2xl md:rounded-xl shadow-2xl p-6 pb-24 md:pb-6 flex flex-col gap-5">
 
     <div class="flex items-start justify-between">

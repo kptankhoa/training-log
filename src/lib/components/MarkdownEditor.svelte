@@ -9,6 +9,10 @@
   export let mode: 'edit' | 'preview' = initialMode;
 
   $: rendered = marked(value) as string;
+
+  function scrollIntoViewOnFocus(el: HTMLTextAreaElement) {
+    setTimeout(() => el.scrollIntoView({ block: 'center' }), 300);
+  }
 </script>
 
 <div class="flex flex-col gap-2">
@@ -32,6 +36,7 @@
       bind:value
       {placeholder}
       {rows}
+      on:focus={(e) => scrollIntoViewOnFocus(e.currentTarget)}
       class="w-full bg-gb-bg2 text-gb-fg font-mono text-sm rounded-md p-3 resize-y
              border border-gb-bg3 focus:outline-none focus:border-gb-blue"
     ></textarea>
