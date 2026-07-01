@@ -119,7 +119,7 @@
           <div class="flex items-center gap-1.5">
             <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
             {#if cell.hasNote}
-              <span class="w-2 h-2 rounded-full bg-gb-fg3 shrink-0" title="Has note"></span>
+              <span class="text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
             {/if}
             {#if cell.hasPhotos}
               <span class="text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
