@@ -39,7 +39,7 @@
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
   type CellData = { null: true } | {
-    num: number; colors: string[]; splitColors: string[]; label: string;
+    num: number; colors: string[]; splitColors: string[]; tagIds: string[]; label: string;
     hasNote: boolean; hasPhotos: boolean; isToday: boolean;
   };
 
@@ -50,6 +50,7 @@
       num: cell,
       colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
       splitColors: (entry?.splitIds ?? []).map((id) => splitMap[id]).filter(Boolean).map((s) => GRUVBOX_COLORS[s.color ?? 'blue']),
+      tagIds: entry?.tags ?? [],
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
       hasPhotos: !!(entry?.photos?.length),
@@ -66,6 +67,12 @@
     });
     return counts;
   })();
+
+  let selectedTagId: string | null = null;
+
+  function toggleTagFilter(tagId: string) {
+    selectedTagId = selectedTagId === tagId ? null : tagId;
+  }
 
   const SWIPE_THRESHOLD = 50;
   let touchStartX = 0;
@@ -117,10 +124,14 @@
           data-has-note={cell.hasNote ? '' : undefined}
           data-has-photos={cell.hasPhotos ? '' : undefined}
           data-today={cell.isToday ? '' : undefined}
+          data-tag-match={selectedTagId && cell.tagIds.includes(selectedTagId) ? '' : undefined}
           class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
                  flex flex-col items-start gap-1 text-left
-                 {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}"
-          style={cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
+                 {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}
+                 {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
+          style={selectedTagId && cell.tagIds.includes(selectedTagId)
+            ? `box-shadow: inset 0 0 0 2px ${GRUVBOX_COLORS[tagMap[selectedTagId]?.color] ?? '#ebdbb2'};`
+            : cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
         >
           <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
           <div class="flex items-center gap-1.5">
@@ -156,17 +167,23 @@
   {#if tags.filter((t) => !t.deleted).length > 0}
     <div class="mt-4 px-1 flex flex-wrap gap-x-4 gap-y-1">
       {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
-        <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
+        <button
+          type="button"
+          on:click={() => toggleTagFilter(tag.id)}
+          aria-pressed={selectedTagId === tag.id}
+          class="flex items-center gap-1.5 text-xs transition
+                 {selectedTagId === tag.id ? 'text-gb-fg font-semibold' : 'text-gb-fg3 hover:text-gb-fg'}"
+        >
           <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
           {tag.name}
           <span class="text-gb-fg4 font-medium">{tagCounts[tag.id] ?? 0}x</span>
-        </span>
+        </button>
       {/each}
     </div>
   {/if}
 
   {#if splits.length > 0}
-    <div class="mt-2 px-1 flex flex-wrap justify-end gap-x-4 gap-y-1">
+    <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
       {#each splits as split (split.id)}
         <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
           <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>

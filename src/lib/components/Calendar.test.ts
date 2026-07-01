@@ -92,6 +92,51 @@ describe('Calendar', () => {
     expect(getByText('Boxing')).toBeInTheDocument();
   });
 
+  it('clicking a tag chip marks days with that tag and dims the rest', async () => {
+    const multiDays: Record<string, DayEntry> = {
+      '2026-06-10': { tags: ['tag1'], label: '', note: '' },
+      '2026-06-11': { tags: ['tag2'], label: '', note: '' },
+    };
+    const { getByText, container } = render(Calendar, {
+      props: { year: 2026, month: 6, days: multiDays, tags }
+    });
+
+    await fireEvent.click(getByText('Weight Lifting'));
+
+    const day10 = getByText('10', { exact: true }).closest('button');
+    const day11 = getByText('11', { exact: true }).closest('button');
+    expect(day10?.hasAttribute('data-tag-match')).toBe(true);
+    expect(day11?.hasAttribute('data-tag-match')).toBe(false);
+    expect(day11?.className).toContain('opacity-30');
+    expect(day10?.className).not.toContain('opacity-30');
+    expect(container.querySelectorAll('[data-tag-match]').length).toBe(1);
+  });
+
+  it('clicking the same tag chip again clears the filter', async () => {
+    const multiDays: Record<string, DayEntry> = {
+      '2026-06-10': { tags: ['tag1'], label: '', note: '' },
+      '2026-06-11': { tags: ['tag2'], label: '', note: '' },
+    };
+    const { getByText, container } = render(Calendar, {
+      props: { year: 2026, month: 6, days: multiDays, tags }
+    });
+
+    const chip = getByText('Weight Lifting');
+    await fireEvent.click(chip);
+    await fireEvent.click(chip);
+
+    expect(container.querySelectorAll('[data-tag-match]').length).toBe(0);
+    expect(container.querySelectorAll('.opacity-30').length).toBe(0);
+  });
+
+  it('reflects the selected tag via aria-pressed on the legend chip', async () => {
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags } });
+    const chip = getByText('Weight Lifting');
+    expect(chip.closest('button')).toHaveAttribute('aria-pressed', 'false');
+    await fireEvent.click(chip);
+    expect(chip.closest('button')).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('hides deleted tags from legend', () => {
     const withDeleted: TrainingTag[] = [
       ...tags,
