@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { icons } from '$lib/icons';
   import type { TrainingTag, DayEntry } from '$lib/types';
 
   export let year: number;
@@ -35,7 +36,7 @@
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-  type CellData = { null: true } | { num: number; colors: string[]; label: string; hasNote: boolean; isToday: boolean };
+  type CellData = { null: true } | { num: number; colors: string[]; label: string; hasNote: boolean; hasPhotos: boolean; isToday: boolean };
 
   $: cellData = gridCells.map((cell): CellData => {
     if (cell === null) return { null: true };
@@ -45,6 +46,7 @@
       colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
+      hasPhotos: !!(entry?.photos?.length),
       isToday: key(cell) === todayKey,
     };
   });
@@ -107,6 +109,7 @@
           type="button"
           on:click={() => dispatch('selectDay', key(cell.num))}
           data-has-note={cell.hasNote ? '' : undefined}
+          data-has-photos={cell.hasPhotos ? '' : undefined}
           data-today={cell.isToday ? '' : undefined}
           class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
                  flex flex-col items-start gap-0.5 text-left
@@ -117,6 +120,9 @@
             <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
             {#if cell.hasNote}
               <span class="w-2 h-2 rounded-full bg-gb-fg3 shrink-0" title="Has note"></span>
+            {/if}
+            {#if cell.hasPhotos}
+              <span class="text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
             {/if}
           </div>
 

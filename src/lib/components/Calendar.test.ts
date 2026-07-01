@@ -45,6 +45,15 @@ describe('Calendar', () => {
     expect(indicators.length).toBe(2);
   });
 
+  it('shows photo indicator only for days with at least one photo', () => {
+    const withPhotos: Record<string, DayEntry> = {
+      '2026-06-10': { tags: [], label: '', note: '', photos: ['users/u1/days/2026-06-10/a.jpg'] },
+      '2026-06-11': { tags: [], label: '', note: '', photos: [] },
+    };
+    const { container } = render(Calendar, { props: { year: 2026, month: 6, days: withPhotos, tags: [] } });
+    expect(container.querySelectorAll('[data-has-photos]').length).toBe(1);
+  });
+
   it('emits prevMonth on left arrow click', async () => {
     const { getByLabelText, getByTestId } = render(CalendarTest, {
       props: { year: 2026, month: 6, days: {}, tags: [] }
