@@ -153,44 +153,6 @@
     >+ Add</button>
   </div>
 
-  <section class="bg-gb-bg1 border border-gb-bg2 p-4 flex flex-col gap-3">
-    <h2 class="text-gb-fg font-semibold text-sm uppercase tracking-wider">General Rules</h2>
-
-    {#if $generalRulesLoading}
-      <Spinner size="w-5 h-5" />
-    {:else if rulesMode === 'view'}
-      {#if $generalRules}
-        <div class="prose prose-invert max-w-none text-sm text-gb-fg
-                    [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
-                    [&_strong]:text-gb-orange [&_a]:text-gb-blue">
-          {@html marked($generalRules)}
-        </div>
-      {:else}
-        <p class="text-gb-fg3 text-sm italic">No general rules yet.</p>
-      {/if}
-      <button
-        type="button"
-        on:click={startEditRules}
-        class="self-end flex items-center gap-1.5 bg-gb-blue text-gb-bg font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
-      >{@html icons.pencilSm}Edit</button>
-    {:else}
-      <MarkdownEditor bind:value={rulesDraft} placeholder="General training rules, guidelines…" initialMode="edit" rows={8} />
-      <div class="flex justify-end gap-2">
-        <button
-          type="button"
-          on:click={cancelEditRules}
-          class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
-        >Cancel</button>
-        <button
-          type="button"
-          on:click={saveRules}
-          disabled={savingRules}
-          class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition disabled:opacity-60"
-        >{savingRules ? 'Saving…' : 'Save'}</button>
-      </div>
-    {/if}
-  </section>
-
   {#if $notesLoading}
     <Spinner />
   {:else if $notes.length === 0}
@@ -319,4 +281,42 @@
       </div>
     {/each}
   </div>
+
+  <section class="bg-gb-bg1 border border-gb-bg2 p-4 flex flex-col gap-3">
+    <h2 class="text-gb-fg font-semibold text-sm uppercase tracking-wider">General Rules</h2>
+
+    {#if $generalRulesLoading}
+      <Spinner size="w-5 h-5" />
+    {:else if rulesMode === 'view'}
+      {#if $generalRules}
+        <div class="prose prose-invert max-w-none text-sm text-gb-fg
+                    [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
+                    [&_strong]:text-gb-orange [&_a]:text-gb-blue">
+          {@html marked($generalRules)}
+        </div>
+      {:else}
+        <p class="text-gb-fg3 text-sm italic">No general rules yet.</p>
+      {/if}
+      <button
+        type="button"
+        on:click={startEditRules}
+        class="self-end flex items-center gap-1.5 bg-gb-blue text-gb-bg font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
+      >{@html icons.pencilSm}Edit</button>
+    {:else}
+      <MarkdownEditor bind:value={rulesDraft} placeholder="General training rules, guidelines…" initialMode="edit" rows={8} />
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          on:click={cancelEditRules}
+          class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+        >Cancel</button>
+        <button
+          type="button"
+          on:click={saveRules}
+          disabled={savingRules}
+          class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition disabled:opacity-60"
+        >{savingRules ? 'Saving…' : 'Save'}</button>
+      </div>
+    {/if}
+  </section>
 </div>
