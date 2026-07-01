@@ -41,6 +41,22 @@ describe('days store', () => {
     expect(get(days)['2026-06-10']).toEqual({ tags: ['tag1'], label: 'Leg day', note: '# PR' });
   });
 
+  it('filters days to the requested month, but allDays keeps every month', async () => {
+    mockOnSnapshot.mockImplementation((_q, cb) => {
+      cb({
+        docs: [
+          { id: '2026-06-10', data: () => ({ tags: ['tag1'], label: '', note: '' }) },
+          { id: '2026-05-20', data: () => ({ tags: ['tag2'], label: '', note: '' }) },
+        ],
+      });
+      return () => {};
+    });
+    const { days, allDays, initDays } = await import('./days');
+    initDays('user1', 2026, 6);
+    expect(Object.keys(get(days))).toEqual(['2026-06-10']);
+    expect(Object.keys(get(allDays)).sort()).toEqual(['2026-05-20', '2026-06-10']);
+  });
+
   it('saveDay calls setDoc with correct path and data', async () => {
     mockOnSnapshot.mockImplementation((_q, cb) => { cb({ docs: [] }); return () => {}; });
     const { saveDay } = await import('./days');

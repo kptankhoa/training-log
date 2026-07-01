@@ -20,6 +20,15 @@
   let editingId: string | null = null;
   let draft: { label: string; sortOrder: number; content: string; color: GruvboxColor } | null = null;
 
+  // "Click again to confirm" delete pattern — arms for 3s, then auto-reverts.
+  let confirmingDelete = false;
+  let confirmDeleteTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function resetDeleteConfirm() {
+    confirmingDelete = false;
+    if (confirmDeleteTimeout) clearTimeout(confirmDeleteTimeout);
+  }
+
   function toggle(note: PlanNote) {
     if (expandedId === note.id) {
       expandedId = null;
@@ -30,16 +39,19 @@
       editingId = null;
       draft = null;
     }
+    resetDeleteConfirm();
   }
 
   function startEdit(note: PlanNote) {
     editingId = note.id;
     draft = { label: note.label, sortOrder: note.sortOrder, content: note.content, color: note.color ?? 'blue' };
+    resetDeleteConfirm();
   }
 
   function cancelEdit() {
     editingId = null;
     draft = null;
+    resetDeleteConfirm();
   }
 
   async function handleSave(noteId: string) {
@@ -55,6 +67,17 @@
     expandedId = null;
     editingId = null;
     draft = null;
+  }
+
+  function handleDeleteClick(noteId: string) {
+    if (confirmingDelete) {
+      resetDeleteConfirm();
+      handleDelete(noteId);
+      return;
+    }
+    confirmingDelete = true;
+    if (confirmDeleteTimeout) clearTimeout(confirmDeleteTimeout);
+    confirmDeleteTimeout = setTimeout(() => { confirmingDelete = false; }, 3000);
   }
 
   async function handleAdd() {
@@ -143,9 +166,10 @@
                 <div class="flex justify-between">
                   <button
                     type="button"
-                    on:click={() => handleDelete(note.id)}
-                    class="text-gb-red text-sm hover:opacity-80 transition px-2 py-1"
-                  >Delete</button>
+                    on:click={() => handleDeleteClick(note.id)}
+                    class="text-sm font-medium hover:opacity-80 transition px-2 py-1
+                           {confirmingDelete ? 'text-white bg-gb-red' : 'text-gb-red'}"
+                  >{confirmingDelete ? 'Confirm delete?' : 'Delete'}</button>
                   <div class="flex gap-2">
                     <button
                       type="button"

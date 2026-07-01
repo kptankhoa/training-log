@@ -25,6 +25,36 @@
   let newTagName = '';
   let newTaskName = '';
 
+  // "Click again to confirm" delete pattern — arms for 3s, then auto-reverts.
+  let confirmingTagId: string | null = null;
+  let confirmingTaskId: string | null = null;
+  let confirmTagTimeout: ReturnType<typeof setTimeout> | null = null;
+  let confirmTaskTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function handleDeleteTagClick(tagId: string) {
+    if (confirmingTagId === tagId) {
+      if (confirmTagTimeout) clearTimeout(confirmTagTimeout);
+      confirmingTagId = null;
+      deleteTag(userId, tagId);
+      return;
+    }
+    confirmingTagId = tagId;
+    if (confirmTagTimeout) clearTimeout(confirmTagTimeout);
+    confirmTagTimeout = setTimeout(() => { confirmingTagId = null; }, 3000);
+  }
+
+  function handleDeleteTaskClick(taskId: string) {
+    if (confirmingTaskId === taskId) {
+      if (confirmTaskTimeout) clearTimeout(confirmTaskTimeout);
+      confirmingTaskId = null;
+      deleteTask(userId, taskId);
+      return;
+    }
+    confirmingTaskId = taskId;
+    if (confirmTaskTimeout) clearTimeout(confirmTaskTimeout);
+    confirmTaskTimeout = setTimeout(() => { confirmingTaskId = null; }, 3000);
+  }
+
   async function handleAdd() {
     const name = newTagName.trim();
     if (!name) return;
@@ -67,10 +97,11 @@
             <span class="flex-1 text-gb-fg text-sm">{tag.name}</span>
             <button
               type="button"
-              on:click={() => deleteTag(userId, tag.id)}
-              aria-label="Delete {tag.name}"
-              class="text-gb-fg3 hover:text-gb-red transition-colors text-sm"
-            >✕</button>
+              on:click={() => handleDeleteTagClick(tag.id)}
+              aria-label={confirmingTagId === tag.id ? `Confirm delete ${tag.name}` : `Delete ${tag.name}`}
+              class="text-xs font-medium px-2 py-1 transition-colors shrink-0
+                     {confirmingTagId === tag.id ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
+            >{confirmingTagId === tag.id ? 'Confirm?' : '✕'}</button>
           </li>
         {/each}
       </ul>
@@ -105,10 +136,11 @@
             <span class="flex-1 text-gb-fg text-sm">{task.name}</span>
             <button
               type="button"
-              on:click={() => deleteTask(userId, task.id)}
-              aria-label="Delete {task.name}"
-              class="text-gb-fg3 hover:text-gb-red transition-colors text-sm"
-            >✕</button>
+              on:click={() => handleDeleteTaskClick(task.id)}
+              aria-label={confirmingTaskId === task.id ? `Confirm delete ${task.name}` : `Delete ${task.name}`}
+              class="text-xs font-medium px-2 py-1 transition-colors shrink-0
+                     {confirmingTaskId === task.id ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
+            >{confirmingTaskId === task.id ? 'Confirm?' : '✕'}</button>
           </li>
         {/each}
       </ul>
