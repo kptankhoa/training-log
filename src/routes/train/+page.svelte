@@ -2,8 +2,9 @@
   import { onMount, onDestroy } from 'svelte';
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
-  import { notes, initNotes } from '$lib/stores/notes';
+  import { notes, notesLoading, initNotes } from '$lib/stores/notes';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import Spinner from '$lib/components/Spinner.svelte';
   import type { PlanNote } from '$lib/types';
 
   let selectedId: string | null = null;
@@ -87,7 +88,9 @@
   <!-- Split picker -->
   <section class="flex flex-col gap-2">
     <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Select Split</h2>
-    {#if $notes.length === 0}
+    {#if $notesLoading}
+      <Spinner />
+    {:else if $notes.length === 0}
       <p class="text-gb-fg3 text-sm">No splits yet — add one in <a href="/splits" class="text-gb-blue underline">Split Design</a>.</p>
     {:else}
       <div class="flex flex-wrap gap-2">

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
-  import { tags, activeTags, initTags } from '$lib/stores/tags';
-  import { days, initDays } from '$lib/stores/days';
+  import { tags, activeTags, tagsLoading, initTags } from '$lib/stores/tags';
+  import { days, daysLoading, initDays } from '$lib/stores/days';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
 
   let selectedDate: string | null = null;
   let viewYear = new Date().getFullYear();
@@ -50,15 +51,19 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-3xl mx-auto">
-  <Calendar
-    year={viewYear}
-    month={viewMonth}
-    days={$days}
-    tags={$tags}
-    on:selectDay={(e) => (selectedDate = e.detail)}
-    on:prevMonth={prevMonth}
-    on:nextMonth={nextMonth}
-  />
+  {#if $tagsLoading || $daysLoading}
+    <Spinner />
+  {:else}
+    <Calendar
+      year={viewYear}
+      month={viewMonth}
+      days={$days}
+      tags={$tags}
+      on:selectDay={(e) => (selectedDate = e.detail)}
+      on:prevMonth={prevMonth}
+      on:nextMonth={nextMonth}
+    />
+  {/if}
 </div>
 
 {#if selectedDate && selectedEntry && userId}

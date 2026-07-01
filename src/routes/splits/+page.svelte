@@ -2,9 +2,10 @@
   import { onMount } from 'svelte';
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
-  import { notes, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
+  import { notes, notesLoading, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import type { PlanNote, GruvboxColor } from '$lib/types';
 
   function cycleColor() {
@@ -80,7 +81,9 @@
     >+ Add</button>
   </div>
 
-  {#if $notes.length === 0}
+  {#if $notesLoading}
+    <Spinner />
+  {:else if $notes.length === 0}
     <p class="text-gb-fg3 text-sm">No notes yet. Add one to get started.</p>
   {/if}
 

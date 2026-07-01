@@ -4,13 +4,17 @@ import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firesto
 import type { BodyMeasurement } from '$lib/types';
 
 const _measurements = writable<BodyMeasurement[]>([]);
+const _measurementsLoading = writable<boolean>(true);
 export const measurements = { subscribe: _measurements.subscribe };
+export const measurementsLoading = { subscribe: _measurementsLoading.subscribe };
 
 export function initMeasurements(userId: string): () => void {
+  _measurementsLoading.set(true);
   return onSnapshot(collection(db, 'users', userId, 'measurements'), (snap) => {
     const loaded = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<BodyMeasurement, 'id'>) }));
     loaded.sort((a, b) => a.id.localeCompare(b.id));
     _measurements.set(loaded);
+    _measurementsLoading.set(false);
   });
 }
 

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
-  import { measurements, initMeasurements, saveMeasurement, deleteMeasurement } from '$lib/stores/measurements';
+  import { measurements, measurementsLoading, initMeasurements, saveMeasurement, deleteMeasurement } from '$lib/stores/measurements';
   import LineChart from '$lib/components/LineChart.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import type { BodyMeasurement } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
@@ -72,7 +73,9 @@
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
   <h1 class="text-gb-green text-2xl font-bold glow-green">Stats</h1>
 
-  {#if $measurements.length === 0}
+  {#if $measurementsLoading}
+    <Spinner />
+  {:else if $measurements.length === 0}
     <div class="bg-gb-bg1 rounded-xl p-10 text-center flex flex-col gap-2">
       <p class="text-gb-fg3 text-lg">No measurements yet</p>
       <p class="text-gb-gray text-sm">Add an entry below to start tracking.</p>

@@ -2,8 +2,9 @@
   import { onMount } from 'svelte';
   import { user, signOut } from '$lib/stores/auth';
   import { icons } from '$lib/icons';
-  import { activeTags, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
+  import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
+  import Spinner from '$lib/components/Spinner.svelte';
   import type { GruvboxColor } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
@@ -38,26 +39,30 @@
   <section class="flex flex-col gap-4">
     <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2">Training Types</h2>
 
-    <ul class="flex flex-col gap-2">
-      {#each $activeTags as tag (tag.id)}
-        <li class="flex items-center gap-3 bg-gb-bg1 px-4 py-3">
-          <button
-            type="button"
-            on:click={() => cycleColor(tag.id, tag.color)}
-            style="background-color: {GRUVBOX_COLORS[tag.color]}"
-            class="w-5 h-5 shrink-0 border-2 border-gb-bg3 hover:scale-110 transition-transform"
-            title="Click to change color"
-          ></button>
-          <span class="flex-1 text-gb-fg text-sm">{tag.name}</span>
-          <button
-            type="button"
-            on:click={() => deleteTag(userId, tag.id)}
-            aria-label="Delete {tag.name}"
-            class="text-gb-fg3 hover:text-gb-red transition-colors text-sm"
-          >✕</button>
-        </li>
-      {/each}
-    </ul>
+    {#if $tagsLoading}
+      <Spinner />
+    {:else}
+      <ul class="flex flex-col gap-2">
+        {#each $activeTags as tag (tag.id)}
+          <li class="flex items-center gap-3 bg-gb-bg1 px-4 py-3">
+            <button
+              type="button"
+              on:click={() => cycleColor(tag.id, tag.color)}
+              style="background-color: {GRUVBOX_COLORS[tag.color]}"
+              class="w-5 h-5 shrink-0 border-2 border-gb-bg3 hover:scale-110 transition-transform"
+              title="Click to change color"
+            ></button>
+            <span class="flex-1 text-gb-fg text-sm">{tag.name}</span>
+            <button
+              type="button"
+              on:click={() => deleteTag(userId, tag.id)}
+              aria-label="Delete {tag.name}"
+              class="text-gb-fg3 hover:text-gb-red transition-colors text-sm"
+            >✕</button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
 
     <div class="flex gap-2">
       <input
