@@ -58,6 +58,23 @@
     });
     return counts;
   })();
+
+  const SWIPE_THRESHOLD = 50;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  function handleTouchStart(e: TouchEvent) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    dispatch(dx < 0 ? 'nextMonth' : 'prevMonth');
+  }
 </script>
 
 <div class="select-none">
@@ -75,7 +92,13 @@
     {/each}
   </div>
 
-  <div class="grid grid-cols-7 gap-px bg-gb-bg2 border border-gb-bg2 rounded-lg overflow-hidden">
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    data-testid="calendar-grid"
+    class="grid grid-cols-7 gap-px bg-gb-bg2 border border-gb-bg2 rounded-lg overflow-hidden"
+    on:touchstart={handleTouchStart}
+    on:touchend={handleTouchEnd}
+  >
     {#each cellData as cell}
       {#if 'null' in cell}
         <div class="bg-gb-bg3 min-h-[4.5rem]"></div>

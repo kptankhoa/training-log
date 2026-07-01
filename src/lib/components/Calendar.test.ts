@@ -107,4 +107,38 @@ describe('Calendar', () => {
     const { container } = render(Calendar, { props: { year: 2020, month: 1, days: {}, tags: [] } });
     expect(container.querySelector('[data-today]')).toBeNull();
   });
+
+  it('emits nextMonth on a leftward swipe past the threshold', async () => {
+    const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+    const grid = getByTestId('calendar-grid');
+    await fireEvent.touchStart(grid, { touches: [{ clientX: 200, clientY: 100 }] });
+    await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 100, clientY: 100 }] });
+    expect(getByTestId('next-month-count').textContent).toBe('1');
+  });
+
+  it('emits prevMonth on a rightward swipe past the threshold', async () => {
+    const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+    const grid = getByTestId('calendar-grid');
+    await fireEvent.touchStart(grid, { touches: [{ clientX: 100, clientY: 100 }] });
+    await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 200, clientY: 100 }] });
+    expect(getByTestId('prev-month-count').textContent).toBe('1');
+  });
+
+  it('does not switch months on a short swipe below the threshold', async () => {
+    const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+    const grid = getByTestId('calendar-grid');
+    await fireEvent.touchStart(grid, { touches: [{ clientX: 100, clientY: 100 }] });
+    await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 120, clientY: 100 }] });
+    expect(getByTestId('next-month-count').textContent).toBe('0');
+    expect(getByTestId('prev-month-count').textContent).toBe('0');
+  });
+
+  it('does not switch months on a mostly-vertical swipe', async () => {
+    const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+    const grid = getByTestId('calendar-grid');
+    await fireEvent.touchStart(grid, { touches: [{ clientX: 100, clientY: 100 }] });
+    await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 160, clientY: 250 }] });
+    expect(getByTestId('next-month-count').textContent).toBe('0');
+    expect(getByTestId('prev-month-count').textContent).toBe('0');
+  });
 });
