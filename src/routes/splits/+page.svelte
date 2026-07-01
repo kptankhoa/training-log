@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
-  import { notes, notesLoading, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
-  import { activeExercises, updateExerciseSplits, initExercises } from '$lib/stores/exercises';
-  import { generalRules, generalRulesLoading, initGeneralRules, saveGeneralRules } from '$lib/stores/generalRules';
+  import { notes, notesLoading, addNote, saveNote, deleteNote } from '$lib/stores/notes';
+  import { activeExercises, updateExerciseSplits } from '$lib/stores/exercises';
+  import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
   import { icons } from '$lib/icons';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
@@ -131,16 +130,6 @@
       savingRules = false;
     }
   }
-
-  onMount(() => {
-    const unsubUser = user.subscribe((u) => {
-      if (!u) return;
-      initNotes(u.uid);
-      initExercises(u.uid);
-      initGeneralRules(u.uid);
-    });
-    return unsubUser;
-  });
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">

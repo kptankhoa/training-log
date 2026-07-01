@@ -1,32 +1,15 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { user, signOut } from '$lib/stores/auth';
   import { icons } from '$lib/icons';
-  import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
-  import { activeTasks, tasksLoading, addTask, deleteTask, initTasks } from '$lib/stores/tasks';
-  import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits, initExercises } from '$lib/stores/exercises';
-  import { notes, initNotes } from '$lib/stores/notes';
+  import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor } from '$lib/stores/tags';
+  import { activeTasks, tasksLoading, addTask, deleteTask } from '$lib/stores/tasks';
+  import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits } from '$lib/stores/exercises';
+  import { notes } from '$lib/stores/notes';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
   import type { Exercise, GruvboxColor } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
-
-  let unsubTags: (() => void) | null = null;
-  let unsubTasks: (() => void) | null = null;
-  let unsubExercises: (() => void) | null = null;
-  let unsubNotes: (() => void) | null = null;
-
-  onMount(() => {
-    const unsubUser = user.subscribe((u) => {
-      if (!u) return;
-      unsubTags?.(); unsubTags = initTags(u.uid);
-      unsubTasks?.(); unsubTasks = initTasks(u.uid);
-      unsubExercises?.(); unsubExercises = initExercises(u.uid);
-      unsubNotes?.(); unsubNotes = initNotes(u.uid);
-    });
-    return () => { unsubUser(); unsubTags?.(); unsubTasks?.(); unsubExercises?.(); unsubNotes?.(); };
-  });
 
   let expandedExerciseId: string | null = null;
 

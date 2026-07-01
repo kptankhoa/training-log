@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { marked } from 'marked';
-  import { user } from '$lib/stores/auth';
-  import { notes, notesLoading, initNotes } from '$lib/stores/notes';
+  import { notes, notesLoading } from '$lib/stores/notes';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
   import type { PlanNote } from '$lib/types';
@@ -76,13 +75,6 @@
   const R = 54;
   const C = 2 * Math.PI * R;
   $: dashOffset = C * (1 - progress);
-
-  onMount(() => {
-    const unsub = user.subscribe((u) => {
-      if (u) initNotes(u.uid);
-    });
-    return unsub;
-  });
 
   onDestroy(() => {
     if (interval) clearInterval(interval);

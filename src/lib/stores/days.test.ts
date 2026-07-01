@@ -5,9 +5,6 @@ const mockOnSnapshot = vi.fn();
 const mockSetDoc = vi.fn();
 const mockDoc = vi.fn(() => ({}));
 const mockCollection = vi.fn(() => ({}));
-const mockQuery = vi.fn((ref) => ref);
-const mockWhere = vi.fn();
-const mockDocumentId = vi.fn(() => '__name__');
 
 vi.mock('$lib/firebase', () => ({ db: {} }));
 vi.mock('firebase/firestore', () => ({
@@ -15,9 +12,6 @@ vi.mock('firebase/firestore', () => ({
   doc: mockDoc,
   onSnapshot: mockOnSnapshot,
   setDoc: mockSetDoc,
-  query: mockQuery,
-  where: mockWhere,
-  documentId: mockDocumentId,
 }));
 
 describe('days store', () => {
@@ -27,22 +21,22 @@ describe('days store', () => {
   });
 
   it('initializes as empty object', async () => {
-    const { days } = await import('./days');
-    expect(get(days)).toEqual({});
+    const { allDays } = await import('./days');
+    expect(get(allDays)).toEqual({});
   });
 
-  it('populates days from Firestore snapshot', async () => {
-    mockOnSnapshot.mockImplementation((_q, cb) => {
+  it('populates allDays from Firestore snapshot', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => {
       cb({ docs: [{ id: '2026-06-10', data: () => ({ tags: ['tag1'], label: 'Leg day', note: '# PR' }) }] });
       return () => {};
     });
-    const { days, initDays } = await import('./days');
-    initDays('user1', 2026, 6);
-    expect(get(days)['2026-06-10']).toEqual({ tags: ['tag1'], label: 'Leg day', note: '# PR' });
+    const { allDays, initDays } = await import('./days');
+    initDays('user1');
+    expect(get(allDays)['2026-06-10']).toEqual({ tags: ['tag1'], label: 'Leg day', note: '# PR' });
   });
 
-  it('filters days to the requested month, but allDays keeps every month', async () => {
-    mockOnSnapshot.mockImplementation((_q, cb) => {
+  it('keeps every month in allDays, unfiltered', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => {
       cb({
         docs: [
           { id: '2026-06-10', data: () => ({ tags: ['tag1'], label: '', note: '' }) },
@@ -51,10 +45,18 @@ describe('days store', () => {
       });
       return () => {};
     });
-    const { days, allDays, initDays } = await import('./days');
-    initDays('user1', 2026, 6);
-    expect(Object.keys(get(days))).toEqual(['2026-06-10']);
+    const { allDays, initDays } = await import('./days');
+    initDays('user1');
     expect(Object.keys(get(allDays)).sort()).toEqual(['2026-05-20', '2026-06-10']);
+  });
+
+  it('filterDaysByMonth returns only entries matching the given year/month', async () => {
+    const { filterDaysByMonth } = await import('./days');
+    const all = {
+      '2026-06-10': { tags: ['tag1'], label: '', note: '' },
+      '2026-05-20': { tags: ['tag2'], label: '', note: '' },
+    };
+    expect(Object.keys(filterDaysByMonth(all, 2026, 6))).toEqual(['2026-06-10']);
   });
 
   it('saveDay calls setDoc with correct path and data', async () => {

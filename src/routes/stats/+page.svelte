@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
   import { measurements, measurementsLoading, initMeasurements, saveMeasurement, deleteMeasurement } from '$lib/stores/measurements';
-  import { allDays, initDays } from '$lib/stores/days';
+  import { allDays } from '$lib/stores/days';
   import LineChart from '$lib/components/LineChart.svelte';
   import PhotoTimeline from '$lib/components/PhotoTimeline.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -14,10 +14,6 @@
     const unsub = user.subscribe((u) => {
       if (!u) return;
       initMeasurements(u.uid);
-      // Reuses the days store just for its unfiltered allDays side effect —
-      // the month arg only matters for the (unused here) month-filtered result.
-      const now = new Date();
-      initDays(u.uid, now.getFullYear(), now.getMonth() + 1);
     });
     return unsub;
   });

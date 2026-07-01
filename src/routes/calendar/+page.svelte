@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
-  import { tags, activeTags, tagsLoading, initTags } from '$lib/stores/tags';
-  import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
-  import { activeTasks, initTasks } from '$lib/stores/tasks';
-  import { exercises, initExercises } from '$lib/stores/exercises';
-  import { notes, initNotes } from '$lib/stores/notes';
+  import { tags, activeTags, tagsLoading } from '$lib/stores/tags';
+  import { allDays, daysLoading, filterDaysByMonth } from '$lib/stores/days';
+  import { activeTasks } from '$lib/stores/tasks';
+  import { exercises } from '$lib/stores/exercises';
+  import { notes } from '$lib/stores/notes';
   import { computeStreaks } from '$lib/streaks';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
@@ -15,51 +14,22 @@
   let viewYear = new Date().getFullYear();
   let viewMonth = new Date().getMonth() + 1;
 
-  let unsubTags: (() => void) | null = null;
-  let unsubDays: (() => void) | null = null;
-  let unsubTasks: (() => void) | null = null;
-  let unsubExercises: (() => void) | null = null;
-  let unsubNotes: (() => void) | null = null;
-
   $: userId = $user?.uid ?? '';
-
-  onMount(() => {
-    const unsubUser = user.subscribe((u) => {
-      if (!u) return;
-      unsubTags?.(); unsubTags = initTags(u.uid);
-      unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
-      unsubTasks?.(); unsubTasks = initTasks(u.uid);
-      unsubExercises?.(); unsubExercises = initExercises(u.uid);
-      unsubNotes?.(); unsubNotes = initNotes(u.uid);
-    });
-    return () => {
-      unsubUser();
-      unsubTags?.();
-      unsubDays?.();
-      unsubTasks?.();
-      unsubExercises?.();
-      unsubNotes?.();
-    };
-  });
-
-  function resubscribeDays() {
-    if (userId) { unsubDays?.(); unsubDays = initDays(userId, viewYear, viewMonth); }
-  }
 
   function prevMonth() {
     if (viewMonth === 1) { viewMonth = 12; viewYear -= 1; }
     else viewMonth -= 1;
-    resubscribeDays();
   }
 
   function nextMonth() {
     if (viewMonth === 12) { viewMonth = 1; viewYear += 1; }
     else viewMonth += 1;
-    resubscribeDays();
   }
 
+  $: monthDays = filterDaysByMonth($allDays, viewYear, viewMonth);
+
   $: selectedEntry = selectedDate
-    ? ($days[selectedDate] ?? { tags: [], label: '', note: '', tasks: [], photos: [] })
+    ? ($allDays[selectedDate] ?? { tags: [], label: '', note: '', tasks: [], photos: [] })
     : null;
 
   $: streaks = computeStreaks($allDays);
@@ -72,7 +42,7 @@
     <Calendar
       year={viewYear}
       month={viewMonth}
-      days={$days}
+      days={monthDays}
       tags={$tags}
       splits={$notes}
       on:selectDay={(e) => (selectedDate = e.detail)}

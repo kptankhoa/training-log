@@ -1,6 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import '../app.css';
   import { user, authReady } from '$lib/stores/auth';
+  import { initTags } from '$lib/stores/tags';
+  import { initDays } from '$lib/stores/days';
+  import { initTasks } from '$lib/stores/tasks';
+  import { initExercises } from '$lib/stores/exercises';
+  import { initNotes } from '$lib/stores/notes';
+  import { initGeneralRules } from '$lib/stores/generalRules';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
@@ -9,6 +16,28 @@
   $: if (browser && $authReady && $user === null && $page.url.pathname !== '/login') {
     goto('/login');
   }
+
+  // Data shared across every page (calendar, home, settings, splits, train) —
+  // subscribed once per login here instead of re-subscribing in each page's
+  // onMount, which used to re-read these collections in full on every navigation.
+  onMount(() => {
+    const unsubs: (() => void)[] = [];
+    const unsubUser = user.subscribe((u) => {
+      unsubs.forEach((fn) => fn());
+      unsubs.length = 0;
+      if (!u) return;
+      unsubs.push(initTags(u.uid));
+      unsubs.push(initDays(u.uid));
+      unsubs.push(initTasks(u.uid));
+      unsubs.push(initExercises(u.uid));
+      unsubs.push(initNotes(u.uid));
+      unsubs.push(initGeneralRules(u.uid));
+    });
+    return () => {
+      unsubUser();
+      unsubs.forEach((fn) => fn());
+    };
+  });
 
   $: showShell = $authReady && $user !== null && $page.url.pathname !== '/login';
   $: loading = !$authReady;

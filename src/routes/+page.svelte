@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
-  import { activeTags, tagsLoading, initTags } from '$lib/stores/tags';
-  import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
-  import { activeTasks, initTasks } from '$lib/stores/tasks';
-  import { exercises, initExercises } from '$lib/stores/exercises';
-  import { notes, initNotes } from '$lib/stores/notes';
+  import { activeTags, tagsLoading } from '$lib/stores/tags';
+  import { allDays, daysLoading } from '$lib/stores/days';
+  import { activeTasks } from '$lib/stores/tasks';
+  import { exercises } from '$lib/stores/exercises';
+  import { notes } from '$lib/stores/notes';
   import { computeStreaks } from '$lib/streaks';
   import DayDetail from '$lib/components/DayDetail.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -16,34 +15,9 @@
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
   });
 
-  let unsubTags: (() => void) | null = null;
-  let unsubDays: (() => void) | null = null;
-  let unsubTasks: (() => void) | null = null;
-  let unsubExercises: (() => void) | null = null;
-  let unsubNotes: (() => void) | null = null;
-
   $: userId = $user?.uid ?? '';
 
-  onMount(() => {
-    const unsubUser = user.subscribe((u) => {
-      if (!u) return;
-      unsubTags?.(); unsubTags = initTags(u.uid);
-      unsubDays?.(); unsubDays = initDays(u.uid, today.getFullYear(), today.getMonth() + 1);
-      unsubTasks?.(); unsubTasks = initTasks(u.uid);
-      unsubExercises?.(); unsubExercises = initExercises(u.uid);
-      unsubNotes?.(); unsubNotes = initNotes(u.uid);
-    });
-    return () => {
-      unsubUser();
-      unsubTags?.();
-      unsubDays?.();
-      unsubTasks?.();
-      unsubExercises?.();
-      unsubNotes?.();
-    };
-  });
-
-  $: entry = $days[todayKey] ?? { tags: [], label: '', note: '', tasks: [], photos: [] };
+  $: entry = $allDays[todayKey] ?? { tags: [], label: '', note: '', tasks: [], photos: [] };
   $: streaks = computeStreaks($allDays);
 </script>
 
