@@ -36,6 +36,7 @@
   let uploadingPhoto = false;
   let photoError = false;
   let fileInput: HTMLInputElement;
+  let lightboxUrl: string | null = null;
 
   // position: fixed sizes against the layout viewport, which doesn't shrink when
   // the mobile keyboard opens — track the visual viewport so the sheet resizes
@@ -240,13 +241,18 @@
       <div class="flex flex-wrap gap-2">
         {#each photoPaths as path (path)}
           <div class="relative w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3">
-            {#if photoUrls[path]}
-              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
-            {:else}
-              <div class="w-full h-full flex items-center justify-center">
+            <button
+              type="button"
+              on:click={() => (lightboxUrl = photoUrls[path] ?? null)}
+              disabled={!photoUrls[path]}
+              class="w-full h-full flex items-center justify-center"
+            >
+              {#if photoUrls[path]}
+                <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
+              {:else}
                 <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
-              </div>
-            {/if}
+              {/if}
+            </button>
             <button
               type="button"
               on:click={() => removePhoto(path)}
@@ -305,3 +311,22 @@
     </button>
   </div>
 </div>
+
+{#if lightboxUrl}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <div
+    class="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4"
+    on:click={() => (lightboxUrl = null)}
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+  >
+    <img src={lightboxUrl} alt="Training day snapshot" class="max-w-full max-h-full object-contain" />
+    <button
+      type="button"
+      on:click={() => (lightboxUrl = null)}
+      aria-label="Close photo"
+      class="absolute top-4 right-4 text-white text-3xl leading-none"
+    >×</button>
+  </div>
+{/if}

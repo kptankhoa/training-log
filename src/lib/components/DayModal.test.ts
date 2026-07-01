@@ -193,6 +193,32 @@ describe('DayModal', () => {
     });
   });
 
+  it('opens a lightbox with the full photo on thumbnail click', async () => {
+    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
+    const { findByAltText, getAllByRole, getByLabelText } = render(DayModal, {
+      props: { dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1' }
+    });
+    const thumbnail = await findByAltText('Training day snapshot');
+    await fireEvent.click(thumbnail.closest('button')!);
+    // DayModal's own dialog plus the newly-opened lightbox dialog
+    expect(getAllByRole('dialog')).toHaveLength(2);
+    expect(getByLabelText('Close photo')).toBeInTheDocument();
+  });
+
+  it('closes the lightbox via its own close button without closing the modal', async () => {
+    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
+    const { findByAltText, getByLabelText, queryByLabelText, getByTestId } = render(DayModalTest, {
+      props: { dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1' }
+    });
+    const thumbnail = await findByAltText('Training day snapshot');
+    await fireEvent.click(thumbnail.closest('button')!);
+    expect(getByLabelText('Close photo')).toBeInTheDocument();
+
+    await fireEvent.click(getByLabelText('Close photo'));
+    expect(queryByLabelText('Close photo')).not.toBeInTheDocument();
+    expect(getByTestId('close-count').textContent).toBe('0');
+  });
+
   it('hides other sections (mobile only) while the note is empty and in edit mode', () => {
     const emptyNoteEntry: DayEntry = { ...entry, note: '' };
     const { getByText } = render(DayModal, {
