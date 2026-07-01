@@ -12,3 +12,10 @@ export interface DayEntry {
   label: string;
   note: string;
 }
+
+export interface PlanNote {
+  id: string;
+  label: string;
+  sortOrder: number;
+  content: string;
+}

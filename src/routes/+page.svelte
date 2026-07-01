@@ -3,10 +3,8 @@
   import { user } from '$lib/stores/auth';
   import { tags, activeTags, initTags } from '$lib/stores/tags';
   import { days, initDays } from '$lib/stores/days';
-  import { globalNote, initNote, saveNote } from '$lib/stores/note';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
-  import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
 
   let selectedDate: string | null = null;
   let viewYear = new Date().getFullYear();
@@ -14,7 +12,6 @@
 
   let unsubTags: (() => void) | null = null;
   let unsubDays: (() => void) | null = null;
-  let unsubNote: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -22,14 +19,12 @@
     const unsubUser = user.subscribe((u) => {
       if (!u) return;
       unsubTags?.(); unsubTags = initTags(u.uid);
-      unsubNote?.(); unsubNote = initNote(u.uid);
       unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
     });
     return () => {
       unsubUser();
       unsubTags?.();
       unsubDays?.();
-      unsubNote?.();
     };
   });
 
@@ -52,15 +47,9 @@
   $: selectedEntry = selectedDate
     ? ($days[selectedDate] ?? { tags: [], label: '', note: '' })
     : null;
-
-  let noteSaveTimer: ReturnType<typeof setTimeout>;
-  function scheduleNoteSave() {
-    clearTimeout(noteSaveTimer);
-    noteSaveTimer = setTimeout(() => { if (userId) saveNote(userId, $globalNote); }, 800);
-  }
 </script>
 
-<div class="p-4 md:p-8 max-w-3xl mx-auto flex flex-col gap-8">
+<div class="p-4 md:p-8 max-w-3xl mx-auto">
   <Calendar
     year={viewYear}
     month={viewMonth}
@@ -70,15 +59,6 @@
     on:prevMonth={prevMonth}
     on:nextMonth={nextMonth}
   />
-
-  <div class="flex flex-col gap-2" on:focusout={scheduleNoteSave}>
-    <MarkdownEditor
-      bind:value={$globalNote}
-      placeholder="Training schedule, weekly goals, quotes…"
-      initialMode="preview"
-      label="Notepad"
-    />
-  </div>
 </div>
 
 {#if selectedDate && selectedEntry && userId}
