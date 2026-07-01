@@ -10,14 +10,13 @@
   $: selectedSplit = $notes.find((n) => n.id === selectedId) ?? null;
 
   // Timer state
-  let inputMinutes = 1;
-  let inputSeconds = 30;
+  let inputSeconds = 90;
   let remaining = 0;
   let running = false;
   let finished = false;
   let interval: ReturnType<typeof setInterval> | null = null;
 
-  $: totalInput = inputMinutes * 60 + inputSeconds;
+  $: totalInput = inputSeconds;
 
   function startStop() {
     if (running) {
@@ -154,29 +153,18 @@
         </div>
       </div>
 
-      <!-- Duration inputs -->
+      <!-- Duration input -->
       <div class="flex items-center gap-2 text-sm">
-        <label class="text-gb-fg3">Set:</label>
-        <div class="flex items-center gap-1">
-          <input
-            type="number" min="0" max="59"
-            bind:value={inputMinutes}
-            on:change={reset}
-            disabled={running}
-            class="w-12 text-center bg-gb-bg1 border border-gb-bg3 text-gb-fg px-1 py-1
-                   focus:outline-none focus:border-gb-blue disabled:opacity-40"
-          />
-          <span class="text-gb-fg3">m</span>
-          <input
-            type="number" min="0" max="59"
-            bind:value={inputSeconds}
-            on:change={reset}
-            disabled={running}
-            class="w-12 text-center bg-gb-bg1 border border-gb-bg3 text-gb-fg px-1 py-1
-                   focus:outline-none focus:border-gb-blue disabled:opacity-40"
-          />
-          <span class="text-gb-fg3">s</span>
-        </div>
+        <label class="text-gb-fg3">Rest:</label>
+        <input
+          type="number" min="1" max="3600"
+          bind:value={inputSeconds}
+          on:change={reset}
+          disabled={running}
+          class="w-16 text-center bg-gb-bg1 border border-gb-bg3 text-gb-fg px-2 py-1
+                 focus:outline-none focus:border-gb-blue disabled:opacity-40"
+        />
+        <span class="text-gb-fg3">sec</span>
       </div>
 
       <!-- Controls -->
