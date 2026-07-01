@@ -121,7 +121,7 @@
     <!-- Notes -->
     <div class="flex flex-col gap-1">
       <span class="text-xs text-gb-fg3 uppercase tracking-wider">Notes</span>
-      <MarkdownEditor bind:value={note} placeholder="Bodyweight, PRs, observations…" initialMode={note ? 'preview' : 'edit'} />
+      <MarkdownEditor bind:value={note} placeholder="Bodyweight, PRs, observations…" initialMode={note ? 'preview' : 'edit'} rows={6} />
     </div>
 
     <button
