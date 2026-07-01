@@ -38,7 +38,7 @@
       {rows}
       on:focus={(e) => scrollIntoViewOnFocus(e.currentTarget)}
       class="w-full bg-gb-bg2 text-gb-fg font-mono text-sm rounded-md p-3 resize-y
-             border border-gb-bg3 focus:outline-none focus:border-gb-blue"
+             border border-gb-bg3 focus:outline-none focus:border-gb-blue [caret-shape:block]"
     ></textarea>
   {:else}
     <div
