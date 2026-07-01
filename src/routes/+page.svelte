@@ -40,12 +40,9 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-5">
-  <div class="flex items-center justify-between">
-    <div>
-      <p class="text-gb-fg3 text-xs uppercase tracking-wider">Today</p>
-      <h1 class="text-gb-green text-xl font-bold glow-green">{heading}</h1>
-    </div>
-    <a href="/calendar" class="text-sm text-gb-blue hover:text-gb-fg transition shrink-0">Calendar</a>
+  <div>
+    <p class="text-gb-fg3 text-xs uppercase tracking-wider">Today</p>
+    <h1 class="text-gb-green text-xl font-bold glow-green">{heading}</h1>
   </div>
 
   {#if $tagsLoading || $daysLoading}
