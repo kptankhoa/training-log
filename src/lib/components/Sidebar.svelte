@@ -4,7 +4,8 @@
   import { icons } from '$lib/icons';
 
   const nav = [
-    { href: '/',         label: 'Calendar', icon: icons.calendar },
+    { href: '/',         label: 'Today',    icon: icons.home     },
+    { href: '/calendar', label: 'Calendar', icon: icons.calendar },
     { href: '/splits',   label: 'Splits',   icon: icons.document },
     { href: '/train',    label: 'Train',    icon: icons.clock    },
     { href: '/stats',    label: 'Stats',    icon: icons.barChart },

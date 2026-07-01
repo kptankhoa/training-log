@@ -1,17 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { user } from '$lib/stores/auth';
-  import { tags, activeTags, tagsLoading, initTags } from '$lib/stores/tags';
+  import { activeTags, tagsLoading, initTags } from '$lib/stores/tags';
   import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
   import { activeTasks, initTasks } from '$lib/stores/tasks';
   import { computeStreaks } from '$lib/streaks';
-  import Calendar from '$lib/components/Calendar.svelte';
-  import DayModal from '$lib/components/DayModal.svelte';
+  import DayDetail from '$lib/components/DayDetail.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
 
-  let selectedDate: string | null = null;
-  let viewYear = new Date().getFullYear();
-  let viewMonth = new Date().getMonth() + 1;
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const heading = today.toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+  });
 
   let unsubTags: (() => void) | null = null;
   let unsubDays: (() => void) | null = null;
@@ -23,7 +24,7 @@
     const unsubUser = user.subscribe((u) => {
       if (!u) return;
       unsubTags?.(); unsubTags = initTags(u.uid);
-      unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
+      unsubDays?.(); unsubDays = initDays(u.uid, today.getFullYear(), today.getMonth() + 1);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
     });
     return () => {
@@ -34,43 +35,22 @@
     };
   });
 
-  function resubscribeDays() {
-    if (userId) { unsubDays?.(); unsubDays = initDays(userId, viewYear, viewMonth); }
-  }
-
-  function prevMonth() {
-    if (viewMonth === 1) { viewMonth = 12; viewYear -= 1; }
-    else viewMonth -= 1;
-    resubscribeDays();
-  }
-
-  function nextMonth() {
-    if (viewMonth === 12) { viewMonth = 1; viewYear += 1; }
-    else viewMonth += 1;
-    resubscribeDays();
-  }
-
-  $: selectedEntry = selectedDate
-    ? ($days[selectedDate] ?? { tags: [], label: '', note: '', tasks: [], photos: [] })
-    : null;
-
+  $: entry = $days[todayKey] ?? { tags: [], label: '', note: '', tasks: [], photos: [] };
   $: streaks = computeStreaks($allDays);
 </script>
 
-<div class="p-4 md:p-8 max-w-3xl mx-auto flex flex-col gap-4">
+<div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-gb-fg3 text-xs uppercase tracking-wider">Today</p>
+      <h1 class="text-gb-green text-xl font-bold glow-green">{heading}</h1>
+    </div>
+    <a href="/calendar" class="text-sm text-gb-blue hover:text-gb-fg transition shrink-0">Calendar</a>
+  </div>
+
   {#if $tagsLoading || $daysLoading}
     <Spinner />
   {:else}
-    <Calendar
-      year={viewYear}
-      month={viewMonth}
-      days={$days}
-      tags={$tags}
-      on:selectDay={(e) => (selectedDate = e.detail)}
-      on:prevMonth={prevMonth}
-      on:nextMonth={nextMonth}
-    />
-
     <div class="flex items-center gap-6 px-1 text-sm">
       <div class="flex items-center gap-2">
         <span class="text-gb-green font-semibold glow-green">{streaks.current}</span>
@@ -81,16 +61,9 @@
         <span class="text-gb-fg3">longest streak</span>
       </div>
     </div>
+
+    {#if userId}
+      <DayDetail dateKey={todayKey} {entry} activeTags={$activeTags} activeTasks={$activeTasks} {userId} />
+    {/if}
   {/if}
 </div>
-
-{#if selectedDate && selectedEntry && userId}
-  <DayModal
-    dateKey={selectedDate}
-    entry={selectedEntry}
-    activeTags={$activeTags}
-    activeTasks={$activeTasks}
-    {userId}
-    on:close={() => (selectedDate = null)}
-  />
-{/if}
