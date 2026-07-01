@@ -4,16 +4,18 @@
   import MarkdownEditor from './MarkdownEditor.svelte';
   import { saveDay } from '$lib/stores/days';
   import { addTag } from '$lib/stores/tags';
-  import type { TrainingTag, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
+  export let activeTasks: DailyTask[] = [];
   export let userId: string;
 
   const dispatch = createEventDispatcher();
 
   let selectedIds = new Set<string>(entry.tags);
+  let completedTaskIds = new Set<string>(entry.tasks ?? []);
   let label = entry.label;
   let note = entry.note;
   let newTagName = '';
@@ -30,6 +32,12 @@
     selectedIds = selectedIds;
   }
 
+  function toggleTask(taskId: string) {
+    if (completedTaskIds.has(taskId)) completedTaskIds.delete(taskId);
+    else completedTaskIds.add(taskId);
+    completedTaskIds = completedTaskIds;
+  }
+
   async function commitNewTag() {
     if (!newTagName.trim()) { addingTag = false; return; }
     await addTag(userId, newTagName.trim());
@@ -38,7 +46,7 @@
   }
 
   async function handleSave() {
-    await saveDay(userId, dateKey, { tags: [...selectedIds], label, note });
+    await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds] });
     dispatch('close');
   }
 
@@ -104,6 +112,26 @@
         {/if}
       </div>
     </div>
+
+    <!-- Daily tasks -->
+    {#if activeTasks.length > 0}
+      <div class="flex flex-col gap-2">
+        <span class="text-xs text-gb-fg3 uppercase tracking-wider">Daily tasks</span>
+        <div class="flex flex-col gap-1.5">
+          {#each activeTasks as task (task.id)}
+            <label class="flex items-center gap-2.5 text-sm text-gb-fg cursor-pointer">
+              <input
+                type="checkbox"
+                checked={completedTaskIds.has(task.id)}
+                on:change={() => toggleTask(task.id)}
+                class="w-4 h-4 accent-gb-green shrink-0"
+              />
+              {task.name}
+            </label>
+          {/each}
+        </div>
+      </div>
+    {/if}
 
     <!-- Label -->
     <div class="flex flex-col gap-1">

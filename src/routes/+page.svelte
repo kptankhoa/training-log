@@ -3,6 +3,7 @@
   import { user } from '$lib/stores/auth';
   import { tags, activeTags, tagsLoading, initTags } from '$lib/stores/tags';
   import { days, daysLoading, initDays } from '$lib/stores/days';
+  import { activeTasks, initTasks } from '$lib/stores/tasks';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -13,6 +14,7 @@
 
   let unsubTags: (() => void) | null = null;
   let unsubDays: (() => void) | null = null;
+  let unsubTasks: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -21,11 +23,13 @@
       if (!u) return;
       unsubTags?.(); unsubTags = initTags(u.uid);
       unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
+      unsubTasks?.(); unsubTasks = initTasks(u.uid);
     });
     return () => {
       unsubUser();
       unsubTags?.();
       unsubDays?.();
+      unsubTasks?.();
     };
   });
 
@@ -46,7 +50,7 @@
   }
 
   $: selectedEntry = selectedDate
-    ? ($days[selectedDate] ?? { tags: [], label: '', note: '' })
+    ? ($days[selectedDate] ?? { tags: [], label: '', note: '', tasks: [] })
     : null;
 </script>
 
@@ -71,6 +75,7 @@
     dateKey={selectedDate}
     entry={selectedEntry}
     activeTags={$activeTags}
+    activeTasks={$activeTasks}
     {userId}
     on:close={() => (selectedDate = null)}
   />

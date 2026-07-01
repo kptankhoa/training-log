@@ -11,6 +11,13 @@ export interface DayEntry {
   tags: string[];
   label: string;
   note: string;
+  tasks?: string[]; // completed daily task ids for the day
+}
+
+export interface DailyTask {
+  id: string;
+  name: string;
+  deleted: boolean;
 }
 
 export interface PlanNote {
