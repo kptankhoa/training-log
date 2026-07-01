@@ -140,7 +140,7 @@
             stroke-width="8"
             stroke-linecap="round"
             stroke-dasharray={C}
-            stroke-dashoffset={dashOffset}
+            stroke-dashoffset={finished ? 0 : dashOffset}
           />
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
