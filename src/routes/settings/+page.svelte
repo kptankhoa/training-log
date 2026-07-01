@@ -4,16 +4,18 @@
   import { icons } from '$lib/icons';
   import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor, initTags } from '$lib/stores/tags';
   import { activeTasks, tasksLoading, addTask, deleteTask, initTasks } from '$lib/stores/tasks';
-  import { activeExercises, exercisesLoading, addExercise, deleteExercise, initExercises } from '$lib/stores/exercises';
+  import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits, initExercises } from '$lib/stores/exercises';
+  import { notes, initNotes } from '$lib/stores/notes';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
-  import type { GruvboxColor } from '$lib/types';
+  import type { Exercise, GruvboxColor } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
 
   let unsubTags: (() => void) | null = null;
   let unsubTasks: (() => void) | null = null;
   let unsubExercises: (() => void) | null = null;
+  let unsubNotes: (() => void) | null = null;
 
   onMount(() => {
     const unsubUser = user.subscribe((u) => {
@@ -21,9 +23,22 @@
       unsubTags?.(); unsubTags = initTags(u.uid);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
       unsubExercises?.(); unsubExercises = initExercises(u.uid);
+      unsubNotes?.(); unsubNotes = initNotes(u.uid);
     });
-    return () => { unsubUser(); unsubTags?.(); unsubTasks?.(); unsubExercises?.(); };
+    return () => { unsubUser(); unsubTags?.(); unsubTasks?.(); unsubExercises?.(); unsubNotes?.(); };
   });
+
+  let expandedExerciseId: string | null = null;
+
+  function toggleExerciseExpand(exerciseId: string) {
+    expandedExerciseId = expandedExerciseId === exerciseId ? null : exerciseId;
+  }
+
+  async function toggleExerciseSplit(exercise: Exercise, splitId: string) {
+    const current = exercise.splitIds ?? [];
+    const next = current.includes(splitId) ? current.filter((id) => id !== splitId) : [...current, splitId];
+    await updateExerciseSplits(userId, exercise.id, next);
+  }
 
   let newTagName = '';
   let newTaskName = '';
@@ -196,15 +211,47 @@
     {:else}
       <ul class="flex flex-col gap-2">
         {#each $activeExercises as exercise (exercise.id)}
-          <li class="flex items-center gap-3 bg-gb-bg1 px-4 py-3">
-            <span class="flex-1 text-gb-fg text-sm">{exercise.name}</span>
-            <button
-              type="button"
-              on:click={() => handleDeleteExerciseClick(exercise.id)}
-              aria-label={confirmingExerciseId === exercise.id ? `Confirm delete ${exercise.name}` : `Delete ${exercise.name}`}
-              class="text-xs font-medium px-2 py-1 transition-colors shrink-0
-                     {confirmingExerciseId === exercise.id ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
-            >{confirmingExerciseId === exercise.id ? 'Confirm?' : '✕'}</button>
+          <li class="flex flex-col bg-gb-bg1">
+            <div class="flex items-center gap-3 px-4 py-3">
+              <button
+                type="button"
+                on:click={() => toggleExerciseExpand(exercise.id)}
+                class="flex-1 text-left text-gb-fg text-sm"
+              >
+                {exercise.name}
+                {#if exercise.splitIds?.length}
+                  <span class="text-gb-fg3 text-xs"> · {exercise.splitIds.length} split{exercise.splitIds.length !== 1 ? 's' : ''}</span>
+                {/if}
+              </button>
+              <button
+                type="button"
+                on:click={() => handleDeleteExerciseClick(exercise.id)}
+                aria-label={confirmingExerciseId === exercise.id ? `Confirm delete ${exercise.name}` : `Delete ${exercise.name}`}
+                class="text-xs font-medium px-2 py-1 transition-colors shrink-0
+                       {confirmingExerciseId === exercise.id ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
+              >{confirmingExerciseId === exercise.id ? 'Confirm?' : '✕'}</button>
+            </div>
+            {#if expandedExerciseId === exercise.id}
+              <div class="px-4 pb-3 flex flex-col gap-2">
+                <span class="text-xs text-gb-fg3 uppercase tracking-wider">Tied to splits (none = always available)</span>
+                {#if $notes.length === 0}
+                  <p class="text-gb-fg3 text-xs italic">No splits yet — add one in Split Design.</p>
+                {:else}
+                  <div class="flex flex-wrap gap-2">
+                    {#each $notes as split (split.id)}
+                      <button
+                        type="button"
+                        on:click={() => toggleExerciseSplit(exercise, split.id)}
+                        class="px-3 py-1 text-xs border transition
+                               {(exercise.splitIds ?? []).includes(split.id)
+                                 ? 'border-gb-green text-gb-green bg-gb-bg2'
+                                 : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
+                      >{split.label || 'Untitled'}</button>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/if}
           </li>
         {/each}
       </ul>

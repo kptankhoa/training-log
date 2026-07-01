@@ -9,13 +9,14 @@
   import { uploadPhoto, getPhotoUrl, deletePhoto } from '$lib/stores/photos';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import { icons } from '$lib/icons';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
   export let exercises: Exercise[] = []; // full list (incl. deleted) so old logs still resolve names
+  export let splits: PlanNote[] = [];
   export let allDays: Record<string, DayEntry> = {};
   export let userId: string;
   // Only useful in a height-constrained modal sheet — the inline Home page
@@ -25,6 +26,7 @@
   const dispatch = createEventDispatcher<{ saved: void }>();
 
   let selectedIds = new Set<string>(entry.tags);
+  let selectedSplitIds = new Set<string>(entry.splitIds ?? []);
   let completedTaskIds = new Set<string>(entry.tasks ?? []);
   let label = entry.label;
   let note = entry.note;
@@ -56,8 +58,8 @@
   let lightboxUrl: string | null = null;
 
   function hasAnyContent(): boolean {
-    return selectedIds.size > 0 || !!label.trim() || !!note.trim() || completedTaskIds.size > 0
-      || photoPaths.length > 0 || exerciseEntries.length > 0;
+    return selectedIds.size > 0 || selectedSplitIds.size > 0 || !!label.trim() || !!note.trim()
+      || completedTaskIds.size > 0 || photoPaths.length > 0 || exerciseEntries.length > 0;
   }
 
   // View mode by default for a day that already has something logged —
@@ -65,6 +67,7 @@
   let mode: 'view' | 'edit' = hasAnyContent() ? 'view' : 'edit';
 
   $: selectedTagList = activeTags.filter((t) => selectedIds.has(t.id));
+  $: selectedSplitList = splits.filter((s) => selectedSplitIds.has(s.id));
 
   onMount(() => {
     photoPaths.forEach((path) => {
@@ -83,6 +86,12 @@
     if (selectedIds.has(tagId)) selectedIds.delete(tagId);
     else selectedIds.add(tagId);
     selectedIds = selectedIds;
+  }
+
+  function toggleSplit(splitId: string) {
+    if (selectedSplitIds.has(splitId)) selectedSplitIds.delete(splitId);
+    else selectedSplitIds.add(splitId);
+    selectedSplitIds = selectedSplitIds;
   }
 
   function toggleTask(taskId: string) {
@@ -151,6 +160,7 @@
 
   function cancelEdit() {
     selectedIds = new Set(entry.tags);
+    selectedSplitIds = new Set(entry.splitIds ?? []);
     completedTaskIds = new Set(entry.tasks ?? []);
     label = entry.label;
     note = entry.note;
@@ -170,7 +180,8 @@
     try {
       const removedPaths = originalPhotoPaths.filter((p) => !photoPaths.includes(p));
       await saveDay(userId, dateKey, {
-        tags: [...selectedIds], label, note, tasks: [...completedTaskIds], photos: photoPaths, exercises: exerciseEntries
+        tags: [...selectedIds], label, note, tasks: [...completedTaskIds], photos: photoPaths,
+        exercises: exerciseEntries, splitIds: [...selectedSplitIds]
       });
       await Promise.all(
         removedPaths.map((p) => deletePhoto(p).catch((err) => console.error('[DayDetail] failed to delete photo:', err)))
@@ -212,6 +223,20 @@
         <p class="text-gb-fg3 text-sm italic">Nothing logged yet.</p>
       {/if}
     </div>
+
+    {#if selectedSplitList.length > 0}
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs text-gb-fg3 uppercase tracking-wider">Splits</span>
+        <div class="flex flex-wrap gap-3">
+          {#each selectedSplitList as split (split.id)}
+            <span class="flex items-center gap-1.5 text-sm text-gb-fg">
+              <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
+              {split.label || 'Untitled'}
+            </span>
+          {/each}
+        </div>
+      </div>
+    {/if}
 
     {#if label}
       <div class="flex flex-col gap-1">
@@ -324,10 +349,27 @@
     </div>
   </div>
 
+  <!-- Splits -->
+  <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
+    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Splits</span>
+    <div class="flex flex-wrap gap-2">
+      {#each splits as split (split.id)}
+        <button
+          type="button"
+          on:click={() => toggleSplit(split.id)}
+          class="px-3 py-1 rounded-full border text-sm transition
+                 {selectedSplitIds.has(split.id)
+                   ? 'border-gb-green text-gb-green bg-gb-bg2'
+                   : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
+        >{split.label || 'Untitled'}</button>
+      {/each}
+    </div>
+  </div>
+
   <!-- Exercises -->
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
     <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
-    <ExerciseEditor {exercises} {allDays} {dateKey} {userId} bind:entries={exerciseEntries} />
+    <ExerciseEditor {exercises} {allDays} {dateKey} {userId} daySplitIds={[...selectedSplitIds]} bind:entries={exerciseEntries} />
   </div>
 
   <!-- Label -->

@@ -166,3 +166,37 @@ describe('ExerciseEditor', () => {
     expect(await getByText('Log Set')).toBeInTheDocument(); // it was added as a card
   });
 });
+
+describe('ExerciseEditor — filtering by the day\'s selected splits', () => {
+  const tiedExercises: Exercise[] = [
+    { id: 'bench', name: 'Bench Press', deleted: false, splitIds: ['push'] },
+    { id: 'squat', name: 'Squat', deleted: false, splitIds: ['legs'] },
+    { id: 'plank', name: 'Plank', deleted: false }, // untied — always available
+  ];
+
+  it('shows every active exercise when no split is selected for the day', () => {
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: tiedExercises, dateKey: '2026-06-10', userId: 'user1', entries: [], daySplitIds: [] }
+    });
+    expect(getByText('+ Bench Press')).toBeInTheDocument();
+    expect(getByText('+ Squat')).toBeInTheDocument();
+    expect(getByText('+ Plank')).toBeInTheDocument();
+  });
+
+  it('narrows to exercises tied to the selected split, plus untied ones', () => {
+    const { getByText, queryByText } = render(ExerciseEditor, {
+      props: { exercises: tiedExercises, dateKey: '2026-06-10', userId: 'user1', entries: [], daySplitIds: ['push'] }
+    });
+    expect(getByText('+ Bench Press')).toBeInTheDocument();
+    expect(getByText('+ Plank')).toBeInTheDocument(); // untied, always shown
+    expect(queryByText('+ Squat')).not.toBeInTheDocument(); // tied to a different split
+  });
+
+  it('shows an exercise tied to multiple splits if any of them match', () => {
+    const multiTied: Exercise[] = [{ id: 'deadlift', name: 'Deadlift', deleted: false, splitIds: ['pull', 'legs'] }];
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: multiTied, dateKey: '2026-06-10', userId: 'user1', entries: [], daySplitIds: ['legs'] }
+    });
+    expect(getByText('+ Deadlift')).toBeInTheDocument();
+  });
+});

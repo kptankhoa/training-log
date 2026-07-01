@@ -70,4 +70,12 @@ describe('exercises store', () => {
     expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { deleted: true });
     expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
   });
+
+  it('updateExerciseSplits calls updateDoc with the new splitIds', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateExerciseSplits } = await import('./exercises');
+    await updateExerciseSplits('user1', 'ex1', ['split1', 'split2']);
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { splitIds: ['split1', 'split2'] });
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
+  });
 });

@@ -5,6 +5,7 @@
   import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
   import { activeTasks, initTasks } from '$lib/stores/tasks';
   import { exercises, initExercises } from '$lib/stores/exercises';
+  import { notes, initNotes } from '$lib/stores/notes';
   import { computeStreaks } from '$lib/streaks';
   import DayDetail from '$lib/components/DayDetail.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -19,6 +20,7 @@
   let unsubDays: (() => void) | null = null;
   let unsubTasks: (() => void) | null = null;
   let unsubExercises: (() => void) | null = null;
+  let unsubNotes: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -29,6 +31,7 @@
       unsubDays?.(); unsubDays = initDays(u.uid, today.getFullYear(), today.getMonth() + 1);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
       unsubExercises?.(); unsubExercises = initExercises(u.uid);
+      unsubNotes?.(); unsubNotes = initNotes(u.uid);
     });
     return () => {
       unsubUser();
@@ -36,6 +39,7 @@
       unsubDays?.();
       unsubTasks?.();
       unsubExercises?.();
+      unsubNotes?.();
     };
   });
 
@@ -70,6 +74,7 @@
         activeTags={$activeTags}
         activeTasks={$activeTasks}
         exercises={$exercises}
+        splits={$notes}
         allDays={$allDays}
         {userId}
         hideOtherSectionsWhileEditingNote={false}

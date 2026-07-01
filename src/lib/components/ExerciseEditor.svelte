@@ -9,10 +9,19 @@
   export let dateKey: string;
   export let userId: string;
   export let entries: ExerciseEntry[] = [];
+  // Splits selected for this day — narrows the pickable list to exercises tied
+  // to one of them (plus untied exercises, which are always available). No
+  // splits selected means no filtering at all.
+  export let daySplitIds: string[] = [];
 
   $: activeExerciseCatalog = exercises.filter((e) => !e.deleted);
   $: exerciseNameById = Object.fromEntries(exercises.map((e) => [e.id, e.name]));
-  $: pickableExercises = activeExerciseCatalog.filter((ex) => !entries.some((e) => e.exerciseId === ex.id));
+  $: pickableExercises = activeExerciseCatalog.filter((ex) => {
+    if (entries.some((e) => e.exerciseId === ex.id)) return false;
+    if (daySplitIds.length === 0) return true;
+    const tiedSplits = ex.splitIds ?? [];
+    return tiedSplits.length === 0 || tiedSplits.some((sid) => daySplitIds.includes(sid));
+  });
   $: lastSessionExercises = getLastSessionExercises(allDays, dateKey);
 
   let draftWeight: Record<string, number> = {};

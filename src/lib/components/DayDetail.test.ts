@@ -28,6 +28,10 @@ const activeTasks: DailyTask[] = [
 const exercises = [
   { id: 'bench', name: 'Bench Press', deleted: false },
 ];
+const splits = [
+  { id: 'push', label: 'Push Day', sortOrder: 1, content: '', color: 'blue' as const },
+  { id: 'pull', label: 'Pull Day', sortOrder: 2, content: '', color: 'red' as const },
+];
 const entry: DayEntry = { tags: ['tag1'], label: 'Leg day', note: '# PR', tasks: ['task1'] };
 const emptyEntry: DayEntry = { tags: [], label: '', note: '' };
 
@@ -382,5 +386,60 @@ describe('DayDetail — exercises integration', () => {
     await fireEvent.click(getByText('Cancel'));
 
     expect(queryByText('Bench Press')).not.toBeInTheDocument();
+  });
+});
+
+describe('DayDetail — splits', () => {
+  it('shows selected splits in view mode', () => {
+    const withSplit: DayEntry = { ...entry, splitIds: ['push'] };
+    const { getByText, queryByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry: withSplit, activeTags, splits, userId: 'user1' }
+    });
+    expect(getByText('Push Day')).toBeInTheDocument();
+    expect(queryByText('Pull Day')).not.toBeInTheDocument();
+  });
+
+  it('toggling a split chip in edit mode selects it', async () => {
+    const { getByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, splits, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    const pushChip = getByText('Push Day');
+    await fireEvent.click(pushChip);
+    expect(pushChip.className).toContain('border-gb-green');
+  });
+
+  it('includes selected splitIds in the saveDay call', async () => {
+    const { saveDay } = await import('$lib/stores/days');
+    const { getByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, splits, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Push Day'));
+    await fireEvent.click(getByText('Save'));
+
+    expect(saveDay).toHaveBeenCalledWith(
+      'user1',
+      '2026-06-10',
+      expect.objectContaining({ splitIds: ['push'] })
+    );
+  });
+
+  it('picking a split narrows the exercise picker in ExerciseEditor', async () => {
+    const tiedExercises = [
+      { id: 'bench', name: 'Bench Press', deleted: false, splitIds: ['push'] },
+      { id: 'row', name: 'Row', deleted: false, splitIds: ['pull'] },
+    ];
+    const { getByText, queryByText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, exercises: tiedExercises, splits, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    expect(getByText('+ Bench Press')).toBeInTheDocument();
+    expect(getByText('+ Row')).toBeInTheDocument();
+
+    await fireEvent.click(getByText('Push Day'));
+
+    expect(getByText('+ Bench Press')).toBeInTheDocument();
+    expect(queryByText('+ Row')).not.toBeInTheDocument();
   });
 });

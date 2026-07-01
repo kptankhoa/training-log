@@ -26,3 +26,7 @@ export async function addExercise(userId: string, name: string): Promise<string>
 export async function deleteExercise(userId: string, exerciseId: string): Promise<void> {
   await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { deleted: true });
 }
+
+export async function updateExerciseSplits(userId: string, exerciseId: string, splitIds: string[]): Promise<void> {
+  await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { splitIds });
+}

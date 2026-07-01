@@ -14,12 +14,14 @@ export interface DayEntry {
   tasks?: string[]; // completed daily task ids for the day
   photos?: string[]; // Storage paths for progress photos taken this day
   exercises?: ExerciseEntry[];
+  splitIds?: string[]; // splits selected for this day
 }
 
 export interface Exercise {
   id: string;
   name: string;
   deleted: boolean;
+  splitIds?: string[]; // splits this exercise belongs to; empty/undefined = available for any split
 }
 
 export interface ExerciseSet {

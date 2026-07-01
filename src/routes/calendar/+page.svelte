@@ -5,6 +5,7 @@
   import { days, allDays, daysLoading, initDays } from '$lib/stores/days';
   import { activeTasks, initTasks } from '$lib/stores/tasks';
   import { exercises, initExercises } from '$lib/stores/exercises';
+  import { notes, initNotes } from '$lib/stores/notes';
   import { computeStreaks } from '$lib/streaks';
   import Calendar from '$lib/components/Calendar.svelte';
   import DayModal from '$lib/components/DayModal.svelte';
@@ -18,6 +19,7 @@
   let unsubDays: (() => void) | null = null;
   let unsubTasks: (() => void) | null = null;
   let unsubExercises: (() => void) | null = null;
+  let unsubNotes: (() => void) | null = null;
 
   $: userId = $user?.uid ?? '';
 
@@ -28,6 +30,7 @@
       unsubDays?.(); unsubDays = initDays(u.uid, viewYear, viewMonth);
       unsubTasks?.(); unsubTasks = initTasks(u.uid);
       unsubExercises?.(); unsubExercises = initExercises(u.uid);
+      unsubNotes?.(); unsubNotes = initNotes(u.uid);
     });
     return () => {
       unsubUser();
@@ -35,6 +38,7 @@
       unsubDays?.();
       unsubTasks?.();
       unsubExercises?.();
+      unsubNotes?.();
     };
   });
 
@@ -95,6 +99,7 @@
     activeTags={$activeTags}
     activeTasks={$activeTasks}
     exercises={$exercises}
+    splits={$notes}
     allDays={$allDays}
     {userId}
     on:close={() => (selectedDate = null)}
