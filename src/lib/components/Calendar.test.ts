@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import Calendar from './Calendar.svelte';
 import CalendarTest from './CalendarTest.svelte';
@@ -6,6 +6,7 @@ import type { TrainingTag, DayEntry } from '$lib/types';
 
 const tags: TrainingTag[] = [
   { id: 'tag1', name: 'Weight Lifting', color: 'blue', deleted: false },
+  { id: 'tag2', name: 'Boxing', color: 'red', deleted: false },
 ];
 const days: Record<string, DayEntry> = {
   '2026-06-10': { tags: ['tag1'], label: 'Leg day', note: '# PR' },
@@ -58,5 +59,52 @@ describe('Calendar', () => {
     });
     await fireEvent.click(getByLabelText('Next month'));
     expect(getByTestId('next-month-count').textContent).toBe('1');
+  });
+
+  it('shows trained count of 1 for a single day with tags', () => {
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days, tags } });
+    const label = getByText('day trained this month');
+    expect(label.previousElementSibling?.textContent).toBe('1');
+  });
+
+  it('shows plural label when multiple days have tags', () => {
+    const multiDays: Record<string, DayEntry> = {
+      '2026-06-10': { tags: ['tag1'], label: '', note: '' },
+      '2026-06-11': { tags: ['tag2'], label: '', note: '' },
+    };
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days: multiDays, tags } });
+    const label = getByText('days trained this month');
+    expect(label.previousElementSibling?.textContent).toBe('2');
+  });
+
+  it('shows tag legend with active tag names', () => {
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags } });
+    expect(getByText('Weight Lifting')).toBeInTheDocument();
+    expect(getByText('Boxing')).toBeInTheDocument();
+  });
+
+  it('hides deleted tags from legend', () => {
+    const withDeleted: TrainingTag[] = [
+      ...tags,
+      { id: 'tag3', name: 'Old Sport', color: 'yellow', deleted: true },
+    ];
+    const { queryByText } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags: withDeleted } });
+    expect(queryByText('Old Sport')).not.toBeInTheDocument();
+  });
+
+  it('marks today with data-today and correct date number', () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const { container } = render(Calendar, { props: { year, month, days: {}, tags: [] } });
+    const todayCell = container.querySelector('[data-today]');
+    expect(todayCell).not.toBeNull();
+    expect(todayCell?.querySelector('span')?.textContent?.trim()).toBe(String(day));
+  });
+
+  it('does not mark any cell as today when viewing a different month', () => {
+    const { container } = render(Calendar, { props: { year: 2020, month: 1, days: {}, tags: [] } });
+    expect(container.querySelector('[data-today]')).toBeNull();
   });
 });
