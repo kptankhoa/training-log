@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
   import { notes, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
@@ -8,32 +9,44 @@
   $: userId = $user?.uid ?? '';
 
   let expandedId: string | null = null;
-  let drafts: Record<string, { label: string; sortOrder: number; content: string }> = {};
+  let editingId: string | null = null;
+  let draft: { label: string; sortOrder: number; content: string } | null = null;
 
   function toggle(note: PlanNote) {
     if (expandedId === note.id) {
       expandedId = null;
+      editingId = null;
+      draft = null;
     } else {
       expandedId = note.id;
-      if (!drafts[note.id]) {
-        drafts[note.id] = { label: note.label, sortOrder: note.sortOrder, content: note.content };
-      }
+      editingId = null;
+      draft = null;
     }
   }
 
+  function startEdit(note: PlanNote) {
+    editingId = note.id;
+    draft = { label: note.label, sortOrder: note.sortOrder, content: note.content };
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    draft = null;
+  }
+
   async function handleSave(noteId: string) {
-    const d = drafts[noteId];
-    if (!d || !userId) return;
-    await saveNote(userId, noteId, { label: d.label, sortOrder: Number(d.sortOrder), content: d.content });
-    expandedId = null;
+    if (!draft || !userId) return;
+    await saveNote(userId, noteId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content });
+    editingId = null;
+    draft = null;
   }
 
   async function handleDelete(noteId: string) {
     if (!userId) return;
     await deleteNote(userId, noteId);
     expandedId = null;
-    delete drafts[noteId];
-    drafts = drafts;
+    editingId = null;
+    draft = null;
   }
 
   async function handleAdd() {
@@ -68,7 +81,7 @@
     {#each $notes as note (note.id)}
       <div class="bg-gb-bg1 border border-gb-bg2">
 
-        <!-- Header / toggle row -->
+        <!-- Header / toggle -->
         <button
           type="button"
           on:click={() => toggle(note)}
@@ -78,47 +91,80 @@
           <span class="text-gb-fg3 text-xs ml-4 shrink-0">{expandedId === note.id ? '▲' : '▼'}</span>
         </button>
 
-        <!-- Expanded content -->
-        {#if expandedId === note.id && drafts[note.id]}
-          <div class="px-4 pb-4 flex flex-col gap-4 border-t border-gb-bg2">
+        {#if expandedId === note.id}
+          <div class="border-t border-gb-bg2">
 
-            <div class="flex gap-3 pt-4">
-              <div class="flex flex-col gap-1 flex-1">
-                <label for="label-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
-                <input
-                  id="label-{note.id}"
-                  type="text"
-                  bind:value={drafts[note.id].label}
-                  class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
-                         focus:outline-none focus:border-gb-blue w-full"
-                />
+            {#if editingId === note.id && draft}
+              <!-- Edit mode -->
+              <div class="px-4 py-4 flex flex-col gap-4">
+                <div class="flex gap-3">
+                  <div class="flex flex-col gap-1 flex-1">
+                    <label for="label-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
+                    <input
+                      id="label-{note.id}"
+                      type="text"
+                      bind:value={draft.label}
+                      class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
+                             focus:outline-none focus:border-gb-blue w-full"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-1 w-20">
+                    <label for="order-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Order</label>
+                    <input
+                      id="order-{note.id}"
+                      type="number"
+                      bind:value={draft.sortOrder}
+                      class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
+                             focus:outline-none focus:border-gb-blue w-full"
+                    />
+                  </div>
+                </div>
+
+                <MarkdownEditor bind:value={draft.content} placeholder="Write your note…" initialMode="edit" />
+
+                <div class="flex justify-between">
+                  <button
+                    type="button"
+                    on:click={() => handleDelete(note.id)}
+                    class="text-gb-red text-sm hover:opacity-80 transition px-2 py-1"
+                  >Delete</button>
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      on:click={cancelEdit}
+                      class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+                    >Cancel</button>
+                    <button
+                      type="button"
+                      on:click={() => handleSave(note.id)}
+                      class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition"
+                    >Save</button>
+                  </div>
+                </div>
               </div>
-              <div class="flex flex-col gap-1 w-20">
-                <label for="order-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Order</label>
-                <input
-                  id="order-{note.id}"
-                  type="number"
-                  bind:value={drafts[note.id].sortOrder}
-                  class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
-                         focus:outline-none focus:border-gb-blue w-full"
-                />
+
+            {:else}
+              <!-- View mode -->
+              <div class="px-4 py-4 flex flex-col gap-4">
+                {#if note.content}
+                  <div class="prose prose-invert max-w-none text-sm text-gb-fg
+                              [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
+                              [&_strong]:text-gb-orange [&_a]:text-gb-blue">
+                    {@html marked(note.content)}
+                  </div>
+                {:else}
+                  <p class="text-gb-fg3 text-sm italic">No content yet.</p>
+                {/if}
+                <div class="flex justify-end">
+                  <button
+                    type="button"
+                    on:click={() => startEdit(note)}
+                    class="bg-gb-bg2 text-gb-fg text-sm px-4 py-2 hover:bg-gb-bg3 transition"
+                  >Update</button>
+                </div>
               </div>
-            </div>
+            {/if}
 
-            <MarkdownEditor bind:value={drafts[note.id].content} placeholder="Write your note…" initialMode="edit" />
-
-            <div class="flex justify-between">
-              <button
-                type="button"
-                on:click={() => handleDelete(note.id)}
-                class="text-gb-red text-sm hover:opacity-80 transition px-2 py-1"
-              >Delete</button>
-              <button
-                type="button"
-                on:click={() => handleSave(note.id)}
-                class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition"
-              >Save</button>
-            </div>
           </div>
         {/if}
       </div>
