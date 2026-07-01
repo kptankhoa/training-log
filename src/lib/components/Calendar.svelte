@@ -75,15 +75,17 @@
         <button
           type="button"
           on:click={() => dispatch('selectDay', key(cell.num))}
+          data-has-note={cell.hasNote ? '' : undefined}
+          data-today={cell.isToday ? '' : undefined}
           class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
                  flex flex-col items-start gap-0.5 text-left
                  {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}"
           style={cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
         >
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1.5">
             <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
             {#if cell.hasNote}
-              <span class="w-1.5 h-1.5 rounded-full bg-gb-gray shrink-0" title="Has note"></span>
+              <span class="w-2 h-2 rounded-full bg-gb-fg3 shrink-0" title="Has note"></span>
             {/if}
           </div>
 
