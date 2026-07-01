@@ -118,70 +118,74 @@
   >Copy last session</button>
 {/if}
 
-{#each entries as ex (ex.exerciseId)}
-  <div class="bg-gb-bg2 border border-gb-bg3 p-3 flex flex-col gap-2">
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-sm font-semibold text-gb-fg">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
-      <button
-        type="button"
-        on:click={() => handleRemoveExerciseClick(ex.exerciseId)}
-        aria-label={confirmingExerciseId === ex.exerciseId ? 'Confirm remove exercise' : 'Remove exercise'}
-        class="text-xs font-medium px-2 py-1 transition-colors shrink-0
-               {confirmingExerciseId === ex.exerciseId ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
-      >{confirmingExerciseId === ex.exerciseId ? 'Confirm?' : '✕'}</button>
-    </div>
-
-    {#if ex.sets.length > 0}
-      <div class="flex flex-wrap gap-1.5">
-        {#each ex.sets as set, i}
+{#if entries.length > 0}
+  <div class="max-h-72 overflow-y-auto flex flex-col gap-2 pr-1">
+    {#each entries as ex (ex.exerciseId)}
+      <div class="bg-gb-bg2 border border-gb-bg3 p-3 flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-sm font-semibold text-gb-fg">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
           <button
             type="button"
-            on:click={() => removeSet(ex.exerciseId, i)}
-            class="text-xs px-2 py-1 bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-red hover:text-gb-red transition"
-          >{set.weight}×{set.reps} ✕</button>
-        {/each}
-      </div>
-    {/if}
+            on:click={() => handleRemoveExerciseClick(ex.exerciseId)}
+            aria-label={confirmingExerciseId === ex.exerciseId ? 'Confirm remove exercise' : 'Remove exercise'}
+            class="text-xs font-medium px-2 py-1 transition-colors shrink-0
+                   {confirmingExerciseId === ex.exerciseId ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
+          >{confirmingExerciseId === ex.exerciseId ? 'Confirm?' : '✕'}</button>
+        </div>
 
-    <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1">
-        <button
-          type="button"
-          on:click={() => adjustWeight(ex.exerciseId, -2.5)}
-          aria-label="Decrease weight"
-          class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
-        >−</button>
-        <span class="text-sm text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
-        <button
-          type="button"
-          on:click={() => adjustWeight(ex.exerciseId, 2.5)}
-          aria-label="Increase weight"
-          class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
-        >+</button>
+        {#if ex.sets.length > 0}
+          <div class="flex flex-wrap gap-1.5">
+            {#each ex.sets as set, i}
+              <button
+                type="button"
+                on:click={() => removeSet(ex.exerciseId, i)}
+                class="text-xs px-2 py-1 bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-red hover:text-gb-red transition"
+              >{set.weight}×{set.reps} ✕</button>
+            {/each}
+          </div>
+        {/if}
+
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              on:click={() => adjustWeight(ex.exerciseId, -2.5)}
+              aria-label="Decrease weight"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+            >−</button>
+            <span class="text-sm text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
+            <button
+              type="button"
+              on:click={() => adjustWeight(ex.exerciseId, 2.5)}
+              aria-label="Increase weight"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+            >+</button>
+          </div>
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              on:click={() => adjustReps(ex.exerciseId, -1)}
+              aria-label="Decrease reps"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+            >−</button>
+            <span class="text-sm text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
+            <button
+              type="button"
+              on:click={() => adjustReps(ex.exerciseId, 1)}
+              aria-label="Increase reps"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+            >+</button>
+          </div>
+          <button
+            type="button"
+            on:click={() => logSet(ex.exerciseId)}
+            class="flex-1 bg-gb-green text-gb-bg font-semibold text-sm px-3 py-1.5 hover:opacity-90 transition"
+          >Log Set</button>
+        </div>
       </div>
-      <div class="flex items-center gap-1">
-        <button
-          type="button"
-          on:click={() => adjustReps(ex.exerciseId, -1)}
-          aria-label="Decrease reps"
-          class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
-        >−</button>
-        <span class="text-sm text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
-        <button
-          type="button"
-          on:click={() => adjustReps(ex.exerciseId, 1)}
-          aria-label="Increase reps"
-          class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
-        >+</button>
-      </div>
-      <button
-        type="button"
-        on:click={() => logSet(ex.exerciseId)}
-        class="flex-1 bg-gb-green text-gb-bg font-semibold text-sm px-3 py-1.5 hover:opacity-90 transition"
-      >Log Set</button>
-    </div>
+    {/each}
   </div>
-{/each}
+{/if}
 
 <div class="flex flex-wrap gap-2">
   {#each pickableExercises as ex (ex.id)}
