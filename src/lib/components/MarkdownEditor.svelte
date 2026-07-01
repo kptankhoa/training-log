@@ -16,7 +16,7 @@
     {#if label}
       <span class="text-gb-fg3 text-xs uppercase tracking-wider">{label}</span>
     {:else}
-      <span />
+      <span></span>
     {/if}
     <button
       type="button"

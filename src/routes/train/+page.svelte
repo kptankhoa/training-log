@@ -157,8 +157,9 @@
 
       <!-- Duration input -->
       <div class="flex items-center gap-2 text-sm">
-        <label class="text-gb-fg3">Rest:</label>
+        <label for="rest-seconds" class="text-gb-fg3">Rest:</label>
         <input
+          id="rest-seconds"
           type="number" min="1" max="3600"
           bind:value={inputSeconds}
           on:change={reset}

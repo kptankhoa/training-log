@@ -41,14 +41,26 @@
     await saveDay(userId, dateKey, { tags: [...selectedIds], label, note });
     dispatch('close');
   }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') dispatch('close');
+  }
+
+  function autofocus(el: HTMLInputElement) {
+    el.focus();
+  }
 </script>
 
+<svelte:window on:keydown={handleKeydown} />
+
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   class="fixed inset-0 bg-black/60 z-60 flex items-end md:items-center justify-center"
   on:click|self={() => dispatch('close')}
   role="dialog"
   aria-modal="true"
   aria-labelledby="modal-title"
+  tabindex="-1"
 >
   <div class="bg-gb-bg1 w-full md:w-[520px] max-h-[85vh] overflow-y-auto
               rounded-t-2xl md:rounded-xl shadow-2xl p-6 pb-24 md:pb-6 flex flex-col gap-5">
@@ -80,7 +92,7 @@
             on:blur={commitNewTag}
             class="px-3 py-1 rounded-full border border-gb-bg3 bg-gb-bg2 text-gb-fg
                    text-sm focus:outline-none focus:border-gb-blue"
-            autofocus
+            use:autofocus
           />
         {:else}
           <button

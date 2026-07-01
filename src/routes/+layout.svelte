@@ -17,7 +17,7 @@
 {#if loading}
   <div class="min-h-screen flex items-center justify-center bg-gb-bg">
     <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin" />
+      <div class="w-8 h-8 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></div>
       <span class="text-gb-fg3 text-sm tracking-widest uppercase">Loading</span>
     </div>
   </div>
