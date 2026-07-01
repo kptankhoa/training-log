@@ -50,6 +50,14 @@
   });
 
   $: trainedCount = cellData.filter((c) => !('null' in c) && (c as { colors: string[] }).colors.length > 0).length;
+
+  $: tagCounts = (() => {
+    const counts: Record<string, number> = {};
+    Object.values(days).forEach((entry) => {
+      entry.tags.forEach((id) => { counts[id] = (counts[id] ?? 0) + 1; });
+    });
+    return counts;
+  })();
 </script>
 
 <div class="select-none">
@@ -114,6 +122,7 @@
         <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
           <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
           {tag.name}
+          <span class="text-gb-fg4 font-medium">{tagCounts[tag.id] ?? 0}x</span>
         </span>
       {/each}
     </div>
