@@ -3,10 +3,11 @@
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
   import { notes, notesLoading, initNotes, addNote, saveNote, deleteNote } from '$lib/stores/notes';
+  import { activeExercises, updateExerciseSplits, initExercises } from '$lib/stores/exercises';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import type { PlanNote, GruvboxColor } from '$lib/types';
+  import type { PlanNote, GruvboxColor, Exercise } from '$lib/types';
 
   function cycleColor() {
     if (!draft) return;
@@ -85,10 +86,23 @@
     await addNote(userId);
   }
 
+  function isExerciseTied(exercise: Exercise, splitId: string): boolean {
+    return (exercise.splitIds ?? []).includes(splitId);
+  }
+
+  async function toggleExerciseTie(exercise: Exercise, splitId: string) {
+    const current = exercise.splitIds ?? [];
+    const next = isExerciseTied(exercise, splitId)
+      ? current.filter((id) => id !== splitId)
+      : [...current, splitId];
+    await updateExerciseSplits(userId, exercise.id, next);
+  }
+
   onMount(() => {
     const unsubUser = user.subscribe((u) => {
       if (!u) return;
       initNotes(u.uid);
+      initExercises(u.uid);
     });
     return unsubUser;
   });
@@ -162,6 +176,26 @@
                 </div>
 
                 <MarkdownEditor bind:value={draft.content} placeholder="Write your note…" initialMode="edit" />
+
+                <div class="flex flex-col gap-2">
+                  <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
+                  {#if $activeExercises.length === 0}
+                    <p class="text-gb-fg3 text-xs italic">No exercises yet — add some in Settings.</p>
+                  {:else}
+                    <div class="flex flex-wrap gap-2">
+                      {#each $activeExercises as exercise (exercise.id)}
+                        <button
+                          type="button"
+                          on:click={() => toggleExerciseTie(exercise, note.id)}
+                          class="px-3 py-1 text-xs border transition
+                                 {isExerciseTied(exercise, note.id)
+                                   ? 'border-gb-green text-gb-green bg-gb-bg2'
+                                   : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
+                        >{exercise.name}</button>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
 
                 <div class="flex justify-between">
                   <button
