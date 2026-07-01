@@ -20,8 +20,9 @@
     { key: 'bfp',        label: 'Body Fat %',  unit: '%',   color: '#fb4934' },
     { key: 'score',      label: 'Score',       unit: '',    color: '#d3869b' },
   ];
-  let activeMetric: MetricKey = 'weight';
-  $: activeMetricInfo = metrics.find((m) => m.key === activeMetric)!;
+  type TabKey = MetricKey | 'all';
+  let activeMetric: TabKey = 'weight';
+  $: activeMetricInfo = metrics.find((m) => m.key === activeMetric);
 
   function formatLabel(dateKey: string): string {
     const [y, m, d] = dateKey.split('-').map(Number);
@@ -29,7 +30,10 @@
   }
 
   $: chartLabels = $measurements.map((e) => formatLabel(e.id));
-  $: chartData = $measurements.map((e) => e[activeMetric]);
+  $: chartData = activeMetricInfo ? $measurements.map((e) => e[activeMetricInfo.key]) : [];
+  $: chartSeries = activeMetric === 'all'
+    ? metrics.map((m) => ({ label: m.label, data: $measurements.map((e) => e[m.key]), color: m.color, unit: m.unit }))
+    : null;
 
   // Add entry form
   let showAddForm = false;
@@ -76,6 +80,14 @@
   {:else}
     <!-- Metric tabs -->
     <div class="flex gap-2 overflow-x-auto pb-1">
+      <button
+        type="button"
+        on:click={() => (activeMetric = 'all')}
+        class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
+               {activeMetric === 'all' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+      >
+        All
+      </button>
       {#each metrics as m (m.key)}
         <button
           type="button"
@@ -89,7 +101,11 @@
     </div>
 
     <div class="bg-gb-bg1 rounded-xl p-4">
-      <LineChart labels={chartLabels} data={chartData} color={activeMetricInfo.color} unit={activeMetricInfo.unit} />
+      {#if chartSeries}
+        <LineChart labels={chartLabels} series={chartSeries} />
+      {:else if activeMetricInfo}
+        <LineChart labels={chartLabels} data={chartData} color={activeMetricInfo.color} unit={activeMetricInfo.unit} />
+      {/if}
     </div>
 
     <!-- Entries list -->
