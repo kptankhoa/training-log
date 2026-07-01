@@ -124,6 +124,19 @@
       </div>
     </div>
 
+    <!-- Label -->
+    <div class="flex flex-col gap-1">
+      <label for="day-label" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
+      <input
+        id="day-label"
+        type="text"
+        bind:value={label}
+        placeholder="Short label shown on calendar"
+        class="w-full bg-gb-bg2 text-gb-fg text-sm rounded-md px-3 py-2
+               border border-gb-bg3 focus:outline-none focus:border-gb-blue"
+      />
+    </div>
+
     <!-- Daily tasks -->
     {#if activeTasks.length > 0}
       <div class="flex flex-col gap-2">
@@ -143,19 +156,6 @@
         </div>
       </div>
     {/if}
-
-    <!-- Label -->
-    <div class="flex flex-col gap-1">
-      <label for="day-label" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
-      <input
-        id="day-label"
-        type="text"
-        bind:value={label}
-        placeholder="Short label shown on calendar"
-        class="w-full bg-gb-bg2 text-gb-fg text-sm rounded-md px-3 py-2
-               border border-gb-bg3 focus:outline-none focus:border-gb-blue"
-      />
-    </div>
 
     <!-- Notes -->
     <div class="flex flex-col gap-1">
