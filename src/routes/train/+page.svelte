@@ -10,6 +10,8 @@
   let selectedId: string | null = null;
   $: selectedSplit = $notes.find((n) => n.id === selectedId) ?? null;
 
+  const PRESETS = [30, 60, 75, 90, 120];
+
   // Timer state
   let inputSeconds = 60;
   let remaining = 0;
@@ -54,6 +56,11 @@
     pause();
     remaining = 0;
     finished = false;
+  }
+
+  function selectPreset(secs: number) {
+    inputSeconds = secs;
+    reset();
   }
 
   function formatTime(secs: number): string {
@@ -171,6 +178,21 @@
                  focus:outline-none focus:border-gb-blue disabled:opacity-40"
         />
         <span class="text-gb-fg3">sec</span>
+      </div>
+
+      <!-- Presets -->
+      <div class="flex gap-2 flex-wrap justify-center">
+        {#each PRESETS as secs}
+          <button
+            type="button"
+            on:click={() => selectPreset(secs)}
+            disabled={running || (remaining > 0 && !finished)}
+            class="px-3 py-1 text-sm border transition disabled:opacity-40
+                   {inputSeconds === secs
+                     ? 'border-gb-green text-gb-green bg-gb-bg1'
+                     : 'border-gb-bg3 text-gb-fg2 bg-gb-bg hover:bg-gb-bg1'}"
+          >{secs}s</button>
+        {/each}
       </div>
 
       <!-- Controls -->
