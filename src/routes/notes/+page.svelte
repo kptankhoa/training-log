@@ -43,7 +43,7 @@
 
   async function handleSave(noteId: string) {
     if (!draft || !userId) return;
-    await saveNote(userId, noteId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content });
+    await saveNote(userId, noteId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content, color: draft.color });
     editingId = null;
     draft = null;
   }
@@ -94,7 +94,7 @@
           on:click={() => toggle(note)}
           class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gb-bg2 transition"
         >
-          <span class="w-2 h-4 shrink-0" style="background-color:{GRUVBOX_COLORS[note.color ?? 'blue']}"></span>
+          <span class="w-3 h-3 shrink-0" style="background-color:{GRUVBOX_COLORS[note.color ?? 'blue']}"></span>
           <span class="font-semibold text-gb-fg text-sm flex-1">{note.label || 'Untitled'}</span>
           <span class="text-gb-fg3 text-xs shrink-0">{expandedId === note.id ? '▲' : '▼'}</span>
         </button>
@@ -111,7 +111,7 @@
                     on:click|stopPropagation={cycleColor}
                     style="background-color:{GRUVBOX_COLORS[draft.color]}"
                     title="Click to change color"
-                    class="w-4 h-9 shrink-0 mb-0 hover:opacity-80 transition-opacity self-end"
+                    class="w-6 h-9 shrink-0 hover:opacity-80 transition-opacity"
                   ></button>
                   <div class="flex flex-col gap-1 flex-1">
                     <label for="label-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
