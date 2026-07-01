@@ -10,7 +10,7 @@
   $: selectedSplit = $notes.find((n) => n.id === selectedId) ?? null;
 
   // Timer state
-  let inputSeconds = 90;
+  let inputSeconds = 60;
   let remaining = 0;
   let running = false;
   let finished = false;
