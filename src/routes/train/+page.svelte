@@ -173,9 +173,8 @@
           type="button"
           on:click={startStop}
           disabled={totalInput === 0}
-          class="px-6 py-2 font-semibold text-sm transition
-                 {running ? 'bg-gb-orange text-white' : 'bg-gb-green text-gb-bg'}
-                 hover:opacity-90 disabled:opacity-40"
+          class="px-6 py-2 font-semibold text-sm transition hover:opacity-90 disabled:opacity-40"
+          style={running ? 'background:#fe8019;color:#fff' : 'background:#b8bb26;color:#1d2021'}
         >
           {running ? 'Pause' : remaining > 0 && !finished ? 'Resume' : 'Start'}
         </button>
