@@ -140,13 +140,8 @@
     {/each}
   </div>
 
-  <div class="mt-3 px-1 flex items-center gap-2 text-sm">
-    <span class="text-gb-green font-semibold glow-green">{trainedCount}</span>
-    <span class="text-gb-fg3">day{trainedCount !== 1 ? 's' : ''} trained this month</span>
-  </div>
-
   {#if tags.filter((t) => !t.deleted).length > 0}
-    <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
+    <div class="mt-4 px-1 flex flex-wrap gap-x-4 gap-y-1">
       {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
         <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
           <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
@@ -156,4 +151,9 @@
       {/each}
     </div>
   {/if}
+
+    <div class="mt-3 px-1 flex items-center gap-2 text-sm">
+    <span class="text-gb-green font-semibold glow-green">{trainedCount}</span>
+    <span class="text-gb-fg3">day{trainedCount !== 1 ? 's' : ''} trained this month</span>
+  </div>
 </div>

@@ -57,7 +57,7 @@
   $: streaks = computeStreaks($allDays);
 </script>
 
-<div class="p-4 md:p-8 max-w-3xl mx-auto flex flex-col gap-4">
+<div class="p-4 md:p-8 max-w-3xl mx-auto flex flex-col gap-3">
   {#if $tagsLoading || $daysLoading}
     <Spinner />
   {:else}

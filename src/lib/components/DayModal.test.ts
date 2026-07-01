@@ -27,11 +27,12 @@ describe('DayModal', () => {
   });
 
   it('renders DayDetail content inside the sheet', () => {
-    const { getByText, getByDisplayValue } = render(DayModal, {
+    const { getByText } = render(DayModal, {
       props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
     });
+    // entry has content, so DayDetail defaults to its view mode
     expect(getByText('Weight Lifting')).toBeInTheDocument();
-    expect(getByDisplayValue('Leg day')).toBeInTheDocument();
+    expect(getByText('Leg day')).toBeInTheDocument();
   });
 
   it('emits close when X button clicked', async () => {
@@ -62,6 +63,7 @@ describe('DayModal', () => {
     const { getByText, getByTestId } = render(DayModalTest, {
       props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
     });
+    await fireEvent.click(getByText('Edit')); // entry has content, DayDetail starts in view mode
     await fireEvent.click(getByText('Save'));
     expect(getByTestId('close-count').textContent).toBe('0');
     await waitFor(() => {

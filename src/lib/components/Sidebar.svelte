@@ -6,8 +6,8 @@
   const nav = [
     { href: '/',         label: 'Today',    icon: icons.home     },
     { href: '/calendar', label: 'Calendar', icon: icons.calendar },
-    { href: '/splits',   label: 'Splits',   icon: icons.document },
     { href: '/train',    label: 'Train',    icon: icons.clock    },
+    { href: '/splits',   label: 'Splits',   icon: icons.document },
     { href: '/stats',    label: 'Stats',    icon: icons.barChart },
     { href: '/settings', label: 'Settings', icon: icons.settings },
   ];
