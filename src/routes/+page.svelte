@@ -50,7 +50,7 @@
   }
 
   $: selectedEntry = selectedDate
-    ? ($days[selectedDate] ?? { tags: [], label: '', note: '', tasks: [] })
+    ? ($days[selectedDate] ?? { tags: [], label: '', note: '', tasks: [], photos: [] })
     : null;
 </script>
 

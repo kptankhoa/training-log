@@ -2,8 +2,10 @@
   import { createEventDispatcher } from 'svelte';
   import TagChip from './TagChip.svelte';
   import MarkdownEditor from './MarkdownEditor.svelte';
+  import { onMount } from 'svelte';
   import { saveDay } from '$lib/stores/days';
   import { addTag } from '$lib/stores/tags';
+  import { uploadPhoto, getPhotoUrl, deletePhoto } from '$lib/stores/photos';
   import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
@@ -22,6 +24,23 @@
   let addingTag = false;
   let saving = false;
   let saved = false;
+
+  // Photos: uploads commit to Storage immediately (need a real ref to preview),
+  // but removals only take effect on Save, so Close still fully discards them.
+  const originalPhotoPaths = entry.photos ?? [];
+  let photoPaths = [...originalPhotoPaths];
+  let photoUrls: Record<string, string> = {};
+  let uploadingPhoto = false;
+  let photoError = false;
+  let fileInput: HTMLInputElement;
+
+  onMount(() => {
+    photoPaths.forEach((path) => {
+      getPhotoUrl(path)
+        .then((url) => { photoUrls[path] = url; photoUrls = photoUrls; })
+        .catch((err) => console.error('[DayModal] failed to load photo:', err));
+    });
+  });
 
   $: [yr, mo, dy] = dateKey.split('-').map(Number);
   $: heading = new Date(yr, mo - 1, dy).toLocaleDateString('en-US', {
@@ -47,11 +66,45 @@
     addingTag = false;
   }
 
+  function triggerPhotoPicker() {
+    fileInput?.click();
+  }
+
+  async function handlePhotoSelect(e: Event) {
+    const input = e.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    uploadingPhoto = true;
+    photoError = false;
+    try {
+      const path = await uploadPhoto(userId, dateKey, file);
+      const url = await getPhotoUrl(path);
+      photoUrls[path] = url;
+      photoUrls = photoUrls;
+      photoPaths = [...photoPaths, path];
+    } catch (err) {
+      photoError = true;
+      console.error('[DayModal] photo upload failed:', err);
+    } finally {
+      uploadingPhoto = false;
+    }
+  }
+
+  function removePhoto(path: string) {
+    photoPaths = photoPaths.filter((p) => p !== path);
+  }
+
   async function handleSave() {
     if (saving || saved) return;
     saving = true;
     try {
-      await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds] });
+      const removedPaths = originalPhotoPaths.filter((p) => !photoPaths.includes(p));
+      await saveDay(userId, dateKey, { tags: [...selectedIds], label, note, tasks: [...completedTaskIds], photos: photoPaths });
+      await Promise.all(
+        removedPaths.map((p) => deletePhoto(p).catch((err) => console.error('[DayModal] failed to delete photo:', err)))
+      );
       saving = false;
       saved = true;
       setTimeout(() => dispatch('close'), 450);
@@ -161,6 +214,58 @@
     <div class="flex flex-col gap-1">
       <span class="text-xs text-gb-fg3 uppercase tracking-wider">Notes</span>
       <MarkdownEditor bind:value={note} placeholder="Bodyweight, PRs, observations…" initialMode={note ? 'preview' : 'edit'} rows={6} />
+    </div>
+
+    <!-- Progress photos -->
+    <div class="flex flex-col gap-2">
+      <span class="text-xs text-gb-fg3 uppercase tracking-wider">Progress photos</span>
+      <div class="flex flex-wrap gap-2">
+        {#each photoPaths as path (path)}
+          <div class="relative w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3">
+            {#if photoUrls[path]}
+              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
+            {:else}
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+              </div>
+            {/if}
+            <button
+              type="button"
+              on:click={() => removePhoto(path)}
+              aria-label="Remove photo"
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center
+                     bg-gb-red text-white text-xs leading-none"
+            >✕</button>
+          </div>
+        {/each}
+
+        {#if uploadingPhoto}
+          <div class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 flex items-center justify-center">
+            <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+          </div>
+        {/if}
+
+        <button
+          type="button"
+          on:click={triggerPhotoPicker}
+          disabled={uploadingPhoto}
+          aria-label="Add photo"
+          class="w-20 h-20 shrink-0 border border-dashed border-gb-bg3 text-gb-fg3 text-2xl
+                 hover:border-gb-blue hover:text-gb-blue transition disabled:opacity-40"
+        >+</button>
+      </div>
+      {#if photoError}
+        <span class="text-xs text-gb-red">Upload failed — try again.</span>
+      {/if}
+      <input
+        bind:this={fileInput}
+        data-testid="photo-file-input"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        on:change={handlePhotoSelect}
+        class="hidden"
+      />
     </div>
 
     <button

@@ -12,6 +12,7 @@ export interface DayEntry {
   label: string;
   note: string;
   tasks?: string[]; // completed daily task ids for the day
+  photos?: string[]; // Storage paths for progress photos taken this day
 }
 
 export interface DailyTask {
