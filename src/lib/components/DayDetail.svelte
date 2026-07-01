@@ -7,6 +7,7 @@
   import { addTag } from '$lib/stores/tags';
   import { uploadPhoto, getPhotoUrl, deletePhoto } from '$lib/stores/photos';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { icons } from '$lib/icons';
   import type { TrainingTag, DailyTask, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
@@ -130,6 +131,7 @@
 
   function startEdit() {
     mode = 'edit';
+    noteMode = 'edit';
   }
 
   function cancelEdit() {
@@ -252,8 +254,8 @@
     <button
       type="button"
       on:click={startEdit}
-      class="self-end bg-gb-bg2 text-gb-fg text-sm px-4 py-2 hover:bg-gb-bg3 transition"
-    >Edit</button>
+      class="self-end flex items-center gap-1.5 bg-gb-blue text-gb-bg font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
+    >{@html icons.pencilSm}Edit</button>
   </div>
 {:else}
   <!-- Training types -->

@@ -84,6 +84,16 @@ describe('DayDetail — view mode (default when the day already has content)', (
     expect(getByDisplayValue('Leg day')).toBeInTheDocument();
     expect(getByText('Save')).toBeInTheDocument();
   });
+
+  it('clicking Edit opens the note editor in edit mode even though it has content', async () => {
+    // entry.note is non-empty, so MarkdownEditor would normally default to preview
+    const { getByText, getByPlaceholderText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Edit'));
+    expect(getByPlaceholderText('Bodyweight, PRs, observations…')).toBeInTheDocument();
+    expect(getByText('Preview')).toBeInTheDocument(); // toggle button confirms we're in edit mode
+  });
 });
 
 describe('DayDetail — edit mode (default when the day is empty)', () => {
@@ -286,8 +296,10 @@ describe('DayDetail — editing behavior', () => {
     expect(photosSection?.className).toContain('hidden');
   });
 
-  it('shows other sections when the note is not in edit mode', async () => {
+  it('shows other sections once the note is switched out of edit mode', async () => {
+    // startEdit always opens the note in edit mode, so switch to Preview first
     const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });
+    await fireEvent.click(getByText('Preview'));
     const trainingTypesSection = getByText('Training types').closest('div');
     expect(trainingTypesSection?.className).not.toContain('hidden');
   });
