@@ -66,11 +66,15 @@
 
   const PRESETS = [30, 60, 75, 90, 120];
 
-  // Timer state
+  // Timer state — remaining is derived from a wall-clock deadline rather than
+  // decremented per tick, because mobile browsers throttle timers in
+  // backgrounded/locked tabs and a counter-based timer would silently run slow
+  // exactly when the phone is set down to rest.
   let inputSeconds = 60;
   let remaining = 0;
   let running = false;
   let finished = false;
+  let endAtMs = 0;
   let interval: ReturnType<typeof setInterval> | null = null;
 
   $: totalInput = inputSeconds;
@@ -87,23 +91,30 @@
     }
   }
 
+  function tick() {
+    remaining = Math.max(0, Math.ceil((endAtMs - Date.now()) / 1000));
+    if (remaining <= 0) {
+      running = false;
+      finished = true;
+      if (interval) { clearInterval(interval); interval = null; }
+    }
+  }
+
   function start() {
     running = true;
-    interval = setInterval(() => {
-      remaining -= 1;
-      if (remaining <= 0) {
-        remaining = 0;
-        running = false;
-        finished = true;
-        clearInterval(interval!);
-        interval = null;
-      }
-    }, 1000);
+    endAtMs = Date.now() + remaining * 1000;
+    interval = setInterval(tick, 1000);
   }
 
   function pause() {
+    if (running) tick(); // sync remaining with real elapsed time before stopping
     running = false;
     if (interval) { clearInterval(interval); interval = null; }
+  }
+
+  // Snap the display to real time the moment the tab wakes back up.
+  function handleVisibilityChange() {
+    if (running && document.visibilityState === 'visible') tick();
   }
 
   function reset() {
@@ -136,6 +147,8 @@
     if (exercisesSavedResetTimeout) clearTimeout(exercisesSavedResetTimeout);
   });
 </script>
+
+<svelte:document on:visibilitychange={handleVisibilityChange} />
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
   <h1 class="text-gb-green text-2xl font-bold glow-green">Train</h1>
