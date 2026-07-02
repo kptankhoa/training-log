@@ -1,13 +1,68 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { slide } from 'svelte/transition';
   import { marked } from 'marked';
   import { notes, notesLoading } from '$lib/stores/notes';
+  import { allDays, daysLoading, saveDay } from '$lib/stores/days';
+  import { exercises } from '$lib/stores/exercises';
+  import { user } from '$lib/stores/auth';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
-  import type { PlanNote } from '$lib/types';
+  import ExerciseEditor from '$lib/components/ExerciseEditor.svelte';
+  import type { PlanNote, ExerciseEntry, DayEntry } from '$lib/types';
 
   let selectedId: string | null = null;
   $: selectedSplit = $notes.find((n) => n.id === selectedId) ?? null;
+
+  $: userId = $user?.uid ?? '';
+
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  // Logging exercises here is a quick add for today — no need to preview
+  // what's already logged on this page, just carry it into the day's entry
+  // (visible on the day's own detail view).
+  let exercisesExpanded = false;
+
+  function cloneExerciseEntries(list: ExerciseEntry[] | undefined): ExerciseEntry[] {
+    return (list ?? []).map((e) => ({ exerciseId: e.exerciseId, sets: e.sets.map((s) => ({ ...s })) }));
+  }
+
+  let exerciseEntries: ExerciseEntry[] = [];
+  let exercisesInitialized = false;
+  $: if (!exercisesInitialized && !$daysLoading) {
+    exerciseEntries = cloneExerciseEntries($allDays[todayKey]?.exercises);
+    exercisesInitialized = true;
+  }
+
+  let exercisesSaving = false;
+  let exercisesSaved = false;
+  let exercisesSavedResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  async function handleSaveExercises() {
+    if (!userId || exercisesSaving || exercisesSaved) return;
+    exercisesSaving = true;
+    try {
+      const existing = $allDays[todayKey];
+      const merged: DayEntry = {
+        tags: existing?.tags ?? [],
+        label: existing?.label ?? '',
+        note: existing?.note ?? '',
+        tasks: existing?.tasks,
+        photos: existing?.photos,
+        splitIds: existing?.splitIds,
+        exercises: exerciseEntries,
+      };
+      await saveDay(userId, todayKey, merged);
+      exercisesSaving = false;
+      exercisesSaved = true;
+      if (exercisesSavedResetTimeout) clearTimeout(exercisesSavedResetTimeout);
+      exercisesSavedResetTimeout = setTimeout(() => { exercisesSaved = false; }, 1500);
+    } catch (err) {
+      exercisesSaving = false;
+      console.error('[Train] failed to save exercises:', err);
+    }
+  }
 
   const PRESETS = [30, 60, 75, 90, 120];
 
@@ -78,6 +133,7 @@
 
   onDestroy(() => {
     if (interval) clearInterval(interval);
+    if (exercisesSavedResetTimeout) clearTimeout(exercisesSavedResetTimeout);
   });
 </script>
 
@@ -125,6 +181,47 @@
       {/if}
     </section>
   {/if}
+
+  <!-- Exercises -->
+  <section class="flex flex-col gap-2">
+    <button
+      type="button"
+      on:click={() => (exercisesExpanded = !exercisesExpanded)}
+      class="flex items-center justify-between text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
+    >
+      <span>Exercises</span>
+      <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '−' : '+'}</span>
+    </button>
+    {#if exercisesExpanded}
+      <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>
+        <ExerciseEditor
+          exercises={$exercises}
+          allDays={$allDays}
+          dateKey={todayKey}
+          {userId}
+          daySplitIds={selectedId ? [selectedId] : []}
+          bind:entries={exerciseEntries}
+        />
+        <button
+          type="button"
+          on:click={handleSaveExercises}
+          disabled={exercisesSaving || exercisesSaved}
+          class="bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
+                 transition-transform hover:opacity-90 active:scale-[0.98]
+                 disabled:opacity-90 flex items-center justify-center gap-2"
+        >
+          {#if exercisesSaved}
+            <span>✓ Saved</span>
+          {:else if exercisesSaving}
+            <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
+            <span>Saving…</span>
+          {:else}
+            <span>Save</span>
+          {/if}
+        </button>
+      </div>
+    {/if}
+  </section>
 
   <!-- Rest timer -->
   <section class="flex flex-col gap-4">
