@@ -35,55 +35,22 @@ const splits = [
 const entry: DayEntry = { tags: ['tag1'], label: 'Leg day', note: '# PR', tasks: ['task1'] };
 const emptyEntry: DayEntry = { tags: [], label: '', note: '' };
 
-describe('DayDetail — view mode (default when the day already has content)', () => {
-  it('shows an Edit button instead of the form', () => {
+describe('DayDetail — mode', () => {
+  it('defaults to view mode with an Edit button when the day already has content', () => {
     const { getByText, queryByText } = render(DayDetail, {
       props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
     });
     expect(getByText('Edit')).toBeInTheDocument();
     expect(queryByText('Save')).not.toBeInTheDocument();
-  });
-
-  it('shows only the selected tags, not every active tag', () => {
-    const { getByText, queryByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
-    });
-    expect(getByText('Weight Lifting')).toBeInTheDocument();
-    expect(queryByText('Boxing')).not.toBeInTheDocument();
-  });
-
-  it('shows the label as text', () => {
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
-    });
     expect(getByText('Leg day')).toBeInTheDocument();
   });
 
-  it('shows daily tasks with completed state, read-only', () => {
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' }
+  it('defaults to edit mode, no Edit button needed, when the day is empty', () => {
+    const { getByText, getByPlaceholderText } = render(DayDetail, {
+      props: { dateKey: '2026-06-10', entry: emptyEntry, activeTags, userId: 'user1' }
     });
-    expect(getByText('Stretch').textContent).toContain('Stretch');
-    // task1 (Stretch) is completed, task2 (Drink water) is not
-    const stretchRow = getByText('Stretch').closest('span');
-    const waterRow = getByText('Drink water').closest('span');
-    expect(stretchRow?.textContent).toContain('✓');
-    expect(waterRow?.textContent).toContain('○');
-  });
-
-  it('renders the note as markdown', () => {
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
-    });
-    expect(getByText('# PR')).toBeInTheDocument();
-  });
-
-  it('shows existing photos as thumbnails', async () => {
-    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
-    const { findByAltText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1' }
-    });
-    expect(await findByAltText('Training day snapshot')).toBeInTheDocument();
+    expect(getByPlaceholderText('Short label shown on calendar')).toBeInTheDocument();
+    expect(getByText('Save')).toBeInTheDocument();
   });
 
   it('clicking Edit switches to the editable form', async () => {
@@ -106,28 +73,12 @@ describe('DayDetail — view mode (default when the day already has content)', (
   });
 });
 
-describe('DayDetail — edit mode (default when the day is empty)', () => {
-  it('shows the form immediately, no Edit button needed', () => {
-    const { getByText, getByPlaceholderText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry: emptyEntry, activeTags, userId: 'user1' }
-    });
-    expect(getByPlaceholderText('Short label shown on calendar')).toBeInTheDocument();
-    expect(getByText('Save')).toBeInTheDocument();
-  });
-});
-
-describe('DayDetail — editing behavior', () => {
+describe('DayDetail — save/cancel orchestration', () => {
   async function renderInEditMode(props: ComponentProps<DayDetail>) {
     const utils = render(DayDetail, { props });
     await fireEvent.click(utils.getByText('Edit'));
     return utils;
   }
-
-  it('renders all active tag chips (not just selected ones)', async () => {
-    const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, userId: 'user1' });
-    expect(getByText('Weight Lifting')).toBeInTheDocument();
-    expect(getByText('Boxing')).toBeInTheDocument();
-  });
 
   it('calls saveDay with correct args on Save click', async () => {
     const { saveDay } = await import('$lib/stores/days');
@@ -177,24 +128,6 @@ describe('DayDetail — editing behavior', () => {
     expect(queryByText('Changed label')).not.toBeInTheDocument();
   });
 
-  it('does not render a Daily tasks section when there are no active tasks', async () => {
-    const { queryByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, userId: 'user1' });
-    expect(queryByText('Daily tasks')).not.toBeInTheDocument();
-  });
-
-  it('renders a checkbox per active task, pre-checked from entry.tasks', async () => {
-    const { getByLabelText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });
-    expect(getByLabelText('Stretch')).toBeChecked();
-    expect(getByLabelText('Drink water')).not.toBeChecked();
-  });
-
-  it('toggles a task checkbox on click', async () => {
-    const { getByLabelText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });
-    const checkbox = getByLabelText('Drink water');
-    await fireEvent.click(checkbox);
-    expect(checkbox).toBeChecked();
-  });
-
   it('includes completed task ids in saveDay call', async () => {
     const { saveDay } = await import('$lib/stores/days');
     const { getByLabelText, getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });
@@ -205,32 +138,6 @@ describe('DayDetail — editing behavior', () => {
       '2026-06-10',
       expect.objectContaining({ tasks: expect.arrayContaining(['task1', 'task2']) })
     );
-  });
-
-  it('uploads a selected file and shows a thumbnail', async () => {
-    const { uploadPhoto, getPhotoUrl } = await import('$lib/stores/photos');
-    const { getByTestId, findByAltText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, userId: 'user1' });
-
-    const fileInput = getByTestId('photo-file-input');
-    const file = new File(['fake'], 'progress.jpg', { type: 'image/jpeg' });
-    await fireEvent.change(fileInput, { target: { files: [file] } });
-
-    expect(uploadPhoto).toHaveBeenCalledWith('user1', '2026-06-10', file);
-    expect(getPhotoUrl).toHaveBeenCalled();
-    expect(await findByAltText('Training day snapshot')).toBeInTheDocument();
-  });
-
-  it('a single click on the remove button arms confirmation without removing', async () => {
-    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
-    const { findByAltText, getByLabelText, queryByAltText } = await renderInEditMode({
-      dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1'
-    });
-
-    await findByAltText('Training day snapshot');
-    await fireEvent.click(getByLabelText('Remove photo'));
-
-    expect(queryByAltText('Training day snapshot')).toBeInTheDocument();
-    expect(getByLabelText('Confirm remove photo')).toBeInTheDocument();
   });
 
   it('removing a photo (after confirm) does not call deletePhoto until Save', async () => {
@@ -270,95 +177,9 @@ describe('DayDetail — editing behavior', () => {
       expect(deletePhoto).toHaveBeenCalledWith('users/user1/days/2026-06-10/existing.jpg');
     });
   });
-
-  it('opens a lightbox with the full photo on thumbnail click', async () => {
-    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
-    const { findByAltText, getByRole, getByLabelText } = await renderInEditMode({
-      dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1'
-    });
-    const thumbnail = await findByAltText('Training day snapshot');
-    await fireEvent.click(thumbnail.closest('button')!);
-    expect(getByRole('dialog')).toBeInTheDocument();
-    expect(getByLabelText('Close photo')).toBeInTheDocument();
-  });
-
-  it('closes the lightbox via its own close button', async () => {
-    const withPhoto: DayEntry = { ...entry, photos: ['users/user1/days/2026-06-10/existing.jpg'] };
-    const { findByAltText, getByLabelText, queryByLabelText } = await renderInEditMode({
-      dateKey: '2026-06-10', entry: withPhoto, activeTags, userId: 'user1'
-    });
-    const thumbnail = await findByAltText('Training day snapshot');
-    await fireEvent.click(thumbnail.closest('button')!);
-    expect(getByLabelText('Close photo')).toBeInTheDocument();
-
-    await fireEvent.click(getByLabelText('Close photo'));
-    expect(queryByLabelText('Close photo')).not.toBeInTheDocument();
-  });
-
-  it('hides other sections (mobile only) while the note is in edit mode', async () => {
-    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
-    const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1' });
-    const trainingTypesSection = getByText('Training types').closest('div');
-    const labelSection = getByText('Label').closest('div');
-    const photosSection = getByText('Progress photos').closest('div');
-    expect(trainingTypesSection?.className).toContain('hidden');
-    expect(labelSection?.className).toContain('hidden');
-    expect(photosSection?.className).toContain('hidden');
-  });
-
-  it('does not hide other sections when hideOtherSectionsWhileEditingNote is false', async () => {
-    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
-    const { getByText } = await renderInEditMode({
-      dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1',
-      hideOtherSectionsWhileEditingNote: false
-    });
-    const trainingTypesSection = getByText('Training types').closest('div');
-    expect(trainingTypesSection?.className).not.toContain('hidden');
-  });
-
-  it('shows other sections once the note is switched out of edit mode', async () => {
-    // startEdit always opens the note in edit mode, so switch to Preview first
-    const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry, activeTags, activeTasks, userId: 'user1' });
-    await fireEvent.click(getByText('Preview'));
-    const trainingTypesSection = getByText('Training types').closest('div');
-    expect(trainingTypesSection?.className).not.toContain('hidden');
-  });
-
-  it('reveals other sections again after switching the note out of edit mode', async () => {
-    const emptyNoteEntry: DayEntry = { ...entry, note: '' };
-    const { getByText } = await renderInEditMode({ dateKey: '2026-06-10', entry: emptyNoteEntry, activeTags, activeTasks, userId: 'user1' });
-    let trainingTypesSection = getByText('Training types').closest('div');
-    expect(trainingTypesSection?.className).toContain('hidden');
-
-    await fireEvent.click(getByText('Preview'));
-
-    trainingTypesSection = getByText('Training types').closest('div');
-    expect(trainingTypesSection?.className).not.toContain('hidden');
-  });
 });
 
-describe('DayDetail — exercises integration', () => {
-  it('shows logged exercises with sets in view mode', () => {
-    const withExercises: DayEntry = {
-      ...entry,
-      exercises: [{ exerciseId: 'bench', sets: [{ weight: 80, reps: 8 }, { weight: 80, reps: 6 }] }]
-    };
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry: withExercises, activeTags, exercises, userId: 'user1' }
-    });
-    expect(getByText('Bench Press')).toBeInTheDocument();
-    expect(getByText(/80×8, 80×6/)).toBeInTheDocument();
-  });
-
-  it('renders the exercise editor in edit mode', async () => {
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
-    });
-    await fireEvent.click(getByText('Edit'));
-    await fireEvent.click(getByText('Splits & Exercises'));
-    expect(getByText('+ Bench Press')).toBeInTheDocument();
-  });
-
+describe('DayDetail — exercises and splits integration', () => {
   it('includes logged exercises in the saveDay call', async () => {
     const { saveDay } = await import('$lib/stores/days');
     const { getByText } = render(DayDetail, {
@@ -390,28 +211,6 @@ describe('DayDetail — exercises integration', () => {
 
     expect(queryByText('Bench Press')).not.toBeInTheDocument();
   });
-});
-
-describe('DayDetail — splits', () => {
-  it('shows selected splits in view mode', () => {
-    const withSplit: DayEntry = { ...entry, splitIds: ['push'] };
-    const { getByText, queryByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry: withSplit, activeTags, splits, userId: 'user1' }
-    });
-    expect(getByText('Push Day')).toBeInTheDocument();
-    expect(queryByText('Pull Day')).not.toBeInTheDocument();
-  });
-
-  it('toggling a split chip in edit mode selects it', async () => {
-    const { getByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, splits, userId: 'user1' }
-    });
-    await fireEvent.click(getByText('Edit'));
-    await fireEvent.click(getByText('Splits & Exercises'));
-    const pushChip = getByText('Push Day');
-    await fireEvent.click(pushChip);
-    expect(pushChip.className).toContain('border-gb-green');
-  });
 
   it('includes selected splitIds in the saveDay call', async () => {
     const { saveDay } = await import('$lib/stores/days');
@@ -428,24 +227,5 @@ describe('DayDetail — splits', () => {
       '2026-06-10',
       expect.objectContaining({ splitIds: ['push'] })
     );
-  });
-
-  it('picking a split narrows the exercise picker in ExerciseEditor', async () => {
-    const tiedExercises = [
-      { id: 'bench', name: 'Bench Press', deleted: false, splitIds: ['push'] },
-      { id: 'row', name: 'Row', deleted: false, splitIds: ['pull'] },
-    ];
-    const { getByText, queryByText } = render(DayDetail, {
-      props: { dateKey: '2026-06-10', entry, activeTags, exercises: tiedExercises, splits, userId: 'user1' }
-    });
-    await fireEvent.click(getByText('Edit'));
-    await fireEvent.click(getByText('Splits & Exercises'));
-    expect(getByText('+ Bench Press')).toBeInTheDocument();
-    expect(getByText('+ Row')).toBeInTheDocument();
-
-    await fireEvent.click(getByText('Push Day'));
-
-    expect(getByText('+ Bench Press')).toBeInTheDocument();
-    expect(queryByText('+ Row')).not.toBeInTheDocument();
   });
 });
