@@ -52,12 +52,12 @@
 
     <div class="flex items-center gap-6 px-1 text-sm">
       <div class="flex items-center gap-2">
-        <span class="text-gb-green font-semibold glow-green">{streaks.current}</span>
-        <span class="text-gb-fg3">day{streaks.current !== 1 ? 's' : ''} current streak</span>
+        <span class="text-gb-light-green dark:text-gb-green font-semibold glow-green">{streaks.current}</span>
+        <span class="text-gb-light-fg3 dark:text-gb-fg3">day{streaks.current !== 1 ? 's' : ''} current streak</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-gb-orange font-semibold">{streaks.longest}</span>
-        <span class="text-gb-fg3">longest streak</span>
+        <span class="text-gb-light-orange dark:text-gb-orange font-semibold">{streaks.longest}</span>
+        <span class="text-gb-light-fg3 dark:text-gb-fg3">longest streak</span>
       </div>
     </div>
   {/if}

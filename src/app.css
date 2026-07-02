@@ -4,7 +4,7 @@
 
 @layer base {
   html, body {
-    @apply bg-gb-bg text-gb-fg min-h-dvh;
+    @apply bg-gb-light-bg text-gb-light-fg dark:bg-gb-bg dark:text-gb-fg min-h-dvh;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   }
 
@@ -50,10 +50,10 @@
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-gb-bg3 rounded; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-gb-gray; }
+  ::-webkit-scrollbar-thumb { @apply bg-gb-light-bg3 dark:bg-gb-bg3 rounded; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gb-light-gray dark:bg-gb-gray; }
 
-  ::selection { @apply bg-gb-green text-gb-bg; }
+  ::selection { @apply bg-gb-light-green text-gb-light-bg dark:bg-gb-green dark:text-gb-bg; }
 
   /* Retro pixel cursors */
   html, body {
@@ -68,10 +68,13 @@
     border-radius: 0 !important;
   }
 
-  /* Green block caret on inputs */
+  /* Green block caret on inputs (light theme's green accent, darker for contrast) */
   input, textarea {
-    caret-color: #b8bb26;
+    caret-color: #79740e;
     caret-shape: block;
+  }
+  .dark input, .dark textarea {
+    caret-color: #b8bb26;
   }
 
   /* Hide number input spin buttons */
@@ -87,6 +90,11 @@
 
 @layer utilities {
   .glow-green {
+    text-shadow:
+      0 0 8px rgba(121, 116, 14, 0.6),
+      0 0 20px rgba(121, 116, 14, 0.25);
+  }
+  .dark .glow-green {
     text-shadow:
       0 0 8px rgba(184, 187, 38, 0.7),
       0 0 20px rgba(184, 187, 38, 0.3);

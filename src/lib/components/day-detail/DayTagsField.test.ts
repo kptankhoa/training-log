@@ -4,6 +4,9 @@ import DayTagsField from './DayTagsField.svelte';
 import type { TrainingTag } from '$lib/types';
 
 vi.mock('$lib/stores/tags', () => ({ addTag: vi.fn().mockResolvedValue(undefined) }));
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
 
 const activeTags: TrainingTag[] = [
   { id: 'tag1', name: 'Weight Lifting', color: 'blue', deleted: false },

@@ -6,7 +6,7 @@
   import { allDays, daysLoading, saveDay } from '$lib/stores/days';
   import { exercises } from '$lib/stores/exercises';
   import { user } from '$lib/stores/auth';
-  import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/gruvbox';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import ExerciseEditor from '$lib/components/day-detail/ExerciseEditor.svelte';
   import RestTimer from '$lib/components/train/RestTimer.svelte';
@@ -71,15 +71,15 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
-  <h1 class="text-gb-green text-2xl font-bold glow-green">Train</h1>
+  <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Train</h1>
 
   <!-- Split picker -->
   <section class="flex flex-col gap-2">
-    <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Select Split</h2>
+    <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Select Split</h2>
     {#if $splitsLoading}
       <Spinner />
     {:else if $splits.length === 0}
-      <p class="text-gb-fg3 text-sm">No splits yet — add one in <a href="/splits" class="text-gb-blue underline">Split Design</a>.</p>
+      <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm">No splits yet — add one in <a href="/splits" class="text-gb-light-blue dark:text-gb-blue underline">Split Design</a>.</p>
     {:else}
       <div class="flex flex-wrap gap-2">
         {#each $splits as split (split.id)}
@@ -88,10 +88,10 @@
             on:click={() => selectedId = selectedId === split.id ? null : split.id}
             class="flex items-center gap-2 px-3 py-2 text-sm border transition
                    {selectedId === split.id
-                     ? 'border-gb-green text-gb-green bg-gb-bg1'
-                     : 'border-gb-bg3 text-gb-fg2 bg-gb-bg hover:bg-gb-bg1'}"
+                     ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1'
+                     : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 bg-gb-light-bg dark:bg-gb-bg hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
           >
-            <span class="w-2.5 h-2.5 shrink-0 rounded-sm" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
+            <span class="w-2.5 h-2.5 shrink-0 rounded-sm" style="background-color:{$gruvboxColors[split.color ?? 'blue']}"></span>
             {split.label || 'Untitled'}
           </button>
         {/each}
@@ -102,15 +102,15 @@
   <!-- Split content -->
   {#if selectedSplit}
     <section class="flex flex-col gap-2">
-      <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">{selectedSplit.label}</h2>
+      <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">{selectedSplit.label}</h2>
       {#if selectedSplit.content}
-        <div class="prose prose-invert max-w-none text-sm text-gb-fg
-                    [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
-                    [&_strong]:text-gb-orange [&_a]:text-gb-blue [&_li]:text-gb-fg">
+        <div class="prose prose-invert max-w-none text-sm text-gb-light-fg dark:text-gb-fg
+                    [&_h1]:text-gb-light-green dark:[&_h1]:text-gb-green [&_h2]:text-gb-light-green dark:[&_h2]:text-gb-green [&_h3]:text-gb-light-green dark:[&_h3]:text-gb-green
+                    [&_strong]:text-gb-light-orange dark:[&_strong]:text-gb-orange [&_a]:text-gb-light-blue dark:[&_a]:text-gb-blue [&_li]:text-gb-light-fg dark:[&_li]:text-gb-fg">
           {@html marked(selectedSplit.content)}
         </div>
       {:else}
-        <p class="text-gb-fg3 text-sm italic">No content for this split.</p>
+        <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm italic">No content for this split.</p>
       {/if}
     </section>
   {/if}
@@ -122,7 +122,7 @@
     <button
       type="button"
       on:click={() => (exercisesExpanded = !exercisesExpanded)}
-      class="flex items-center justify-between text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
+      class="flex items-center justify-between text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
     >
       <span>Exercises</span>
       <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '−' : '+'}</span>
@@ -141,14 +141,14 @@
           type="button"
           on:click={handleSaveExercises}
           disabled={exercisesSaving || exercisesSaved}
-          class="bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
+          class="bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold py-2.5 rounded-md
                  transition-transform hover:opacity-90 active:scale-[0.98]
                  disabled:opacity-90 flex items-center justify-center gap-2"
         >
           {#if exercisesSaved}
             <span>✓ Saved</span>
           {:else if exercisesSaving}
-            <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
+            <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg dark:border-gb-bg border-t-transparent animate-spin"></span>
             <span>Saving…</span>
           {:else}
             <span>Save</span>

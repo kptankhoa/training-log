@@ -50,15 +50,15 @@
 <!-- Daily tasks -->
 {#if activeTasks.length > 0}
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Daily tasks</span>
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Daily tasks</span>
     <div class="flex flex-col gap-1.5">
       {#each activeTasks as task (task.id)}
-        <label class="flex items-center gap-2.5 text-sm text-gb-fg cursor-pointer">
+        <label class="flex items-center gap-2.5 text-sm text-gb-light-fg dark:text-gb-fg cursor-pointer">
           <input
             type="checkbox"
             checked={completedTaskIds.has(task.id)}
             on:change={() => toggleTask(task.id)}
-            class="w-4 h-4 accent-gb-green shrink-0"
+            class="w-4 h-4 accent-gb-light-green dark:accent-gb-green shrink-0"
           />
           {task.name}
         </label>
@@ -69,7 +69,7 @@
 
 <!-- Notes -->
 <div class="flex flex-col gap-1">
-  <span class="text-xs text-gb-fg3 uppercase tracking-wider">Notes</span>
+  <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Notes</span>
   <MarkdownEditor bind:value={note} bind:mode={noteMode} placeholder="Bodyweight, PRs, observations…" rows={6} />
 </div>
 
@@ -81,7 +81,7 @@
       type="button"
       on:click={() => dispatch('cancel')}
       disabled={saving}
-      class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+      class="text-gb-light-fg3 dark:text-gb-fg3 text-sm hover:text-gb-light-fg dark:hover:text-gb-fg transition px-3 py-2"
     >Cancel</button>
   {/if}
 
@@ -89,14 +89,14 @@
     type="button"
     on:click={() => dispatch('save')}
     disabled={saving || saved}
-    class="flex-1 bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
+    class="flex-1 bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold py-2.5 rounded-md
            transition-transform hover:opacity-90 active:scale-[0.98]
            disabled:opacity-90 flex items-center justify-center gap-2"
   >
     {#if saved}
       <span>✓ Saved</span>
     {:else if saving}
-      <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
+      <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg dark:border-gb-bg border-t-transparent animate-spin"></span>
       <span>Saving…</span>
     {:else}
       <span>Save</span>

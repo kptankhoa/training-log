@@ -82,35 +82,35 @@
   {#if $bodyMeasurementsLoading}
     <Spinner />
   {:else if $bodyMeasurements.length === 0}
-    <div class="bg-gb-bg1 rounded-xl p-10 text-center flex flex-col gap-2">
-      <p class="text-gb-fg3 text-lg">No measurements yet</p>
-      <p class="text-gb-gray text-sm">Add an entry below to start tracking.</p>
+    <div class="bg-gb-light-bg1 dark:bg-gb-bg1 rounded-xl p-10 text-center flex flex-col gap-2">
+      <p class="text-gb-light-fg3 dark:text-gb-fg3 text-lg">No measurements yet</p>
+      <p class="text-gb-light-gray dark:text-gb-gray text-sm">Add an entry below to start tracking.</p>
     </div>
   {:else}
-    <div class="overflow-x-auto bg-gb-bg1 rounded-xl">
+    <div class="overflow-x-auto bg-gb-light-bg1 dark:bg-gb-bg1 rounded-xl">
       <table class="text-sm border-collapse">
         <thead>
           <tr>
-            <th class="sticky left-0 bg-gb-bg1 text-left px-3 py-2 text-gb-fg3 uppercase tracking-wider text-xs whitespace-nowrap">Date</th>
+            <th class="sticky left-0 bg-gb-light-bg1 dark:bg-gb-bg1 text-left px-3 py-2 text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider text-xs whitespace-nowrap">Date</th>
             {#each columns as col (col.key)}
-              <th class="text-left px-3 py-2 text-gb-fg3 uppercase tracking-wider text-xs whitespace-nowrap">{col.label}</th>
+              <th class="text-left px-3 py-2 text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider text-xs whitespace-nowrap">{col.label}</th>
             {/each}
             <th class="px-3 py-2"></th>
           </tr>
         </thead>
         <tbody>
           {#each [...$bodyMeasurements].reverse() as entry (entry.id)}
-            <tr class="border-t border-gb-bg2">
-              <td class="sticky left-0 bg-gb-bg1 px-3 py-2 text-gb-fg3 whitespace-nowrap">{formatLabel(entry.id)}</td>
+            <tr class="border-t border-gb-light-bg2 dark:border-gb-bg2">
+              <td class="sticky left-0 bg-gb-light-bg1 dark:bg-gb-bg1 px-3 py-2 text-gb-light-fg3 dark:text-gb-fg3 whitespace-nowrap">{formatLabel(entry.id)}</td>
               {#each columns as col (col.key)}
-                <td class="px-3 py-2 text-gb-fg whitespace-nowrap">{fmt(entry[col.key])}</td>
+                <td class="px-3 py-2 text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{fmt(entry[col.key])}</td>
               {/each}
               <td class="px-3 py-2">
                 <button
                   type="button"
                   on:click={() => handleDelete(entry.id)}
                   aria-label="Delete entry for {entry.id}"
-                  class="text-gb-fg3 hover:text-gb-red transition-colors"
+                  class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red transition-colors"
                 >✕</button>
               </td>
             </tr>
@@ -125,13 +125,13 @@
     <button
       type="button"
       on:click={() => (showAddForm = !showAddForm)}
-      class="text-sm text-gb-blue hover:text-gb-fg transition self-start"
+      class="text-sm text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition self-start"
     >
       {showAddForm ? '− Cancel' : '+ Add entry'}
     </button>
 
     {#if showAddForm}
-      <div class="bg-gb-bg1 p-4 flex flex-col gap-3">
+      <div class="bg-gb-light-bg1 dark:bg-gb-bg1 p-4 flex flex-col gap-3">
         <div class="flex flex-col gap-1">
           <FormField id="bm-date" label="Date" type="date" bind:value={draftDate} />
         </div>
@@ -150,7 +150,7 @@
         <button
           type="button"
           on:click={handleAddEntry}
-          class="bg-gb-green text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition self-start"
+          class="bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition self-start"
         >Save entry</button>
       </div>
     {/if}

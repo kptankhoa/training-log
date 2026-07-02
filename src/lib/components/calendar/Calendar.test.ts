@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import Calendar from './Calendar.svelte';
 import CalendarTest from './CalendarTest.svelte';
 import type { TrainingTag, DayEntry } from '$lib/types';
+
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
 
 const tags: TrainingTag[] = [
   { id: 'tag1', name: 'Weight Lifting', color: 'blue', deleted: false },

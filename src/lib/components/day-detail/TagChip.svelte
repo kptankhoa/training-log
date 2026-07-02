@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/gruvbox';
   import type { TrainingTag } from '$lib/types';
 
   export let tag: TrainingTag;
@@ -8,7 +8,7 @@
 
   const dispatch = createEventDispatcher<{ toggle: string }>();
 
-  $: hex = GRUVBOX_COLORS[tag.color];
+  $: hex = $gruvboxColors[tag.color];
 </script>
 
 <button

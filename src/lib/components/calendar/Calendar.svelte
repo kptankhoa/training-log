@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/gruvbox';
+  import { theme } from '$lib/stores/theme';
   import { icons } from '$lib/icons';
   import type { TrainingTag, Split, DayEntry } from '$lib/types';
 
@@ -48,8 +49,8 @@
     const entry = days[key(cell)];
     return {
       num: cell,
-      colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
-      splitColors: (entry?.splitIds ?? []).map((id) => splitMap[id]).filter(Boolean).map((s) => GRUVBOX_COLORS[s.color ?? 'blue']),
+      colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => $gruvboxColors[t.color]),
+      splitColors: (entry?.splitIds ?? []).map((id) => splitMap[id]).filter(Boolean).map((s) => $gruvboxColors[s.color ?? 'blue']),
       tagIds: [...(entry?.tags ?? []), ...(entry?.splitIds ?? [])],
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
@@ -94,35 +95,35 @@
   function getSelectedIdColor() {
     if (!selectedTagId) return null;
     const el = tagMap[selectedTagId] ?? splitMap[selectedTagId];
-    return el ? GRUVBOX_COLORS[el.color] : null;
+    return el ? $gruvboxColors[el.color] : null;
   }
 </script>
 
 <div class="select-none">
   <div class="flex items-center justify-between mb-3 px-1">
     <button aria-label="Previous month" on:click={() => dispatch('prevMonth')}
-      class="text-gb-fg2 hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-bg2 transition text-xl leading-none">‹</button>
-    <h2 class="text-gb-green font-semibold text-lg glow-green">{MONTHS[month - 1]} {year}</h2>
+      class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">‹</button>
+    <h2 class="text-gb-light-green dark:text-gb-green font-semibold text-lg glow-green">{MONTHS[month - 1]} {year}</h2>
     <button aria-label="Next month" on:click={() => dispatch('nextMonth')}
-      class="text-gb-fg2 hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-bg2 transition text-xl leading-none">›</button>
+      class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">›</button>
   </div>
 
   <div class="grid grid-cols-7 mb-1">
     {#each DAY_HEADERS as h}
-      <div class="text-center text-xs text-gb-gray font-medium py-1">{h}</div>
+      <div class="text-center text-xs text-gb-light-gray dark:text-gb-gray font-medium py-1">{h}</div>
     {/each}
   </div>
 
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     data-testid="calendar-grid"
-    class="grid grid-cols-7 gap-px bg-gb-bg2 border border-gb-bg2 rounded-lg overflow-hidden"
+    class="grid grid-cols-7 gap-px bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg2 dark:border-gb-bg2 rounded-lg overflow-hidden"
     on:touchstart={handleTouchStart}
     on:touchend={handleTouchEnd}
   >
     {#each cellData as cell}
       {#if 'null' in cell}
-        <div class="bg-gb-bg3 min-h-[4.5rem]"></div>
+        <div class="bg-gb-light-bg3 dark:bg-gb-bg3 min-h-[4.5rem]"></div>
       {:else}
         <button
           type="button"
@@ -131,26 +132,26 @@
           data-has-photos={cell.hasPhotos ? '' : undefined}
           data-today={cell.isToday ? '' : undefined}
           data-tag-match={selectedTagId && cell.tagIds.includes(selectedTagId) ? '' : undefined}
-          class="hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
+          class="hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
                  flex flex-col items-start gap-1 text-left
-                 {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}
+                 {cell.isToday ? 'bg-gb-light-bg1 dark:bg-gb-bg1' : 'bg-gb-light-bg dark:bg-gb-bg'}
                  {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
           style={selectedTagId && cell.tagIds.includes(selectedTagId)
-            ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? '#ebdbb2'};`
-            : cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
+            ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? ($theme === 'dark' ? '#ebdbb2' : '#3c3836')};`
+            : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#b8bb26' : '#79740e'};` : ''}
         >
-          <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
+          <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-light-green dark:text-gb-green glow-green' : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
           <div class="flex items-center gap-1.5">
             {#if cell.hasNote}
-              <span class="text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
+              <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
             {/if}
             {#if cell.hasPhotos}
-              <span class="text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
+              <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
             {/if}
           </div>
 
           {#if cell.label}
-            <span class="text-[10px] text-gb-fg3 leading-tight truncate w-full">{cell.label}</span>
+            <span class="text-[10px] text-gb-light-fg3 dark:text-gb-fg3 leading-tight truncate w-full">{cell.label}</span>
           {/if}
 
           <div class="flex items-center justify-between w-full mt-auto">
@@ -172,7 +173,7 @@
 
   {#if tags.filter((t) => !t.deleted).length > 0}
     <div class="mt-4 px-1 flex flex-wrap gap-x-4 gap-y-1">
-    <span class="text-xs text-gb-fg3 font-semibold uppercase tracking-wider">
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 font-semibold uppercase tracking-wider">
       Left:
     </span>
       {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
@@ -181,11 +182,11 @@
           on:click={() => toggleTagFilter(tag.id)}
           aria-pressed={selectedTagId === tag.id}
           class="flex items-center gap-1.5 text-xs transition
-                 {selectedTagId === tag.id ? 'text-gb-fg font-semibold' : 'text-gb-fg3 hover:text-gb-fg'}"
+                 {selectedTagId === tag.id ? 'text-gb-light-fg dark:text-gb-fg font-semibold' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-fg dark:hover:text-gb-fg'}"
         >
-          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
+          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{$gruvboxColors[tag.color]}"></span>
           {tag.name}
-          <span class="text-gb-fg4 font-medium">{tagCounts[tag.id] ?? 0}x</span>
+          <span class="text-gb-light-fg4 dark:text-gb-fg4 font-medium">{tagCounts[tag.id] ?? 0}x</span>
         </button>
       {/each}
     </div>
@@ -193,7 +194,7 @@
 
   {#if splits.length > 0}
     <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
-    <span class="text-xs text-gb-fg3 font-semibold uppercase tracking-wider">
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 font-semibold uppercase tracking-wider">
       Right:
     </span>
       {#each splits as split (split.id)}
@@ -202,9 +203,9 @@
           on:click={() => toggleTagFilter(split.id)}
           aria-pressed={selectedTagId === split.id}
           class="flex items-center gap-1.5 text-xs transition
-                 {selectedTagId === split.id ? 'text-gb-fg font-semibold' : 'text-gb-fg3 hover:text-gb-fg'}"
+                 {selectedTagId === split.id ? 'text-gb-light-fg dark:text-gb-fg font-semibold' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-fg dark:hover:text-gb-fg'}"
         >
-          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color]}"></span>
+          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{$gruvboxColors[split.color]}"></span>
           {split.label}
         </button>
       {/each}
@@ -212,7 +213,7 @@
   {/if}
 
     <div class="mt-3 px-1 flex items-center gap-2 text-sm">
-    <span class="text-gb-green font-semibold glow-green">{trainedCount}</span>
-    <span class="text-gb-fg3">day{trainedCount !== 1 ? 's' : ''} trained this month</span>
+    <span class="text-gb-light-green dark:text-gb-green font-semibold glow-green">{trainedCount}</span>
+    <span class="text-gb-light-fg3 dark:text-gb-fg3">day{trainedCount !== 1 ? 's' : ''} trained this month</span>
   </div>
 </div>

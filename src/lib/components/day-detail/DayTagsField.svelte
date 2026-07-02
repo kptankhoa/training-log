@@ -1,7 +1,7 @@
 <script lang="ts">
   import TagChip from './TagChip.svelte';
   import { addTag } from '$lib/stores/tags';
-  import { GRUVBOX_COLORS } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/gruvbox';
   import type { TrainingTag } from '$lib/types';
 
   export let activeTags: TrainingTag[];
@@ -35,23 +35,23 @@
 
 {#if readonly}
   <div class="flex flex-col gap-1.5">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Training types</span>
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Training types</span>
     {#if selectedTagList.length > 0}
       <div class="flex flex-wrap gap-3">
         {#each selectedTagList as tag (tag.id)}
-          <span class="flex items-center gap-1.5 text-sm text-gb-fg">
-            <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[tag.color]}"></span>
+          <span class="flex items-center gap-1.5 text-sm text-gb-light-fg dark:text-gb-fg">
+            <span class="w-2.5 h-2.5 shrink-0" style="background-color:{$gruvboxColors[tag.color]}"></span>
             {tag.name}
           </span>
         {/each}
       </div>
     {:else}
-      <p class="text-gb-fg3 text-sm italic">Nothing logged yet.</p>
+      <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm italic">Nothing logged yet.</p>
     {/if}
   </div>
 {:else}
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Training types</span>
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Training types</span>
     <div class="flex flex-wrap gap-2">
       {#each activeTags as tag (tag.id)}
         <TagChip {tag} selected={selectedIds.has(tag.id)} on:toggle={() => toggleTag(tag.id)} />
@@ -64,16 +64,16 @@
           placeholder="Type name…"
           on:keydown={(e) => e.key === 'Enter' && commitNewTag()}
           on:blur={commitNewTag}
-          class="px-3 py-1 rounded-full border border-gb-bg3 bg-gb-bg2 text-gb-fg
-                 text-sm focus:outline-none focus:border-gb-blue"
+          class="px-3 py-1 rounded-full border border-gb-light-bg3 dark:border-gb-bg3 bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg
+                 text-sm focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue"
           use:autofocus
         />
       {:else}
         <button
           type="button"
           on:click={() => (addingTag = true)}
-          class="px-3 py-1 rounded-full border border-gb-bg3 text-gb-fg3 text-sm
-                 hover:border-gb-blue hover:text-gb-blue transition"
+          class="px-3 py-1 rounded-full border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 text-sm
+                 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue transition"
         >+ Add</button>
       {/if}
     </div>

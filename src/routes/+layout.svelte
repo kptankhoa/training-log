@@ -8,6 +8,7 @@
   import { initExercises } from '$lib/stores/exercises';
   import { initSplits } from '$lib/stores/splits';
   import { initGeneralRules } from '$lib/stores/generalRules';
+  import { theme, initTheme } from '$lib/stores/theme';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
@@ -32,6 +33,7 @@
       unsubs.push(initExercises(u.uid));
       unsubs.push(initSplits(u.uid));
       unsubs.push(initGeneralRules(u.uid));
+      unsubs.push(initTheme(u.uid));
     });
     return () => {
       unsubUser();
@@ -39,15 +41,23 @@
     };
   });
 
+  // Keep the live <html> class and the FOUC-avoidance localStorage cache
+  // (read synchronously by the inline script in app.html) in sync with
+  // whatever the theme store resolves to.
+  $: if (browser) {
+    document.documentElement.classList.toggle('dark', $theme === 'dark');
+    localStorage.setItem('theme', $theme);
+  }
+
   $: showShell = $authReady && $user !== null && $page.url.pathname !== '/login';
   $: loading = !$authReady;
 </script>
 
 {#if loading}
-  <div class="min-h-dvh flex items-center justify-center bg-gb-bg">
+  <div class="min-h-dvh flex items-center justify-center bg-gb-light-bg dark:bg-gb-bg">
     <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></div>
-      <span class="text-gb-fg3 text-sm tracking-widest uppercase">Loading</span>
+      <div class="w-8 h-8 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></div>
+      <span class="text-gb-light-fg3 dark:text-gb-fg3 text-sm tracking-widest uppercase">Loading</span>
     </div>
   </div>
 {:else if showShell}

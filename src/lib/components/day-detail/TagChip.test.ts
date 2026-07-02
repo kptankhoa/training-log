@@ -4,6 +4,10 @@ import TagChip from './TagChip.svelte';
 import TagChipTest from './TagChipTest.svelte';
 import type { TrainingTag } from '$lib/types';
 
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
+
 const tag: TrainingTag = { id: 'tag1', name: 'Boxing', color: 'red', deleted: false };
 
 describe('TagChip', () => {

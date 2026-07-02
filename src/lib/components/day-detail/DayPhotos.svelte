@@ -76,19 +76,19 @@
 {#if readonly}
   {#if photoPaths.length > 0}
     <div class="flex flex-col gap-1.5">
-      <span class="text-xs text-gb-fg3 uppercase tracking-wider">Progress photos</span>
+      <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Progress photos</span>
       <div class="flex flex-wrap gap-2">
         {#each photoPaths as path (path)}
           <button
             type="button"
             on:click={() => (lightboxUrl = photoUrls[path] ?? null)}
             disabled={!photoUrls[path]}
-            class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 overflow-hidden flex items-center justify-center"
+            class="w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 overflow-hidden flex items-center justify-center"
           >
             {#if photoUrls[path]}
               <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
             {:else}
-              <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+              <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
             {/if}
           </button>
         {/each}
@@ -97,10 +97,10 @@
   {/if}
 {:else}
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Progress photos</span>
+    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Progress photos</span>
     <div class="flex flex-wrap gap-2">
       {#each photoPaths as path (path)}
-        <div class="relative w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3">
+        <div class="relative w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3">
           <button
             type="button"
             on:click={() => (lightboxUrl = photoUrls[path] ?? null)}
@@ -110,7 +110,7 @@
             {#if photoUrls[path]}
               <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
             {:else}
-              <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+              <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
             {/if}
           </button>
           <button
@@ -118,15 +118,15 @@
             on:click={() => handleRemovePhotoClick(path)}
             aria-label={confirmingPhotoPath === path ? 'Confirm remove photo' : 'Remove photo'}
             class="absolute -top-1.5 -right-1.5 flex items-center justify-center
-                   bg-gb-red text-white leading-none transition-all
+                   bg-gb-light-red dark:bg-gb-red text-white leading-none transition-all
                    {confirmingPhotoPath === path ? 'px-1.5 h-5 text-[10px] font-semibold' : 'w-5 h-5 text-xs'}"
           >{confirmingPhotoPath === path ? 'Sure?' : '✕'}</button>
         </div>
       {/each}
 
       {#if uploadingPhoto}
-        <div class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 flex items-center justify-center">
-          <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+        <div class="w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 flex items-center justify-center">
+          <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
         </div>
       {/if}
 
@@ -135,12 +135,12 @@
         on:click={triggerPhotoPicker}
         disabled={uploadingPhoto}
         aria-label="Add photo"
-        class="w-20 h-20 shrink-0 border border-dashed border-gb-bg3 text-gb-fg3 text-2xl
-               hover:border-gb-blue hover:text-gb-blue transition disabled:opacity-40"
+        class="w-20 h-20 shrink-0 border border-dashed border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 text-2xl
+               hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue transition disabled:opacity-40"
       >+</button>
     </div>
     {#if photoError}
-      <span class="text-xs text-gb-red">Upload failed — try again.</span>
+      <span class="text-xs text-gb-light-red dark:text-gb-red">Upload failed — try again.</span>
     {/if}
     <input
       bind:this={fileInput}

@@ -53,13 +53,13 @@
 </script>
 
 {#if entries.length === 0}
-  <p class="text-gb-fg3 text-sm">No progress photos yet — add some from a day's log.</p>
+  <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm">No progress photos yet — add some from a day's log.</p>
 {:else}
-  <div class="relative flex flex-col gap-6 pl-6 border-l-2 border-gb-bg3">
+  <div class="relative flex flex-col gap-6 pl-6 border-l-2 border-gb-light-bg3 dark:border-gb-bg3">
     {#each entries as entry (entry.dateKey)}
       <div class="relative">
-        <span class="absolute -left-[1.6rem] top-1 w-3 h-3 rounded-full bg-gb-green"></span>
-        <div class="text-xs text-gb-fg3 uppercase tracking-wider mb-2">{formatLabel(entry.dateKey)}</div>
+        <span class="absolute -left-[1.6rem] top-1 w-3 h-3 rounded-full bg-gb-light-green dark:bg-gb-green"></span>
+        <div class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider mb-2">{formatLabel(entry.dateKey)}</div>
         <div class="flex flex-wrap gap-2">
           {#each entry.paths as path (path)}
             <div class="flex flex-col items-center gap-1 w-20 shrink-0">
@@ -67,16 +67,16 @@
                 type="button"
                 on:click={() => (lightboxUrl = urls[path] ?? null)}
                 disabled={!urls[path]}
-                class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 overflow-hidden flex items-center justify-center"
+                class="w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 overflow-hidden flex items-center justify-center"
               >
                 {#if urls[path]}
                   <img src={urls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
                 {:else}
-                  <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+                  <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
                 {/if}
               </button>
               {#if sizes[path] !== undefined}
-                <span class="text-[10px] text-gb-fg3">{formatSize(sizes[path])}</span>
+                <span class="text-[10px] text-gb-light-fg3 dark:text-gb-fg3">{formatSize(sizes[path])}</span>
               {/if}
             </div>
           {/each}

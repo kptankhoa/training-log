@@ -11,6 +11,7 @@
     Legend,
     Filler,
   } from 'chart.js';
+  import { theme } from '$lib/stores/theme';
 
   Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, Filler);
 
@@ -31,6 +32,10 @@
 
   $: lines = series ?? [{ label: '', data, color, unit }];
   $: showLegend = lines.length > 1;
+
+  $: tickColor = $theme === 'dark' ? '#a89984' : '#7c6f64';
+  $: gridColor = $theme === 'dark' ? '#3c3836' : '#ebdbb2';
+  $: legendColor = $theme === 'dark' ? '#ebdbb2' : '#3c3836';
 
   let canvas: HTMLCanvasElement;
   let chart: Chart | null = null;
@@ -57,11 +62,11 @@
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { beginAtZero, ticks: { color: '#a89984' }, grid: { color: '#3c3836' } },
-          x: { ticks: { color: '#a89984' }, grid: { color: '#3c3836' } },
+          y: { beginAtZero, ticks: { color: tickColor }, grid: { color: gridColor } },
+          x: { ticks: { color: tickColor }, grid: { color: gridColor } },
         },
         plugins: {
-          legend: { display: showLegend, labels: { color: '#ebdbb2' } },
+          legend: { display: showLegend, labels: { color: legendColor } },
           tooltip: {
             callbacks: {
               label: (ctx) => {
@@ -76,7 +81,7 @@
   }
 
   onMount(render);
-  $: if (canvas) { labels; lines; beginAtZero; render(); }
+  $: if (canvas) { labels; lines; beginAtZero; tickColor; gridColor; legendColor; render(); }
   onDestroy(() => chart?.destroy());
 </script>
 

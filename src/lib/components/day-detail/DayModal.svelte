@@ -56,16 +56,16 @@
   aria-labelledby="modal-title"
   tabindex="-1"
 >
-  <div class="bg-gb-bg1 w-full md:w-[520px] max-h-[85%] overflow-y-auto
+  <div class="bg-gb-light-bg1 dark:bg-gb-bg1 w-full md:w-[520px] max-h-[85%] overflow-y-auto
               rounded-t-2xl md:rounded-xl shadow-2xl p-6 pb-24 md:pb-6 flex flex-col gap-5">
 
     <div class="flex items-start justify-between">
-      <h2 id="modal-title" class="text-gb-green font-semibold text-lg leading-tight glow-green">{heading}</h2>
+      <h2 id="modal-title" class="text-gb-light-green dark:text-gb-green font-semibold text-lg leading-tight glow-green">{heading}</h2>
       <button
         type="button"
         on:click={() => dispatch('close')}
         aria-label="Close"
-        class="text-gb-fg3 hover:text-gb-fg text-2xl leading-none ml-4 shrink-0"
+        class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-fg dark:hover:text-gb-fg text-2xl leading-none ml-4 shrink-0"
       >×</button>
     </div>
 

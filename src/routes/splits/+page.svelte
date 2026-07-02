@@ -5,7 +5,7 @@
   import { activeExercises, updateExerciseSplits } from '$lib/stores/exercises';
   import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
   import { icons } from '$lib/icons';
-  import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
+  import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Split, GruvboxColor, Exercise } from '$lib/types';
@@ -134,37 +134,37 @@
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
   <div class="flex items-center justify-between">
-    <h1 class="text-gb-green text-2xl font-bold glow-green">Split Design</h1>
+    <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Split Design</h1>
     <button
       type="button"
       on:click={handleAdd}
-      class="bg-gb-blue text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition"
+      class="bg-gb-light-blue dark:bg-gb-blue text-gb-light-bg dark:text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition"
     >+ Add</button>
   </div>
 
   {#if $splitsLoading}
     <Spinner />
   {:else if $splits.length === 0}
-    <p class="text-gb-fg3 text-sm">No splits yet. Add one to get started.</p>
+    <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm">No splits yet. Add one to get started.</p>
   {/if}
 
   <div class="flex flex-col gap-2">
     {#each $splits as split (split.id)}
-      <div class="bg-gb-bg1 border border-gb-bg2">
+      <div class="bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg2 dark:border-gb-bg2">
 
         <!-- Header / toggle -->
         <button
           type="button"
           on:click={() => toggle(split)}
-          class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gb-bg2 transition"
+          class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition"
         >
-          <span class="w-3 h-3 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
-          <span class="font-semibold text-gb-fg text-sm flex-1">{split.label || 'Untitled'}</span>
-          <span class="text-gb-fg3 text-xs shrink-0">{expandedId === split.id ? '▲' : '▼'}</span>
+          <span class="w-3 h-3 shrink-0" style="background-color:{$gruvboxColors[split.color ?? 'blue']}"></span>
+          <span class="font-semibold text-gb-light-fg dark:text-gb-fg text-sm flex-1">{split.label || 'Untitled'}</span>
+          <span class="text-gb-light-fg3 dark:text-gb-fg3 text-xs shrink-0">{expandedId === split.id ? '▲' : '▼'}</span>
         </button>
 
         {#if expandedId === split.id}
-          <div class="border-t border-gb-bg2">
+          <div class="border-t border-gb-light-bg2 dark:border-gb-bg2">
 
             {#if editingId === split.id && draft}
               <!-- Edit mode -->
@@ -173,28 +173,28 @@
                   <button
                     type="button"
                     on:click|stopPropagation={cycleColor}
-                    style="background-color:{GRUVBOX_COLORS[draft.color]}"
+                    style="background-color:{$gruvboxColors[draft.color]}"
                     title="Click to change color"
                     class="w-6 h-9 shrink-0 hover:opacity-80 transition-opacity"
                   ></button>
                   <div class="flex flex-col gap-1 flex-1">
-                    <label for="label-{split.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
+                    <label for="label-{split.id}" class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Label</label>
                     <input
                       id="label-{split.id}"
                       type="text"
                       bind:value={draft.label}
-                      class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
-                             focus:outline-none focus:border-gb-blue w-full"
+                      class="bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg text-sm px-3 py-2 border border-gb-light-bg3 dark:border-gb-bg3
+                             focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue w-full"
                     />
                   </div>
                   <div class="flex flex-col gap-1 w-20">
-                    <label for="order-{split.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Order</label>
+                    <label for="order-{split.id}" class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Order</label>
                     <input
                       id="order-{split.id}"
                       type="number"
                       bind:value={draft.sortOrder}
-                      class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
-                             focus:outline-none focus:border-gb-blue w-full"
+                      class="bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg text-sm px-3 py-2 border border-gb-light-bg3 dark:border-gb-bg3
+                             focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue w-full"
                     />
                   </div>
                 </div>
@@ -202,9 +202,9 @@
                 <MarkdownEditor bind:value={draft.content} placeholder="Write your split…" initialMode="edit" />
 
                 <div class="flex flex-col gap-2">
-                  <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
+                  <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Exercises</span>
                   {#if $activeExercises.length === 0}
-                    <p class="text-gb-fg3 text-xs italic">No exercises yet — add some in Settings.</p>
+                    <p class="text-gb-light-fg3 dark:text-gb-fg3 text-xs italic">No exercises yet — add some in Settings.</p>
                   {:else}
                     <div class="flex flex-wrap gap-2">
                       {#each $activeExercises as exercise (exercise.id)}
@@ -213,8 +213,8 @@
                           on:click={() => toggleExerciseTie(exercise, split.id)}
                           class="px-3 py-1 text-xs border transition
                                  {isExerciseTied(exercise, split.id)
-                                   ? 'border-gb-green text-gb-green bg-gb-bg2'
-                                   : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
+                                   ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                                   : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
                         >{exercise.name}</button>
                       {/each}
                     </div>
@@ -226,18 +226,18 @@
                     type="button"
                     on:click={() => handleDeleteClick(split.id)}
                     class="text-sm font-medium hover:opacity-80 transition px-2 py-1
-                           {confirmingDelete ? 'text-white bg-gb-red' : 'text-gb-red'}"
+                           {confirmingDelete ? 'text-white bg-gb-light-red dark:bg-gb-red' : 'text-gb-light-red dark:text-gb-red'}"
                   >{confirmingDelete ? 'Confirm delete?' : 'Delete'}</button>
                   <div class="flex gap-2">
                     <button
                       type="button"
                       on:click={cancelEdit}
-                      class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+                      class="text-gb-light-fg3 dark:text-gb-fg3 text-sm hover:text-gb-light-fg dark:hover:text-gb-fg transition px-3 py-2"
                     >Cancel</button>
                     <button
                       type="button"
                       on:click={() => handleSave(split.id)}
-                      class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition"
+                      class="bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition"
                     >Save</button>
                   </div>
                 </div>
@@ -247,19 +247,19 @@
               <!-- View mode -->
               <div class="px-4 py-4 flex flex-col gap-4">
                 {#if split.content}
-                  <div class="prose prose-invert max-w-none text-sm text-gb-fg
-                              [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
-                              [&_strong]:text-gb-orange [&_a]:text-gb-blue">
+                  <div class="prose prose-invert max-w-none text-sm text-gb-light-fg dark:text-gb-fg
+                              [&_h1]:text-gb-light-green dark:[&_h1]:text-gb-green [&_h2]:text-gb-light-green dark:[&_h2]:text-gb-green [&_h3]:text-gb-light-green dark:[&_h3]:text-gb-green
+                              [&_strong]:text-gb-light-orange dark:[&_strong]:text-gb-orange [&_a]:text-gb-light-blue dark:[&_a]:text-gb-blue">
                     {@html marked(split.content)}
                   </div>
                 {:else}
-                  <p class="text-gb-fg3 text-sm italic">No content yet.</p>
+                  <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm italic">No content yet.</p>
                 {/if}
                 <div class="flex justify-end">
                   <button
                     type="button"
                     on:click={() => startEdit(split)}
-                    class="bg-gb-bg2 text-gb-fg text-sm px-4 py-2 hover:bg-gb-bg3 transition"
+                    class="bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg text-sm px-4 py-2 hover:bg-gb-light-bg3 dark:hover:bg-gb-bg3 transition"
                   >Update</button>
                 </div>
               </div>
@@ -271,25 +271,25 @@
     {/each}
   </div>
 
-  <section class="bg-gb-bg1 border border-gb-bg2 p-4 flex flex-col gap-3">
-    <h2 class="text-gb-fg font-semibold text-sm uppercase tracking-wider">General Rules</h2>
+  <section class="bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg2 dark:border-gb-bg2 p-4 flex flex-col gap-3">
+    <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold text-sm uppercase tracking-wider">General Rules</h2>
 
     {#if $generalRulesLoading}
       <Spinner size="w-5 h-5" />
     {:else if rulesMode === 'view'}
       {#if $generalRules}
-        <div class="prose prose-invert max-w-none text-sm text-gb-fg
-                    [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
-                    [&_strong]:text-gb-orange [&_a]:text-gb-blue">
+        <div class="prose prose-invert max-w-none text-sm text-gb-light-fg dark:text-gb-fg
+                    [&_h1]:text-gb-light-green dark:[&_h1]:text-gb-green [&_h2]:text-gb-light-green dark:[&_h2]:text-gb-green [&_h3]:text-gb-light-green dark:[&_h3]:text-gb-green
+                    [&_strong]:text-gb-light-orange dark:[&_strong]:text-gb-orange [&_a]:text-gb-light-blue dark:[&_a]:text-gb-blue">
           {@html marked($generalRules)}
         </div>
       {:else}
-        <p class="text-gb-fg3 text-sm italic">No general rules yet.</p>
+        <p class="text-gb-light-fg3 dark:text-gb-fg3 text-sm italic">No general rules yet.</p>
       {/if}
       <button
         type="button"
         on:click={startEditRules}
-        class="self-end flex items-center gap-1.5 bg-gb-blue text-gb-bg font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
+        class="self-end flex items-center gap-1.5 bg-gb-light-blue dark:bg-gb-blue text-gb-light-bg dark:text-gb-bg font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
       >{@html icons.pencilSm}Edit</button>
     {:else}
       <MarkdownEditor bind:value={rulesDraft} placeholder="General training rules, guidelines…" initialMode="edit" rows={8} />
@@ -297,13 +297,13 @@
         <button
           type="button"
           on:click={cancelEditRules}
-          class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+          class="text-gb-light-fg3 dark:text-gb-fg3 text-sm hover:text-gb-light-fg dark:hover:text-gb-fg transition px-3 py-2"
         >Cancel</button>
         <button
           type="button"
           on:click={saveRules}
           disabled={savingRules}
-          class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition disabled:opacity-60"
+          class="bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition disabled:opacity-60"
         >{savingRules ? 'Saving…' : 'Save'}</button>
       </div>
     {/if}

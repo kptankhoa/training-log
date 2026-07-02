@@ -18,14 +18,14 @@
 <div class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
     {#if label}
-      <span class="text-gb-fg3 text-xs uppercase tracking-wider">{label}</span>
+      <span class="text-gb-light-fg3 dark:text-gb-fg3 text-xs uppercase tracking-wider">{label}</span>
     {:else}
       <span></span>
     {/if}
     <button
       type="button"
       on:click={() => (mode = mode === 'edit' ? 'preview' : 'edit')}
-      class="text-xs text-gb-blue hover:text-gb-fg transition px-2 py-1 rounded bg-gb-bg2"
+      class="text-xs text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition px-2 py-1 rounded bg-gb-light-bg2 dark:bg-gb-bg2"
     >
       {mode === 'edit' ? 'Preview' : 'Edit'}
     </button>
@@ -37,20 +37,20 @@
       {placeholder}
       {rows}
       on:focus={(e) => scrollIntoViewOnFocus(e.currentTarget)}
-      class="w-full bg-gb-bg2 text-gb-fg font-mono text-sm rounded-md p-3 resize-y
-             border border-gb-bg3 focus:outline-none focus:border-gb-blue [caret-shape:block]"
+      class="w-full bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg font-mono text-sm rounded-md p-3 resize-y
+             border border-gb-light-bg3 dark:border-gb-bg3 focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue [caret-shape:block]"
     ></textarea>
   {:else}
     <div
-      class="prose prose-invert max-w-none bg-gb-bg2 rounded-md p-3
-             text-gb-fg text-sm [&_h1]:text-gb-green [&_h2]:text-gb-green
-             [&_h3]:text-gb-green [&_strong]:text-gb-orange [&_a]:text-gb-blue"
+      class="prose prose-invert max-w-none bg-gb-light-bg2 dark:bg-gb-bg2 rounded-md p-3
+             text-gb-light-fg dark:text-gb-fg text-sm [&_h1]:text-gb-light-green dark:[&_h1]:text-gb-green [&_h2]:text-gb-light-green dark:[&_h2]:text-gb-green
+             [&_h3]:text-gb-light-green dark:[&_h3]:text-gb-green [&_strong]:text-gb-light-orange dark:[&_strong]:text-gb-orange [&_a]:text-gb-light-blue dark:[&_a]:text-gb-blue"
       style="min-height: {rows * 1.5}rem"
     >
       {#if value}
         {@html rendered}
       {:else}
-        <span class="text-gb-fg3">{placeholder}</span>
+        <span class="text-gb-light-fg3 dark:text-gb-fg3">{placeholder}</span>
       {/if}
     </div>
   {/if}

@@ -6,6 +6,9 @@ import type { Exercise, Split } from '$lib/types';
 vi.mock('$lib/stores/exercises', () => ({
   addExercise: vi.fn().mockResolvedValue('new-ex-id'),
 }));
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
 
 const exercises: Exercise[] = [{ id: 'bench', name: 'Bench Press', deleted: false }];
 const splits: Split[] = [

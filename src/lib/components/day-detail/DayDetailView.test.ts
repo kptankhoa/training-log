@@ -5,6 +5,9 @@ import DayDetailViewTest from './DayDetailViewTest.svelte';
 import type { TrainingTag, DailyTask } from '$lib/types';
 
 vi.mock('marked', () => ({ marked: (s: string) => s }));
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
 
 const activeTags: TrainingTag[] = [{ id: 'tag1', name: 'Weight Lifting', color: 'blue', deleted: false }];
 const activeTasks: DailyTask[] = [{ id: 'task1', name: 'Stretch', deleted: false }];

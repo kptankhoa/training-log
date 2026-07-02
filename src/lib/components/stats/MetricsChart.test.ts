@@ -42,6 +42,10 @@ vi.mock('chart.js', () => {
   };
 });
 
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
+
 import MetricsChart from './MetricsChart.svelte';
 
 describe('MetricsChart', () => {

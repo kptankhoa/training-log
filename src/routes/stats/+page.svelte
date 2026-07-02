@@ -12,7 +12,7 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
-  <h1 class="text-gb-green text-2xl font-bold glow-green">Stats</h1>
+  <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Stats</h1>
 
   <!-- Section tabs -->
   <div class="flex gap-2">
@@ -20,7 +20,7 @@
       type="button"
       on:click={() => (activeSection = 'metrics')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeSection === 'metrics' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeSection === 'metrics' ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
     >
       Metrics
     </button>
@@ -28,7 +28,7 @@
       type="button"
       on:click={() => (activeSection = 'measurements')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeSection === 'measurements' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeSection === 'measurements' ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
     >
       Measurements
     </button>
@@ -36,7 +36,7 @@
       type="button"
       on:click={() => (activeSection = 'photos')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeSection === 'photos' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeSection === 'photos' ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
     >
       Photos
     </button>

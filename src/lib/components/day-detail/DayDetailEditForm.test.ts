@@ -8,6 +8,9 @@ vi.mock('$lib/stores/photos', () => ({
   uploadPhoto: vi.fn().mockResolvedValue('users/user1/days/2026-06-10/photo.jpg'),
   getPhotoUrl: vi.fn().mockResolvedValue('https://example.com/photo.jpg'),
 }));
+vi.mock('$lib/stores/theme', () => ({
+  theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb('dark'); return () => {}; } }
+}));
 
 const activeTags: TrainingTag[] = [{ id: 'tag1', name: 'Weight Lifting', color: 'blue', deleted: false }];
 const activeTasks: DailyTask[] = [

@@ -78,7 +78,7 @@
       type="button"
       on:click={() => (activeMetric = 'all')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeMetric === 'all' ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+             {activeMetric === 'all' ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
     >
       All
     </button>
@@ -87,7 +87,7 @@
         type="button"
         on:click={() => (activeMetric = m.key)}
         class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-               {activeMetric === m.key ? 'border-gb-green text-gb-green bg-gb-bg1' : 'border-gb-bg3 text-gb-fg2 hover:bg-gb-bg1'}"
+               {activeMetric === m.key ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
       >
         {m.label}
       </button>
@@ -97,12 +97,12 @@
   {#if $measurementsLoading}
     <Spinner />
   {:else if $measurements.length === 0}
-    <div class="bg-gb-bg1 rounded-xl p-10 text-center flex flex-col gap-2">
-      <p class="text-gb-fg3 text-lg">No measurements yet</p>
-      <p class="text-gb-gray text-sm">Add an entry below to start tracking.</p>
+    <div class="bg-gb-light-bg1 dark:bg-gb-bg1 rounded-xl p-10 text-center flex flex-col gap-2">
+      <p class="text-gb-light-fg3 dark:text-gb-fg3 text-lg">No measurements yet</p>
+      <p class="text-gb-light-gray dark:text-gb-gray text-sm">Add an entry below to start tracking.</p>
     </div>
   {:else}
-    <div class="bg-gb-bg1 rounded-xl p-4">
+    <div class="bg-gb-light-bg1 dark:bg-gb-bg1 rounded-xl p-4">
       {#if chartSeries}
         <LineChart labels={chartLabels} series={chartSeries} />
       {:else if activeMetricInfo}
@@ -112,19 +112,19 @@
 
     <!-- Entries list -->
     <section class="flex flex-col gap-2">
-      <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Entries</h2>
+      <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Entries</h2>
       <div class="flex flex-col gap-1">
         {#each [...$measurements].reverse() as entry (entry.id)}
-          <div class="flex items-center gap-3 bg-gb-bg1 px-3 py-2 text-sm">
-            <span class="text-gb-fg3 w-24 shrink-0">{formatLabel(entry.id)}</span>
-            <span class="flex-1 text-gb-fg truncate">
+          <div class="flex items-center gap-3 bg-gb-light-bg1 dark:bg-gb-bg1 px-3 py-2 text-sm">
+            <span class="text-gb-light-fg3 dark:text-gb-fg3 w-24 shrink-0">{formatLabel(entry.id)}</span>
+            <span class="flex-1 text-gb-light-fg dark:text-gb-fg truncate">
               {entry.weight}kg · {entry.muscleMass}kg MM · {entry.fatMass}kg FM · {entry.bfp}% BF · {entry.score} score
             </span>
             <button
               type="button"
               on:click={() => handleDelete(entry.id)}
               aria-label="Delete entry for {entry.id}"
-              class="text-gb-fg3 hover:text-gb-red transition-colors shrink-0"
+              class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red transition-colors shrink-0"
             >✕</button>
           </div>
         {/each}
@@ -137,13 +137,13 @@
     <button
       type="button"
       on:click={() => (showAddForm = !showAddForm)}
-      class="text-sm text-gb-blue hover:text-gb-fg transition self-start"
+      class="text-sm text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition self-start"
     >
       {showAddForm ? '− Cancel' : '+ Add entry'}
     </button>
 
     {#if showAddForm}
-      <div class="bg-gb-bg1 p-4 flex flex-col gap-3">
+      <div class="bg-gb-light-bg1 dark:bg-gb-bg1 p-4 flex flex-col gap-3">
         <div class="flex flex-col gap-1">
           <FormField id="m-date" label="Date" type="date" bind:value={draftDate} />
         </div>
@@ -167,7 +167,7 @@
         <button
           type="button"
           on:click={handleAddEntry}
-          class="bg-gb-green text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition self-start"
+          class="bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold px-4 py-2 text-sm hover:opacity-90 transition self-start"
         >Save entry</button>
       </div>
     {/if}

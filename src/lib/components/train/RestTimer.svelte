@@ -87,17 +87,17 @@
 <svelte:document on:visibilitychange={handleVisibilityChange} />
 
 <section class="flex flex-col gap-4">
-  <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Rest Timer</h2>
+  <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Rest Timer</h2>
 
   <!-- Ring + time display -->
   <div class="flex flex-col items-center gap-6">
     <div class="relative w-[10.5rem] h-[10.5rem]">
       <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
-        <circle cx="60" cy="60" r={R} fill="none" stroke="currentColor" class="text-gb-bg2" stroke-width="8"/>
+        <circle cx="60" cy="60" r={R} fill="none" stroke="currentColor" class="text-gb-light-bg2 dark:text-gb-bg2" stroke-width="8"/>
         <circle
           cx="60" cy="60" r={R} fill="none"
           stroke="currentColor"
-          class="{finished ? 'text-gb-red' : 'text-gb-green'} transition-all duration-1000"
+          class="{finished ? 'text-gb-light-red dark:text-gb-red' : 'text-gb-light-green dark:text-gb-green'} transition-all duration-1000"
           stroke-width="8"
           stroke-linecap="round"
           stroke-dasharray={C}
@@ -106,29 +106,29 @@
       </svg>
       <div class="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
         {#if finished}
-          <span class="text-xs font-semibold uppercase tracking-widest" style="color:#fb4934">Go!</span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-gb-light-red dark:text-gb-red">Go!</span>
         {:else if running}
-          <span class="text-xs uppercase tracking-widest" style="color:#a89984">Rest</span>
+          <span class="text-xs uppercase tracking-widest text-gb-light-fg3 dark:text-gb-fg3">Rest</span>
         {:else}
           <span class="text-xs uppercase tracking-widest opacity-0">·</span>
         {/if}
-        <span class="text-2xl font-bold tabular-nums" style="color:{finished ? '#fb4934' : running ? '#b8bb26' : '#ebdbb2'}">{displayTime}</span>
+        <span class="text-2xl font-bold tabular-nums {finished ? 'text-gb-light-red dark:text-gb-red' : running ? 'text-gb-light-green dark:text-gb-green' : 'text-gb-light-fg dark:text-gb-fg'}">{displayTime}</span>
       </div>
     </div>
 
     <!-- Duration input -->
     <div class="flex items-center gap-2 text-sm">
-      <label for="rest-seconds" class="text-gb-fg3">Rest:</label>
+      <label for="rest-seconds" class="text-gb-light-fg3 dark:text-gb-fg3">Rest:</label>
       <input
         id="rest-seconds"
         type="number" min="1" max="3600"
         bind:value={inputSeconds}
         on:change={reset}
         disabled={running || (remaining > 0 && !finished)}
-        class="w-16 text-center bg-gb-bg1 border border-gb-bg3 text-gb-fg px-2 py-1
-               focus:outline-none focus:border-gb-blue disabled:opacity-40"
+        class="w-16 text-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg px-2 py-1
+               focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue disabled:opacity-40"
       />
-      <span class="text-gb-fg3">sec</span>
+      <span class="text-gb-light-fg3 dark:text-gb-fg3">sec</span>
     </div>
 
     <!-- Presets -->
@@ -140,8 +140,8 @@
           disabled={running || (remaining > 0 && !finished)}
           class="px-3 py-1 text-sm border transition disabled:opacity-40
                  {inputSeconds === secs
-                   ? 'border-gb-green text-gb-green bg-gb-bg1'
-                   : 'border-gb-bg3 text-gb-fg2 bg-gb-bg hover:bg-gb-bg1'}"
+                   ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1'
+                   : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 bg-gb-light-bg dark:bg-gb-bg hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
         >{secs}s</button>
       {/each}
     </div>
@@ -152,15 +152,15 @@
         type="button"
         on:click={startStop}
         disabled={totalInput === 0}
-        class="px-6 py-2 font-semibold text-sm transition hover:opacity-90 disabled:opacity-40"
-        style={running ? 'background:#fe8019;color:#fff' : 'background:#b8bb26;color:#1d2021'}
+        class="px-6 py-2 font-semibold text-sm transition hover:opacity-90 disabled:opacity-40
+               {running ? 'bg-gb-light-orange dark:bg-gb-orange text-white' : 'bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg'}"
       >
         {running ? 'Pause' : remaining > 0 && !finished ? 'Resume' : 'Start'}
       </button>
       <button
         type="button"
         on:click={reset}
-        class="px-4 py-2 text-sm text-gb-fg3 border border-gb-bg3 hover:bg-gb-bg1 transition"
+        class="px-4 py-2 text-sm text-gb-light-fg3 dark:text-gb-fg3 border border-gb-light-bg3 dark:border-gb-bg3 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition"
       >
         Reset
       </button>

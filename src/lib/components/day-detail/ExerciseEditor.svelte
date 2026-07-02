@@ -115,22 +115,22 @@
   <button
     type="button"
     on:click={copyLastSession}
-    class="self-start text-sm text-gb-blue hover:text-gb-fg transition"
+    class="self-start text-sm text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition"
   >Copy last session</button>
 {/if}
 
 {#if entries.length > 0}
   <div class="max-h-72 overflow-y-auto flex flex-col gap-2 pr-1">
     {#each entries as ex (ex.exerciseId)}
-      <div class="bg-gb-bg2 border border-gb-bg3 p-3 flex flex-col gap-2">
+      <div class="bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 p-3 flex flex-col gap-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-semibold text-gb-fg">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
+          <span class="text-sm font-semibold text-gb-light-fg dark:text-gb-fg">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
           <button
             type="button"
             on:click={() => handleRemoveExerciseClick(ex.exerciseId)}
             aria-label={confirmingExerciseId === ex.exerciseId ? 'Confirm remove exercise' : 'Remove exercise'}
             class="text-xs font-medium px-2 py-1 transition-colors shrink-0
-                   {confirmingExerciseId === ex.exerciseId ? 'text-white bg-gb-red' : 'text-gb-fg3 hover:text-gb-red'}"
+                   {confirmingExerciseId === ex.exerciseId ? 'text-white bg-gb-light-red dark:bg-gb-red' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red'}"
           >{confirmingExerciseId === ex.exerciseId ? 'Confirm?' : '✕'}</button>
         </div>
 
@@ -140,7 +140,7 @@
               <button
                 type="button"
                 on:click={() => removeSet(ex.exerciseId, i)}
-                class="text-xs px-2 py-1 bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-red hover:text-gb-red transition"
+                class="text-xs px-2 py-1 bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-red dark:hover:border-gb-red hover:text-gb-light-red dark:hover:text-gb-red transition"
               >{set.weight}×{set.reps} ✕</button>
             {/each}
           </div>
@@ -152,14 +152,14 @@
               type="button"
               use:holdRepeat={() => adjustWeight(ex.exerciseId, -2.5)}
               aria-label="Decrease weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
+              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
             >−</button>
-            <span class="text-sm text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
+            <span class="text-sm text-gb-light-fg dark:text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
             <button
               type="button"
               use:holdRepeat={() => adjustWeight(ex.exerciseId, 2.5)}
               aria-label="Increase weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
+              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
             >+</button>
           </div>
           <div class="flex items-center gap-1">
@@ -167,20 +167,20 @@
               type="button"
               use:holdRepeat={() => adjustReps(ex.exerciseId, -1)}
               aria-label="Decrease reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
+              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
             >−</button>
-            <span class="text-sm text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
+            <span class="text-sm text-gb-light-fg dark:text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
             <button
               type="button"
               use:holdRepeat={() => adjustReps(ex.exerciseId, 1)}
               aria-label="Increase reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
+              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
             >+</button>
           </div>
           <button
             type="button"
             on:click={() => logSet(ex.exerciseId)}
-            class="flex-1 bg-gb-green text-gb-bg font-semibold text-sm px-3 py-1.5 hover:opacity-90 transition"
+            class="flex-1 bg-gb-light-green dark:bg-gb-green text-gb-light-bg dark:text-gb-bg font-semibold text-sm px-3 py-1.5 hover:opacity-90 transition"
           >Log Set</button>
         </div>
       </div>
@@ -193,8 +193,8 @@
     <button
       type="button"
       on:click={() => addExerciseToLog(ex.id)}
-      class="px-3 py-1 rounded-full border border-gb-bg3 text-gb-fg3 text-sm
-             hover:border-gb-blue hover:text-gb-blue transition"
+      class="px-3 py-1 rounded-full border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 text-sm
+             hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue transition"
     >+ {ex.name}</button>
   {/each}
 
@@ -205,16 +205,16 @@
       placeholder="Type name…"
       on:keydown={(e) => e.key === 'Enter' && commitNewExercise()}
       on:blur={commitNewExercise}
-      class="px-3 py-1 rounded-full border border-gb-bg3 bg-gb-bg2 text-gb-fg
-             text-sm focus:outline-none focus:border-gb-blue"
+      class="px-3 py-1 rounded-full border border-gb-light-bg3 dark:border-gb-bg3 bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg
+             text-sm focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue"
       use:autofocus
     />
   {:else}
     <button
       type="button"
       on:click={() => (addingExercise = true)}
-      class="px-3 py-1 rounded-full border border-gb-bg3 text-gb-fg3 text-sm
-             hover:border-gb-blue hover:text-gb-blue transition"
+      class="px-3 py-1 rounded-full border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 text-sm
+             hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue transition"
     >+ Add exercise</button>
   {/if}
 </div>
