@@ -17,8 +17,8 @@
 </script>
 
 <!-- Desktop left rail -->
-<nav class="hidden md:flex flex-col w-64 min-h-dvh bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
-  <div class="mb-6 px-2 flex items-center gap-2">
+<nav class="hidden md:flex flex-col min-h-dvh bg-gb-bg0 border-r border-gb-bg2 p-6 gap-1 shrink-0">
+  <div class="mb-8 px-2 flex items-center gap-2">
     <span class="shrink-0 text-gb-green [filter:drop-shadow(0_0_6px_rgba(184,187,38,0.8))]">{@html icons.dumbbell}</span>
     <pre class="text-gb-green glow-green font-mono text-[11px] leading-[1.15] whitespace-pre" aria-label="Training Log">{heading}</pre>
   </div>

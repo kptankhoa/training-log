@@ -31,7 +31,7 @@ export const icons = {
   settings:  strokeIcon(18, PATHS.settings),
   signOut:   strokeIcon(18, PATHS.signOut),
   signOutSm: strokeIcon(16, PATHS.signOut),
-  dumbbell:  fillIcon(50, PATHS.dumbbell),
+  dumbbell:  fillIcon(40, PATHS.dumbbell),
   cameraSm:  fillIcon(10, PATHS.camera),
   noteSm:    fillIcon(10, PATHS.note),
   pencilSm:  fillIcon(14, PATHS.pencil),
