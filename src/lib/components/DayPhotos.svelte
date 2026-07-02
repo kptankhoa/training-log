@@ -86,7 +86,7 @@
             class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 overflow-hidden flex items-center justify-center"
           >
             {#if photoUrls[path]}
-              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
+              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
             {:else}
               <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
             {/if}
@@ -105,10 +105,10 @@
             type="button"
             on:click={() => (lightboxUrl = photoUrls[path] ?? null)}
             disabled={!photoUrls[path]}
-            class="w-full h-full flex items-center justify-center"
+            class="w-full h-full overflow-hidden flex items-center justify-center"
           >
             {#if photoUrls[path]}
-              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
+              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
             {:else}
               <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
             {/if}
