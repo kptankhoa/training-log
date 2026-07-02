@@ -25,6 +25,7 @@
   export let hideOtherSectionsWhileEditingNote = true;
   export let saving: boolean;
   export let saved: boolean;
+  export let hideCancel: boolean;
 
   const dispatch = createEventDispatcher<{ save: void; cancel: void }>();
 
@@ -75,12 +76,15 @@
 <DayPhotos bind:photoPaths {dateKey} {userId} {noteEditing} />
 
 <div class="flex justify-end gap-2">
-  <button
-    type="button"
-    on:click={() => dispatch('cancel')}
-    disabled={saving}
-    class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
-  >Cancel</button>
+  {#if hideCancel !== true}
+    <button
+      type="button"
+      on:click={() => dispatch('cancel')}
+      disabled={saving}
+      class="text-gb-fg3 text-sm hover:text-gb-fg transition px-3 py-2"
+    >Cancel</button>
+  {/if}
+
   <button
     type="button"
     on:click={() => dispatch('save')}

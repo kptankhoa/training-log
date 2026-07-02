@@ -20,6 +20,7 @@
   export let hideOtherSectionsWhileEditingNote = true;
   export let saving: boolean = false;
   export let saved: boolean = false;
+  export let hideCancel: boolean = false;
 
   let saveCount = 0;
   let cancelCount = 0;
@@ -28,7 +29,7 @@
 <DayDetailEditForm
   {dateKey} {userId} {activeTags} bind:selectedIds {splits} bind:selectedSplitIds {exercises} {allDays}
   bind:exerciseEntries bind:label {activeTasks} bind:completedTaskIds bind:note bind:noteMode bind:photoPaths
-  {hideOtherSectionsWhileEditingNote} {saving} {saved}
+  {hideOtherSectionsWhileEditingNote} {saving} {saved} {hideCancel}
   on:save={() => (saveCount += 1)}
   on:cancel={() => (cancelCount += 1)}
 />

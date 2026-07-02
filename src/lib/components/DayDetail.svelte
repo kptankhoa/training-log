@@ -113,7 +113,7 @@
   <DayDetailEditForm
     {dateKey} {userId} {activeTags} bind:selectedIds {splits} bind:selectedSplitIds {exercises} {allDays}
     bind:exerciseEntries bind:label {activeTasks} bind:completedTaskIds bind:note bind:noteMode bind:photoPaths
-    {hideOtherSectionsWhileEditingNote} {saving} {saved}
+    {hideOtherSectionsWhileEditingNote} {saving} {saved} hideCancel={editOnly}
     on:save={handleSave} on:cancel={cancelEdit}
   />
 {/if}
