@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { holdRepeat } from '$lib/actions/holdRepeat';
   import { addExercise } from '$lib/stores/exercises';
   import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
   import type { Exercise, ExerciseEntry, DayEntry } from '$lib/types';
@@ -149,31 +150,31 @@
           <div class="flex items-center gap-1">
             <button
               type="button"
-              on:click={() => adjustWeight(ex.exerciseId, -2.5)}
+              use:holdRepeat={() => adjustWeight(ex.exerciseId, -2.5)}
               aria-label="Decrease weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
             >−</button>
             <span class="text-sm text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
             <button
               type="button"
-              on:click={() => adjustWeight(ex.exerciseId, 2.5)}
+              use:holdRepeat={() => adjustWeight(ex.exerciseId, 2.5)}
               aria-label="Increase weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
             >+</button>
           </div>
           <div class="flex items-center gap-1">
             <button
               type="button"
-              on:click={() => adjustReps(ex.exerciseId, -1)}
+              use:holdRepeat={() => adjustReps(ex.exerciseId, -1)}
               aria-label="Decrease reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
             >−</button>
             <span class="text-sm text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
             <button
               type="button"
-              on:click={() => adjustReps(ex.exerciseId, 1)}
+              use:holdRepeat={() => adjustReps(ex.exerciseId, 1)}
               aria-label="Increase reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition"
+              class="w-7 h-7 flex items-center justify-center bg-gb-bg1 border border-gb-bg3 text-gb-fg hover:border-gb-blue transition select-none"
             >+</button>
           </div>
           <button
