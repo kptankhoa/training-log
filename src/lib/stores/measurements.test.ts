@@ -51,12 +51,13 @@ describe('measurements store', () => {
       { weight: 80.5, muscleMass: 36.7, fatMass: 16.5, bfp: 20.5, score: 83 },
       { merge: true }
     );
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'metrics', '2026-06-23');
   });
 
   it('deleteMeasurement calls deleteDoc with correct ref', async () => {
     const { deleteMeasurement } = await import('./measurements');
     await deleteMeasurement('user1', '2026-06-23');
     expect(mockDeleteDoc).toHaveBeenCalledTimes(1);
-    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'measurements', '2026-06-23');
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'metrics', '2026-06-23');
   });
 });
