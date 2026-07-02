@@ -51,9 +51,9 @@ describe('PhotoTimeline', () => {
     };
     vi.mocked(getPhotoSize).mockImplementation((path: string) => Promise.resolve(sizesByPath[path]));
     const { findByText } = render(PhotoTimeline, { props: { days } });
-    expect(await findByText('2 MB')).toBeInTheDocument();
-    expect(await findByText('980 KB')).toBeInTheDocument();
-    expect(await findByText('512 B')).toBeInTheDocument();
+    expect(await findByText('2MB')).toBeInTheDocument();
+    expect(await findByText('980KB')).toBeInTheDocument();
+    expect(await findByText('512B')).toBeInTheDocument();
   });
 
   it('closes the lightbox when clicking the close button', async () => {

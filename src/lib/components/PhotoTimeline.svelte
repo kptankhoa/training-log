@@ -32,7 +32,7 @@
   $: loadMissingUrls(entries);
 
   function formatSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024) return `${bytes}B`;
     const units = ['KB', 'MB', 'GB'];
     let value = bytes / 1024;
     let unitIndex = 0;
@@ -41,7 +41,7 @@
       unitIndex++;
     }
     const rounded = Math.round(value * 10) / 10;
-    return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)} ${units[unitIndex]}`;
+    return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)}${units[unitIndex]}`;
   }
 
   function formatLabel(dateKey: string): string {
