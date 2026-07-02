@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockUploadBytes = vi.fn();
 const mockGetDownloadURL = vi.fn();
+const mockGetMetadata = vi.fn();
 const mockDeleteObject = vi.fn();
 const mockRef = vi.fn((_storage, path: string) => ({ path }));
 
@@ -10,6 +11,7 @@ vi.mock('firebase/storage', () => ({
   ref: mockRef,
   uploadBytes: mockUploadBytes,
   getDownloadURL: mockGetDownloadURL,
+  getMetadata: mockGetMetadata,
   deleteObject: mockDeleteObject,
 }));
 
@@ -36,6 +38,15 @@ describe('photos store', () => {
 
     expect(mockRef).toHaveBeenCalledWith(expect.anything(), 'users/user1/days/2026-06-10/photo.jpg');
     expect(url).toBe('https://example.com/photo.jpg');
+  });
+
+  it('getPhotoSize resolves the byte size from Storage metadata', async () => {
+    mockGetMetadata.mockResolvedValue({ size: 2048 });
+    const { getPhotoSize } = await import('./photos');
+    const size = await getPhotoSize('users/user1/days/2026-06-10/photo.jpg');
+
+    expect(mockRef).toHaveBeenCalledWith(expect.anything(), 'users/user1/days/2026-06-10/photo.jpg');
+    expect(size).toBe(2048);
   });
 
   it('deletePhoto removes the object at the given path', async () => {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getPhotoUrl } from '$lib/stores/photos';
+  import { getPhotoUrl, getPhotoSize } from '$lib/stores/photos';
   import type { DayEntry } from '$lib/types';
 
   export let days: Record<string, DayEntry> = {};
@@ -10,19 +10,39 @@
     .sort((a, b) => b.dateKey.localeCompare(a.dateKey)); // newest first
 
   let urls: Record<string, string> = {};
+  let sizes: Record<string, number> = {};
 
   function loadMissingUrls(list: { dateKey: string; paths: string[] }[]) {
     list.forEach((entry) => {
       entry.paths.forEach((path) => {
-        if (urls[path]) return;
-        getPhotoUrl(path)
-          .then((url) => { urls = { ...urls, [path]: url }; })
-          .catch((err) => console.error('[PhotoTimeline] failed to load photo:', err));
+        if (!urls[path]) {
+          getPhotoUrl(path)
+            .then((url) => { urls = { ...urls, [path]: url }; })
+            .catch((err) => console.error('[PhotoTimeline] failed to load photo:', err));
+        }
+        if (sizes[path] === undefined) {
+          getPhotoSize(path)
+            .then((size) => { sizes = { ...sizes, [path]: size }; })
+            .catch((err) => console.error('[PhotoTimeline] failed to load photo size:', err));
+        }
       });
     });
   }
 
   $: loadMissingUrls(entries);
+
+  function formatSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    const units = ['KB', 'MB', 'GB'];
+    let value = bytes / 1024;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex++;
+    }
+    const rounded = Math.round(value * 10) / 10;
+    return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)} ${units[unitIndex]}`;
+  }
 
   function formatLabel(dateKey: string): string {
     const [y, m, d] = dateKey.split('-').map(Number);
@@ -42,18 +62,23 @@
         <div class="text-xs text-gb-fg3 uppercase tracking-wider mb-2">{formatLabel(entry.dateKey)}</div>
         <div class="flex flex-wrap gap-2">
           {#each entry.paths as path (path)}
-            <button
-              type="button"
-              on:click={() => (lightboxUrl = urls[path] ?? null)}
-              disabled={!urls[path]}
-              class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 overflow-hidden flex items-center justify-center"
-            >
-              {#if urls[path]}
-                <img src={urls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
-              {:else}
-                <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+            <div class="flex flex-col items-center gap-1 w-20 shrink-0">
+              <button
+                type="button"
+                on:click={() => (lightboxUrl = urls[path] ?? null)}
+                disabled={!urls[path]}
+                class="w-20 h-20 shrink-0 bg-gb-bg2 border border-gb-bg3 overflow-hidden flex items-center justify-center"
+              >
+                {#if urls[path]}
+                  <img src={urls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
+                {:else}
+                  <span class="w-4 h-4 rounded-full border-2 border-gb-bg3 border-t-gb-green animate-spin"></span>
+                {/if}
+              </button>
+              {#if sizes[path] !== undefined}
+                <span class="text-[10px] text-gb-fg3">{formatSize(sizes[path])}</span>
               {/if}
-            </button>
+            </div>
           {/each}
         </div>
       </div>

@@ -1,10 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, waitFor } from '@testing-library/svelte';
 import PhotoTimeline from './PhotoTimeline.svelte';
+import { getPhotoSize } from '$lib/stores/photos';
 import type { DayEntry } from '$lib/types';
 
 vi.mock('$lib/stores/photos', () => ({
   getPhotoUrl: vi.fn((path: string) => Promise.resolve(`https://example.com/${path}`)),
+  getPhotoSize: vi.fn(() => Promise.resolve(2_097_152)),
 }));
 
 const days: Record<string, DayEntry> = {
@@ -39,6 +41,19 @@ describe('PhotoTimeline', () => {
     const thumbnails = await findAllByAltText('Training day snapshot');
     await fireEvent.click(thumbnails[0].closest('button')!);
     await waitFor(() => expect(getByRole('dialog')).toBeInTheDocument());
+  });
+
+  it('shows each photo\'s size formatted with the highest sensible unit', async () => {
+    const sizesByPath: Record<string, number> = {
+      'a.jpg': 2_097_152, // 2 MiB
+      'b.jpg': 1_003_520, // 980 KiB
+      'c.jpg': 512, // 512 B
+    };
+    vi.mocked(getPhotoSize).mockImplementation((path: string) => Promise.resolve(sizesByPath[path]));
+    const { findByText } = render(PhotoTimeline, { props: { days } });
+    expect(await findByText('2 MB')).toBeInTheDocument();
+    expect(await findByText('980 KB')).toBeInTheDocument();
+    expect(await findByText('512 B')).toBeInTheDocument();
   });
 
   it('closes the lightbox when clicking the close button', async () => {
