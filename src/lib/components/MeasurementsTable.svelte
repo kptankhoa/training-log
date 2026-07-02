@@ -69,7 +69,7 @@
     for (const key of Object.keys(draftValues) as FieldKey[]) {
       const raw = draftValues[key].trim();
       const parsed = Number(raw);
-      if (raw !== '' && !Number.isNaN(parsed)) data[key] = parsed;
+      if (raw !== '' && Number.isFinite(parsed)) data[key] = parsed;
     }
     await saveBodyMeasurement(userId, draftDate, data);
     resetDraft();
