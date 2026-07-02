@@ -8,6 +8,7 @@
     deleteBodyMeasurement,
   } from '$lib/stores/bodyMeasurements';
   import Spinner from './Spinner.svelte';
+  import FormField from './FormField.svelte';
   import type { BodyMeasurementEntry } from '$lib/types';
 
   export let userId: string;
@@ -132,16 +133,17 @@
     {#if showAddForm}
       <div class="bg-gb-bg1 p-4 flex flex-col gap-3">
         <div class="flex flex-col gap-1">
-          <label for="bm-date" class="text-xs text-gb-fg3 uppercase tracking-wider">Date</label>
-          <input id="bm-date" type="date" bind:value={draftDate}
-            class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+          <FormField id="bm-date" label="Date" type="date" bind:value={draftDate} />
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {#each columns as col (col.key)}
             <div class="flex flex-col gap-1">
-              <label for="bm-{col.key}" class="text-xs text-gb-fg3 uppercase tracking-wider">{col.label} ({col.unit})</label>
-              <input id="bm-{col.key}" type="text" inputmode="decimal" bind:value={draftValues[col.key]}
-                class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+              <FormField
+                id="bm-{col.key}"
+                label="{col.label} ({col.unit})"
+                inputmode="decimal"
+                bind:value={draftValues[col.key]}
+              />
             </div>
           {/each}
         </div>

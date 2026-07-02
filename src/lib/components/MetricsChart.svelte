@@ -3,6 +3,7 @@
   import { measurements, measurementsLoading, initMeasurements, saveMeasurement, deleteMeasurement } from '$lib/stores/measurements';
   import LineChart from './LineChart.svelte';
   import Spinner from './Spinner.svelte';
+  import FormField from './FormField.svelte';
   import type { BodyMeasurement } from '$lib/types';
 
   export let userId: string;
@@ -144,35 +145,23 @@
     {#if showAddForm}
       <div class="bg-gb-bg1 p-4 flex flex-col gap-3">
         <div class="flex flex-col gap-1">
-          <label for="m-date" class="text-xs text-gb-fg3 uppercase tracking-wider">Date</label>
-          <input id="m-date" type="date" bind:value={draftDate}
-            class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+          <FormField id="m-date" label="Date" type="date" bind:value={draftDate} />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1">
-            <label for="m-weight" class="text-xs text-gb-fg3 uppercase tracking-wider">Weight (kg)</label>
-            <input id="m-weight" type="number" step="0.1" bind:value={draftWeight}
-              class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+            <FormField id="m-weight" label="Weight (kg)" inputmode="decimal" bind:value={draftWeight} />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="m-muscle" class="text-xs text-gb-fg3 uppercase tracking-wider">Muscle Mass (kg)</label>
-            <input id="m-muscle" type="number" step="0.1" bind:value={draftMuscleMass}
-              class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+            <FormField id="m-muscle" label="Muscle Mass (kg)" inputmode="decimal" bind:value={draftMuscleMass} />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="m-fat" class="text-xs text-gb-fg3 uppercase tracking-wider">Fat Mass (kg)</label>
-            <input id="m-fat" type="number" step="0.1" bind:value={draftFatMass}
-              class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+            <FormField id="m-fat" label="Fat Mass (kg)" inputmode="decimal" bind:value={draftFatMass} />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="m-bfp" class="text-xs text-gb-fg3 uppercase tracking-wider">Body Fat %</label>
-            <input id="m-bfp" type="number" step="0.1" bind:value={draftBfp}
-              class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+            <FormField id="m-bfp" label="Body Fat %" inputmode="decimal" bind:value={draftBfp} />
           </div>
           <div class="flex flex-col gap-1">
-            <label for="m-score" class="text-xs text-gb-fg3 uppercase tracking-wider">Score</label>
-            <input id="m-score" type="number" step="1" bind:value={draftScore}
-              class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
+            <FormField id="m-score" label="Score" inputmode="decimal" bind:value={draftScore} />
           </div>
         </div>
         <button

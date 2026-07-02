@@ -5,6 +5,7 @@
   import TagChip from './TagChip.svelte';
   import MarkdownEditor from './MarkdownEditor.svelte';
   import ExerciseEditor from './ExerciseEditor.svelte';
+  import FormField from './FormField.svelte';
   import { saveDay } from '$lib/stores/days';
   import { addTag } from '$lib/stores/tags';
   import { uploadPhoto, getPhotoUrl, deletePhoto } from '$lib/stores/photos';
@@ -392,15 +393,7 @@
 
   <!-- Label -->
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-1">
-    <label for="day-label" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
-    <input
-      id="day-label"
-      type="text"
-      bind:value={label}
-      placeholder="Short label shown on calendar"
-      class="w-full bg-gb-bg2 text-gb-fg text-sm rounded-md px-3 py-2
-             border border-gb-bg3 focus:outline-none focus:border-gb-blue"
-    />
+    <FormField id="day-label" label="Label" placeholder="Short label shown on calendar" bind:value={label} />
   </div>
 
   <!-- Daily tasks -->
