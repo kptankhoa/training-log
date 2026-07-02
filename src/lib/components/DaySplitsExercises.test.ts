@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import DaySplitsExercises from './DaySplitsExercises.svelte';
-import type { Exercise, PlanNote } from '$lib/types';
+import type { Exercise, Split } from '$lib/types';
 
 vi.mock('$lib/stores/exercises', () => ({
   addExercise: vi.fn().mockResolvedValue('new-ex-id'),
 }));
 
 const exercises: Exercise[] = [{ id: 'bench', name: 'Bench Press', deleted: false }];
-const splits: PlanNote[] = [
+const splits: Split[] = [
   { id: 'push', label: 'Push Day', sortOrder: 1, content: '', color: 'blue' },
   { id: 'pull', label: 'Pull Day', sortOrder: 2, content: '', color: 'red' },
 ];

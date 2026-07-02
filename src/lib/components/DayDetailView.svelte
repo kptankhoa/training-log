@@ -5,11 +5,11 @@
   import DaySplitsExercises from './DaySplitsExercises.svelte';
   import DayPhotos from './DayPhotos.svelte';
   import { icons } from '$lib/icons';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split } from '$lib/types';
 
   export let activeTags: TrainingTag[];
   export let selectedIds: Set<string>;
-  export let splits: PlanNote[];
+  export let splits: Split[];
   export let selectedSplitIds: Set<string>;
   export let exercises: Exercise[] = [];
   export let exerciseEntries: ExerciseEntry[];

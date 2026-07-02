@@ -4,7 +4,7 @@
   import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor } from '$lib/stores/tags';
   import { activeTasks, tasksLoading, addTask, deleteTask } from '$lib/stores/tasks';
   import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits } from '$lib/stores/exercises';
-  import { notes } from '$lib/stores/notes';
+  import { splits } from '$lib/stores/splits';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
   import type { Exercise, GruvboxColor } from '$lib/types';
@@ -217,11 +217,11 @@
             {#if expandedExerciseId === exercise.id}
               <div class="px-4 pb-3 flex flex-col gap-2">
                 <span class="text-xs text-gb-fg3 uppercase tracking-wider">Tied to splits (none = always available)</span>
-                {#if $notes.length === 0}
+                {#if $splits.length === 0}
                   <p class="text-gb-fg3 text-xs italic">No splits yet — add one in Split Design.</p>
                 {:else}
                   <div class="flex flex-wrap gap-2">
-                    {#each $notes as split (split.id)}
+                    {#each $splits as split (split.id)}
                       <button
                         type="button"
                         on:click={() => toggleExerciseSplit(exercise, split.id)}

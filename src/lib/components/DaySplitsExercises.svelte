@@ -2,9 +2,9 @@
   import { slide } from 'svelte/transition';
   import ExerciseEditor from './ExerciseEditor.svelte';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
-  import type { Exercise, ExerciseEntry, PlanNote, DayEntry } from '$lib/types';
+  import type { Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 
-  export let splits: PlanNote[];
+  export let splits: Split[];
   export let exercises: Exercise[] = [];
   export let allDays: Record<string, DayEntry> = {};
   export let dateKey: string = '';

@@ -40,7 +40,7 @@ export interface DailyTask {
   deleted: boolean;
 }
 
-export interface PlanNote {
+export interface Split {
   id: string;
   label: string;
   sortOrder: number;

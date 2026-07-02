@@ -2,13 +2,13 @@
   import { createEventDispatcher } from 'svelte';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import { icons } from '$lib/icons';
-  import type { TrainingTag, PlanNote, DayEntry } from '$lib/types';
+  import type { TrainingTag, Split, DayEntry } from '$lib/types';
 
   export let year: number;
   export let month: number; // 1–12
   export let days: Record<string, DayEntry> = {};
   export let tags: TrainingTag[] = [];
-  export let splits: PlanNote[] = [];
+  export let splits: Split[] = [];
 
   const dispatch = createEventDispatcher<{ selectDay: string; prevMonth: void; nextMonth: void }>();
 

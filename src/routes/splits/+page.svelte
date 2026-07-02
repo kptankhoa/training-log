@@ -1,14 +1,14 @@
 <script lang="ts">
   import { marked } from 'marked';
   import { user } from '$lib/stores/auth';
-  import { notes, notesLoading, addNote, saveNote, deleteNote } from '$lib/stores/notes';
+  import { splits, splitsLoading, addSplit, saveSplit, deleteSplit } from '$lib/stores/splits';
   import { activeExercises, updateExerciseSplits } from '$lib/stores/exercises';
   import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
   import { icons } from '$lib/icons';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
   import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import type { PlanNote, GruvboxColor, Exercise } from '$lib/types';
+  import type { Split, GruvboxColor, Exercise } from '$lib/types';
 
   function cycleColor() {
     if (!draft) return;
@@ -31,22 +31,22 @@
     if (confirmDeleteTimeout) clearTimeout(confirmDeleteTimeout);
   }
 
-  function toggle(note: PlanNote) {
-    if (expandedId === note.id) {
+  function toggle(split: Split) {
+    if (expandedId === split.id) {
       expandedId = null;
       editingId = null;
       draft = null;
     } else {
-      expandedId = note.id;
+      expandedId = split.id;
       editingId = null;
       draft = null;
     }
     resetDeleteConfirm();
   }
 
-  function startEdit(note: PlanNote) {
-    editingId = note.id;
-    draft = { label: note.label, sortOrder: note.sortOrder, content: note.content, color: note.color ?? 'blue' };
+  function startEdit(split: Split) {
+    editingId = split.id;
+    draft = { label: split.label, sortOrder: split.sortOrder, content: split.content, color: split.color ?? 'blue' };
     resetDeleteConfirm();
   }
 
@@ -56,25 +56,25 @@
     resetDeleteConfirm();
   }
 
-  async function handleSave(noteId: string) {
+  async function handleSave(splitId: string) {
     if (!draft || !userId) return;
-    await saveNote(userId, noteId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content, color: draft.color });
+    await saveSplit(userId, splitId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content, color: draft.color });
     editingId = null;
     draft = null;
   }
 
-  async function handleDelete(noteId: string) {
+  async function handleDelete(splitId: string) {
     if (!userId) return;
-    await deleteNote(userId, noteId);
+    await deleteSplit(userId, splitId);
     expandedId = null;
     editingId = null;
     draft = null;
   }
 
-  function handleDeleteClick(noteId: string) {
+  function handleDeleteClick(splitId: string) {
     if (confirmingDelete) {
       resetDeleteConfirm();
-      handleDelete(noteId);
+      handleDelete(splitId);
       return;
     }
     confirmingDelete = true;
@@ -84,7 +84,7 @@
 
   async function handleAdd() {
     if (!userId) return;
-    await addNote(userId);
+    await addSplit(userId);
   }
 
   function isExerciseTied(exercise: Exercise, splitId: string): boolean {
@@ -142,31 +142,31 @@
     >+ Add</button>
   </div>
 
-  {#if $notesLoading}
+  {#if $splitsLoading}
     <Spinner />
-  {:else if $notes.length === 0}
-    <p class="text-gb-fg3 text-sm">No notes yet. Add one to get started.</p>
+  {:else if $splits.length === 0}
+    <p class="text-gb-fg3 text-sm">No splits yet. Add one to get started.</p>
   {/if}
 
   <div class="flex flex-col gap-2">
-    {#each $notes as note (note.id)}
+    {#each $splits as split (split.id)}
       <div class="bg-gb-bg1 border border-gb-bg2">
 
         <!-- Header / toggle -->
         <button
           type="button"
-          on:click={() => toggle(note)}
+          on:click={() => toggle(split)}
           class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gb-bg2 transition"
         >
-          <span class="w-3 h-3 shrink-0" style="background-color:{GRUVBOX_COLORS[note.color ?? 'blue']}"></span>
-          <span class="font-semibold text-gb-fg text-sm flex-1">{note.label || 'Untitled'}</span>
-          <span class="text-gb-fg3 text-xs shrink-0">{expandedId === note.id ? '▲' : '▼'}</span>
+          <span class="w-3 h-3 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
+          <span class="font-semibold text-gb-fg text-sm flex-1">{split.label || 'Untitled'}</span>
+          <span class="text-gb-fg3 text-xs shrink-0">{expandedId === split.id ? '▲' : '▼'}</span>
         </button>
 
-        {#if expandedId === note.id}
+        {#if expandedId === split.id}
           <div class="border-t border-gb-bg2">
 
-            {#if editingId === note.id && draft}
+            {#if editingId === split.id && draft}
               <!-- Edit mode -->
               <div class="px-4 py-4 flex flex-col gap-4">
                 <div class="flex gap-3 items-end">
@@ -178,9 +178,9 @@
                     class="w-6 h-9 shrink-0 hover:opacity-80 transition-opacity"
                   ></button>
                   <div class="flex flex-col gap-1 flex-1">
-                    <label for="label-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
+                    <label for="label-{split.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Label</label>
                     <input
-                      id="label-{note.id}"
+                      id="label-{split.id}"
                       type="text"
                       bind:value={draft.label}
                       class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
@@ -188,9 +188,9 @@
                     />
                   </div>
                   <div class="flex flex-col gap-1 w-20">
-                    <label for="order-{note.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Order</label>
+                    <label for="order-{split.id}" class="text-xs text-gb-fg3 uppercase tracking-wider">Order</label>
                     <input
-                      id="order-{note.id}"
+                      id="order-{split.id}"
                       type="number"
                       bind:value={draft.sortOrder}
                       class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3
@@ -199,7 +199,7 @@
                   </div>
                 </div>
 
-                <MarkdownEditor bind:value={draft.content} placeholder="Write your note…" initialMode="edit" />
+                <MarkdownEditor bind:value={draft.content} placeholder="Write your split…" initialMode="edit" />
 
                 <div class="flex flex-col gap-2">
                   <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
@@ -210,9 +210,9 @@
                       {#each $activeExercises as exercise (exercise.id)}
                         <button
                           type="button"
-                          on:click={() => toggleExerciseTie(exercise, note.id)}
+                          on:click={() => toggleExerciseTie(exercise, split.id)}
                           class="px-3 py-1 text-xs border transition
-                                 {isExerciseTied(exercise, note.id)
+                                 {isExerciseTied(exercise, split.id)
                                    ? 'border-gb-green text-gb-green bg-gb-bg2'
                                    : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
                         >{exercise.name}</button>
@@ -224,7 +224,7 @@
                 <div class="flex justify-between">
                   <button
                     type="button"
-                    on:click={() => handleDeleteClick(note.id)}
+                    on:click={() => handleDeleteClick(split.id)}
                     class="text-sm font-medium hover:opacity-80 transition px-2 py-1
                            {confirmingDelete ? 'text-white bg-gb-red' : 'text-gb-red'}"
                   >{confirmingDelete ? 'Confirm delete?' : 'Delete'}</button>
@@ -236,7 +236,7 @@
                     >Cancel</button>
                     <button
                       type="button"
-                      on:click={() => handleSave(note.id)}
+                      on:click={() => handleSave(split.id)}
                       class="bg-gb-green text-gb-bg font-semibold px-5 py-2 text-sm hover:opacity-90 transition"
                     >Save</button>
                   </div>
@@ -246,11 +246,11 @@
             {:else}
               <!-- View mode -->
               <div class="px-4 py-4 flex flex-col gap-4">
-                {#if note.content}
+                {#if split.content}
                   <div class="prose prose-invert max-w-none text-sm text-gb-fg
                               [&_h1]:text-gb-green [&_h2]:text-gb-green [&_h3]:text-gb-green
                               [&_strong]:text-gb-orange [&_a]:text-gb-blue">
-                    {@html marked(note.content)}
+                    {@html marked(split.content)}
                   </div>
                 {:else}
                   <p class="text-gb-fg3 text-sm italic">No content yet.</p>
@@ -258,7 +258,7 @@
                 <div class="flex justify-end">
                   <button
                     type="button"
-                    on:click={() => startEdit(note)}
+                    on:click={() => startEdit(split)}
                     class="bg-gb-bg2 text-gb-fg text-sm px-4 py-2 hover:bg-gb-bg3 transition"
                   >Update</button>
                 </div>

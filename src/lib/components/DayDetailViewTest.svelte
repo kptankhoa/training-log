@@ -1,10 +1,10 @@
 <script lang="ts">
   import DayDetailView from './DayDetailView.svelte';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split } from '$lib/types';
 
   export let activeTags: TrainingTag[];
   export let selectedIds: Set<string> = new Set();
-  export let splits: PlanNote[] = [];
+  export let splits: Split[] = [];
   export let selectedSplitIds: Set<string> = new Set();
   export let exercises: Exercise[] = [];
   export let exerciseEntries: ExerciseEntry[] = [];

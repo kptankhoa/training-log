@@ -5,13 +5,13 @@
   import DayTagsField from './DayTagsField.svelte';
   import DaySplitsExercises from './DaySplitsExercises.svelte';
   import DayPhotos from './DayPhotos.svelte';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 
   export let dateKey: string;
   export let userId: string;
   export let activeTags: TrainingTag[];
   export let selectedIds: Set<string>;
-  export let splits: PlanNote[];
+  export let splits: Split[];
   export let selectedSplitIds: Set<string>;
   export let exercises: Exercise[] = [];
   export let allDays: Record<string, DayEntry> = {};

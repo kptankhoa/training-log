@@ -4,7 +4,7 @@
   import { allDays, daysLoading } from '$lib/stores/days';
   import { activeTasks } from '$lib/stores/tasks';
   import { exercises } from '$lib/stores/exercises';
-  import { notes } from '$lib/stores/notes';
+  import { splits } from '$lib/stores/splits';
   import { computeStreaks } from '$lib/streaks';
   import DayDetail from '$lib/components/DayDetail.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -48,7 +48,7 @@
         activeTags={$activeTags}
         activeTasks={$activeTasks}
         exercises={$exercises}
-        splits={$notes}
+        splits={$splits}
         allDays={$allDays}
         {userId}
         hideOtherSectionsWhileEditingNote={false}

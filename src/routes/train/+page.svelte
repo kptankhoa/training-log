@@ -2,17 +2,17 @@
   import { onDestroy } from 'svelte';
   import { slide } from 'svelte/transition';
   import { marked } from 'marked';
-  import { notes, notesLoading } from '$lib/stores/notes';
+  import { splits, splitsLoading } from '$lib/stores/splits';
   import { allDays, daysLoading, saveDay } from '$lib/stores/days';
   import { exercises } from '$lib/stores/exercises';
   import { user } from '$lib/stores/auth';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
   import Spinner from '$lib/components/Spinner.svelte';
   import ExerciseEditor from '$lib/components/ExerciseEditor.svelte';
-  import type { PlanNote, ExerciseEntry, DayEntry } from '$lib/types';
+  import type { ExerciseEntry, DayEntry } from '$lib/types';
 
   let selectedId: string | null = null;
-  $: selectedSplit = $notes.find((n) => n.id === selectedId) ?? null;
+  $: selectedSplit = $splits.find((n) => n.id === selectedId) ?? null;
 
   $: userId = $user?.uid ?? '';
 
@@ -156,13 +156,13 @@
   <!-- Split picker -->
   <section class="flex flex-col gap-2">
     <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Select Split</h2>
-    {#if $notesLoading}
+    {#if $splitsLoading}
       <Spinner />
-    {:else if $notes.length === 0}
+    {:else if $splits.length === 0}
       <p class="text-gb-fg3 text-sm">No splits yet — add one in <a href="/splits" class="text-gb-blue underline">Split Design</a>.</p>
     {:else}
       <div class="flex flex-wrap gap-2">
-        {#each $notes as split (split.id)}
+        {#each $splits as split (split.id)}
           <button
             type="button"
             on:click={() => selectedId = selectedId === split.id ? null : split.id}

@@ -4,14 +4,14 @@
   import DayDetailEditForm from './DayDetailEditForm.svelte';
   import { saveDay } from '$lib/stores/days';
   import { deletePhoto } from '$lib/stores/photos';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
   export let exercises: Exercise[] = []; // full list (incl. deleted) so old logs still resolve names
-  export let splits: PlanNote[] = [];
+  export let splits: Split[] = [];
   export let allDays: Record<string, DayEntry> = {};
   export let userId: string;
   // Only useful in a height-constrained modal sheet — the inline Home page

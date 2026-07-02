@@ -6,7 +6,7 @@
   import { initDays } from '$lib/stores/days';
   import { initTasks } from '$lib/stores/tasks';
   import { initExercises } from '$lib/stores/exercises';
-  import { initNotes } from '$lib/stores/notes';
+  import { initSplits } from '$lib/stores/splits';
   import { initGeneralRules } from '$lib/stores/generalRules';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -30,7 +30,7 @@
       unsubs.push(initDays(u.uid));
       unsubs.push(initTasks(u.uid));
       unsubs.push(initExercises(u.uid));
-      unsubs.push(initNotes(u.uid));
+      unsubs.push(initSplits(u.uid));
       unsubs.push(initGeneralRules(u.uid));
     });
     return () => {

@@ -1,12 +1,12 @@
 <script lang="ts">
   import DayDetailEditForm from './DayDetailEditForm.svelte';
-  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, PlanNote, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 
   export let dateKey: string;
   export let userId: string;
   export let activeTags: TrainingTag[];
   export let selectedIds: Set<string> = new Set();
-  export let splits: PlanNote[] = [];
+  export let splits: Split[] = [];
   export let selectedSplitIds: Set<string> = new Set();
   export let exercises: Exercise[] = [];
   export let allDays: Record<string, DayEntry> = {};

@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import DayDetail from './DayDetail.svelte';
-  import type { TrainingTag, DailyTask, Exercise, PlanNote, DayEntry } from '$lib/types';
+  import type { TrainingTag, DailyTask, Exercise, Split, DayEntry } from '$lib/types';
 
   export let dateKey: string;      // YYYY-MM-DD
   export let entry: DayEntry;
   export let activeTags: TrainingTag[];
   export let activeTasks: DailyTask[] = [];
   export let exercises: Exercise[] = [];
-  export let splits: PlanNote[] = [];
+  export let splits: Split[] = [];
   export let allDays: Record<string, DayEntry> = {};
   export let userId: string;
 
