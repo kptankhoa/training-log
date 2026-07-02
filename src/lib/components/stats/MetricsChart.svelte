@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
   import { measurements, measurementsLoading, initMeasurements, saveMeasurement, deleteMeasurement } from '$lib/stores/measurements';
   import LineChart from './LineChart.svelte';
-  import Spinner from './Spinner.svelte';
-  import FormField from './FormField.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
+  import FormField from '$lib/components/shared/FormField.svelte';
   import type { BodyMeasurement } from '$lib/types';
 
   export let userId: string;

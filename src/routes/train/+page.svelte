@@ -7,8 +7,8 @@
   import { exercises } from '$lib/stores/exercises';
   import { user } from '$lib/stores/auth';
   import { GRUVBOX_COLORS } from '$lib/gruvbox';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import ExerciseEditor from '$lib/components/ExerciseEditor.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
+  import ExerciseEditor from '$lib/components/day-detail/ExerciseEditor.svelte';
   import type { ExerciseEntry, DayEntry } from '$lib/types';
 
   let selectedId: string | null = null;

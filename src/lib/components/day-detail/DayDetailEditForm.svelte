@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import MarkdownEditor from './MarkdownEditor.svelte';
-  import FormField from './FormField.svelte';
+  import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
+  import FormField from '$lib/components/shared/FormField.svelte';
   import DayTagsField from './DayTagsField.svelte';
   import DaySplitsExercises from './DaySplitsExercises.svelte';
   import DayPhotos from './DayPhotos.svelte';

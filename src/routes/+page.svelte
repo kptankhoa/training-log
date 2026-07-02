@@ -6,8 +6,8 @@
   import { exercises } from '$lib/stores/exercises';
   import { splits } from '$lib/stores/splits';
   import { computeStreaks } from '$lib/streaks';
-  import DayDetail from '$lib/components/DayDetail.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
+  import DayDetail from '$lib/components/day-detail/DayDetail.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
 
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;

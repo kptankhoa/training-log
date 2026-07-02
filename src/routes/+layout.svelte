@@ -11,7 +11,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
-  import Sidebar from '$lib/components/Sidebar.svelte';
+  import Sidebar from '$lib/components/shell/Sidebar.svelte';
 
   $: if (browser && $authReady && $user === null && $page.url.pathname !== '/login') {
     goto('/login');

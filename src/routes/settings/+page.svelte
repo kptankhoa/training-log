@@ -7,7 +7,7 @@
   import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits } from '$lib/stores/exercises';
   import { splits } from '$lib/stores/splits';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
-  import Spinner from '$lib/components/Spinner.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Exercise, GruvboxColor } from '$lib/types';
 
   $: userId = $user?.uid ?? '';

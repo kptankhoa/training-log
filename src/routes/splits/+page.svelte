@@ -6,8 +6,8 @@
   import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
   import { icons } from '$lib/icons';
   import { GRUVBOX_COLORS, COLOR_ORDER } from '$lib/gruvbox';
-  import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
+  import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Split, GruvboxColor, Exercise } from '$lib/types';
 
   function cycleColor() {

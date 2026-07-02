@@ -1,9 +1,9 @@
 <script lang="ts">
   import { user } from '$lib/stores/auth';
   import { allDays } from '$lib/stores/days';
-  import MetricsChart from '$lib/components/MetricsChart.svelte';
-  import MeasurementsTable from '$lib/components/MeasurementsTable.svelte';
-  import PhotoTimeline from '$lib/components/PhotoTimeline.svelte';
+  import MetricsChart from '$lib/components/stats/MetricsChart.svelte';
+  import MeasurementsTable from '$lib/components/stats/MeasurementsTable.svelte';
+  import PhotoTimeline from '$lib/components/stats/PhotoTimeline.svelte';
 
   $: userId = $user?.uid ?? '';
 

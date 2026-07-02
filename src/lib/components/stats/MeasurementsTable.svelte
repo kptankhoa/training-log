@@ -7,8 +7,8 @@
     saveBodyMeasurement,
     deleteBodyMeasurement,
   } from '$lib/stores/bodyMeasurements';
-  import Spinner from './Spinner.svelte';
-  import FormField from './FormField.svelte';
+  import Spinner from '$lib/components/shared/Spinner.svelte';
+  import FormField from '$lib/components/shared/FormField.svelte';
   import type { BodyMeasurementEntry } from '$lib/types';
 
   export let userId: string;
