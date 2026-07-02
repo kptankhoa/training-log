@@ -133,7 +133,7 @@
       <div class="bg-gb-bg1 p-4 flex flex-col gap-3">
         <div class="flex flex-col gap-1">
           <label for="bm-date" class="text-xs text-gb-fg3 uppercase tracking-wider">Date</label>
-          <input id="bm-date" type="date" lang="en-GB" bind:value={draftDate}
+          <input id="bm-date" type="date" bind:value={draftDate}
             class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
