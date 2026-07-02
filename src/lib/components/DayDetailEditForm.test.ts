@@ -52,8 +52,12 @@ describe('DayDetailEditForm — note-editing hides other sections (mobile only)'
       props: baseProps({ activeTags, activeTasks, noteMode: 'edit' })
     });
     const trainingTypesSection = getByText('Training types').closest('div');
+    const labelSection = getByText('Label').closest('div');
+    const dailyTasksSection = getByText('Daily tasks').closest('div');
     const photosSection = getByText('Progress photos').closest('div');
     expect(trainingTypesSection?.className).toContain('hidden');
+    expect(labelSection?.className).toContain('hidden');
+    expect(dailyTasksSection?.className).toContain('hidden');
     expect(photosSection?.className).toContain('hidden');
   });
 
