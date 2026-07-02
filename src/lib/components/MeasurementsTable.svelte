@@ -68,7 +68,8 @@
     const data: Partial<Omit<BodyMeasurementEntry, 'id'>> = {};
     for (const key of Object.keys(draftValues) as FieldKey[]) {
       const raw = draftValues[key].trim();
-      if (raw !== '') data[key] = Number(raw);
+      const parsed = Number(raw);
+      if (raw !== '' && !Number.isNaN(parsed)) data[key] = parsed;
     }
     await saveBodyMeasurement(userId, draftDate, data);
     resetDraft();

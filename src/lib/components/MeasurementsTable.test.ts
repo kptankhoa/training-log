@@ -75,4 +75,12 @@ describe('MeasurementsTable', () => {
     await fireEvent.click(getByText('Save entry'));
     expect(mockSave).toHaveBeenCalledWith('user1', expect.any(String), {});
   });
+
+  it('excludes a field with non-numeric text instead of saving it as NaN', async () => {
+    const { getByText, getByLabelText } = render(MeasurementsTable, { props: { userId: 'user1' } });
+    await fireEvent.click(getByText('+ Add entry'));
+    await fireEvent.input(getByLabelText('Chest (cm)'), { target: { value: 'abc' } });
+    await fireEvent.click(getByText('Save entry'));
+    expect(mockSave).toHaveBeenCalledWith('user1', expect.any(String), {});
+  });
 });
