@@ -182,47 +182,6 @@
     </section>
   {/if}
 
-  <!-- Exercises -->
-  <section class="flex flex-col gap-2">
-    <button
-      type="button"
-      on:click={() => (exercisesExpanded = !exercisesExpanded)}
-      class="flex items-center justify-between text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
-    >
-      <span>Exercises</span>
-      <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '−' : '+'}</span>
-    </button>
-    {#if exercisesExpanded}
-      <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>
-        <ExerciseEditor
-          exercises={$exercises}
-          allDays={$allDays}
-          dateKey={todayKey}
-          {userId}
-          daySplitIds={selectedId ? [selectedId] : []}
-          bind:entries={exerciseEntries}
-        />
-        <button
-          type="button"
-          on:click={handleSaveExercises}
-          disabled={exercisesSaving || exercisesSaved}
-          class="bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
-                 transition-transform hover:opacity-90 active:scale-[0.98]
-                 disabled:opacity-90 flex items-center justify-center gap-2"
-        >
-          {#if exercisesSaved}
-            <span>✓ Saved</span>
-          {:else if exercisesSaving}
-            <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
-            <span>Saving…</span>
-          {:else}
-            <span>Save</span>
-          {/if}
-        </button>
-      </div>
-    {/if}
-  </section>
-
   <!-- Rest timer -->
   <section class="flex flex-col gap-4">
     <h2 class="text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Rest Timer</h2>
@@ -304,5 +263,46 @@
         </button>
       </div>
     </div>
+  </section>
+
+  <!-- Exercises -->
+  <section class="flex flex-col gap-2">
+    <button
+      type="button"
+      on:click={() => (exercisesExpanded = !exercisesExpanded)}
+      class="flex items-center justify-between text-gb-fg font-semibold border-b border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
+    >
+      <span>Exercises</span>
+      <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '−' : '+'}</span>
+    </button>
+    {#if exercisesExpanded}
+      <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>
+        <ExerciseEditor
+          exercises={$exercises}
+          allDays={$allDays}
+          dateKey={todayKey}
+          {userId}
+          daySplitIds={selectedId ? [selectedId] : []}
+          bind:entries={exerciseEntries}
+        />
+        <button
+          type="button"
+          on:click={handleSaveExercises}
+          disabled={exercisesSaving || exercisesSaved}
+          class="bg-gb-green text-gb-bg font-semibold py-2.5 rounded-md
+                 transition-transform hover:opacity-90 active:scale-[0.98]
+                 disabled:opacity-90 flex items-center justify-center gap-2"
+        >
+          {#if exercisesSaved}
+            <span>✓ Saved</span>
+          {:else if exercisesSaving}
+            <span class="w-4 h-4 rounded-full border-2 border-gb-bg border-t-transparent animate-spin"></span>
+            <span>Saving…</span>
+          {:else}
+            <span>Save</span>
+          {/if}
+        </button>
+      </div>
+    {/if}
   </section>
 </div>
