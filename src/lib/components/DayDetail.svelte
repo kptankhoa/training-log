@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { slide } from 'svelte/transition';
   import { marked } from 'marked';
   import TagChip from './TagChip.svelte';
   import MarkdownEditor from './MarkdownEditor.svelte';
@@ -46,6 +47,10 @@
   }
 
   let exerciseEntries: ExerciseEntry[] = cloneExerciseEntries(entry.exercises);
+
+  // Not every day has a split/exercise logged — start collapsed unless there's
+  // already something there, so an empty day's edit form isn't so tall.
+  let splitsExpanded = selectedSplitIds.size > 0 || exerciseEntries.length > 0;
 
   // Photos: uploads commit to Storage immediately (need a real ref to preview),
   // but removals only take effect on Save, so discarding edits still works.
@@ -167,6 +172,7 @@
     noteMode = note ? 'preview' : 'edit';
     photoPaths = [...originalPhotoPaths];
     exerciseEntries = cloneExerciseEntries(entry.exercises);
+    splitsExpanded = selectedSplitIds.size > 0 || exerciseEntries.length > 0;
     addingTag = false;
     newTagName = '';
     if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
@@ -349,27 +355,39 @@
     </div>
   </div>
 
-  <!-- Splits -->
+  <!-- Splits & Exercises -->
   <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Splits</span>
-    <div class="flex flex-wrap gap-2">
-      {#each splits as split (split.id)}
-        <button
-          type="button"
-          on:click={() => toggleSplit(split.id)}
-          class="px-3 py-1 rounded-full border text-sm transition
-                 {selectedSplitIds.has(split.id)
-                   ? 'border-gb-green text-gb-green bg-gb-bg2'
-                   : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
-        >{split.label || 'Untitled'}</button>
-      {/each}
-    </div>
-  </div>
-
-  <!-- Exercises -->
-  <div class="{noteEditing ? 'hidden md:flex' : 'flex'} flex-col gap-2">
-    <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
-    <ExerciseEditor {exercises} {allDays} {dateKey} {userId} daySplitIds={[...selectedSplitIds]} bind:entries={exerciseEntries} />
+    <button
+      type="button"
+      on:click={() => (splitsExpanded = !splitsExpanded)}
+      class="flex items-center justify-between text-xs text-gb-fg3 uppercase tracking-wider"
+    >
+      <span>Splits & Exercises</span>
+      <span class="text-sm leading-none">{splitsExpanded ? '−' : '+'}</span>
+    </button>
+    {#if splitsExpanded}
+      <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>
+        <div class="flex flex-col gap-2">
+          <span class="text-xs text-gb-fg3 uppercase tracking-wider">Splits</span>
+          <div class="flex flex-wrap gap-2">
+            {#each splits as split (split.id)}
+              <button
+                type="button"
+                on:click={() => toggleSplit(split.id)}
+                class="px-3 py-1 rounded-full border text-sm transition
+                       {selectedSplitIds.has(split.id)
+                         ? 'border-gb-green text-gb-green bg-gb-bg2'
+                         : 'border-gb-bg3 text-gb-fg3 hover:border-gb-blue hover:text-gb-blue'}"
+              >{split.label || 'Untitled'}</button>
+            {/each}
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-xs text-gb-fg3 uppercase tracking-wider">Exercises</span>
+          <ExerciseEditor {exercises} {allDays} {dateKey} {userId} daySplitIds={[...selectedSplitIds]} bind:entries={exerciseEntries} />
+        </div>
+      </div>
+    {/if}
   </div>
 
   <!-- Label -->

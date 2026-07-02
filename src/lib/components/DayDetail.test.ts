@@ -355,6 +355,7 @@ describe('DayDetail — exercises integration', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     expect(getByText('+ Bench Press')).toBeInTheDocument();
   });
 
@@ -364,6 +365,7 @@ describe('DayDetail — exercises integration', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     await fireEvent.click(getByText('+ Bench Press'));
     await fireEvent.click(getByText('Log Set'));
     await fireEvent.click(getByText('Save'));
@@ -382,6 +384,7 @@ describe('DayDetail — exercises integration', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, exercises, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     await fireEvent.click(getByText('+ Bench Press'));
     await fireEvent.click(getByText('Cancel'));
 
@@ -404,6 +407,7 @@ describe('DayDetail — splits', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, splits, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     const pushChip = getByText('Push Day');
     await fireEvent.click(pushChip);
     expect(pushChip.className).toContain('border-gb-green');
@@ -415,6 +419,7 @@ describe('DayDetail — splits', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, splits, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     await fireEvent.click(getByText('Push Day'));
     await fireEvent.click(getByText('Save'));
 
@@ -434,6 +439,7 @@ describe('DayDetail — splits', () => {
       props: { dateKey: '2026-06-10', entry, activeTags, exercises: tiedExercises, splits, userId: 'user1' }
     });
     await fireEvent.click(getByText('Edit'));
+    await fireEvent.click(getByText('Splits & Exercises'));
     expect(getByText('+ Bench Press')).toBeInTheDocument();
     expect(getByText('+ Row')).toBeInTheDocument();
 
