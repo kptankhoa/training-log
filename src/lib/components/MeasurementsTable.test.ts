@@ -65,4 +65,14 @@ describe('MeasurementsTable', () => {
     await fireEvent.click(getByText('Save entry'));
     expect(mockSave).toHaveBeenCalledWith('user1', expect.any(String), { chest: 101, waist: 82 });
   });
+
+  it('excludes a field that was typed into and then cleared before saving', async () => {
+    const { getByText, getByLabelText } = render(MeasurementsTable, { props: { userId: 'user1' } });
+    await fireEvent.click(getByText('+ Add entry'));
+    const chestInput = getByLabelText('Chest (cm)');
+    await fireEvent.input(chestInput, { target: { value: '101' } });
+    await fireEvent.input(chestInput, { target: { value: '' } });
+    await fireEvent.click(getByText('Save entry'));
+    expect(mockSave).toHaveBeenCalledWith('user1', expect.any(String), {});
+  });
 });

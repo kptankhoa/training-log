@@ -67,7 +67,7 @@
     if (!userId || !draftDate) return;
     const data: Partial<Omit<BodyMeasurementEntry, 'id'>> = {};
     for (const key of Object.keys(draftValues) as FieldKey[]) {
-      const raw = String(draftValues[key]).trim();
+      const raw = draftValues[key].trim();
       if (raw !== '') data[key] = Number(raw);
     }
     await saveBodyMeasurement(userId, draftDate, data);
@@ -139,7 +139,7 @@
           {#each columns as col (col.key)}
             <div class="flex flex-col gap-1">
               <label for="bm-{col.key}" class="text-xs text-gb-fg3 uppercase tracking-wider">{col.label} ({col.unit})</label>
-              <input id="bm-{col.key}" type="number" step="0.1" bind:value={draftValues[col.key]}
+              <input id="bm-{col.key}" type="text" inputmode="decimal" bind:value={draftValues[col.key]}
                 class="bg-gb-bg2 text-gb-fg text-sm px-3 py-2 border border-gb-bg3 focus:outline-none focus:border-gb-blue" />
             </div>
           {/each}
