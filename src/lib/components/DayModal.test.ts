@@ -27,12 +27,13 @@ describe('DayModal', () => {
   });
 
   it('renders DayDetail content inside the sheet', () => {
-    const { getByText } = render(DayModal, {
+    const { getByText, getByDisplayValue } = render(DayModal, {
       props: { dateKey: '2026-06-10', entry, activeTags, userId: 'user1' }
     });
-    // entry has content, so DayDetail defaults to its view mode
+    // DayModal always renders DayDetail in edit mode (editOnly), so content
+    // shows as tag chips / input values rather than read-only text.
     expect(getByText('Weight Lifting')).toBeInTheDocument();
-    expect(getByText('Leg day')).toBeInTheDocument();
+    expect(getByDisplayValue('Leg day')).toBeInTheDocument();
   });
 
   it('emits close when X button clicked', async () => {

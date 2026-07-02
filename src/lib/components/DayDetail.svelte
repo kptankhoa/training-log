@@ -17,6 +17,7 @@
   // Only useful in a height-constrained modal sheet — the inline Home page
   // has no such constraint, so it opts out.
   export let hideOtherSectionsWhileEditingNote = true;
+  export let editOnly = false; // for DayModal, which has its own Save/Cancel buttons
 
   const dispatch = createEventDispatcher<{ saved: void }>();
 
@@ -25,7 +26,7 @@
   let completedTaskIds = new Set<string>(entry.tasks ?? []);
   let label = entry.label;
   let note = entry.note;
-  let noteMode: 'edit' | 'preview' = note ? 'preview' : 'edit';
+  let noteMode: 'edit' | 'preview' = editOnly || note ? 'preview' : 'edit';
   let saving = false;
   let saved = false;
   let savedResetTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -48,7 +49,7 @@
 
   // View mode by default for a day that already has something logged —
   // jumping straight into an editable form every time feels heavy-handed.
-  let mode: 'view' | 'edit' = hasAnyContent() ? 'view' : 'edit';
+  let mode: 'view' | 'edit' = (editOnly || !hasAnyContent()) ? 'edit' : 'view';
 
   onDestroy(() => {
     if (savedResetTimeout) clearTimeout(savedResetTimeout);
@@ -56,7 +57,9 @@
 
   function startEdit() {
     mode = 'edit';
+    if (!editOnly) {
     noteMode = 'edit';
+    }
   }
 
   function cancelEdit() {
@@ -89,7 +92,9 @@
       if (savedResetTimeout) clearTimeout(savedResetTimeout);
       savedResetTimeout = setTimeout(() => {
         saved = false;
-        mode = 'view';
+        if (!editOnly) {
+          mode = 'view';
+        }
       }, 1500);
     } catch (err) {
       saving = false;

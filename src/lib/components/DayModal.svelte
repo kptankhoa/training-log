@@ -69,6 +69,6 @@
       >×</button>
     </div>
 
-    <DayDetail {dateKey} {entry} {activeTags} {activeTasks} {exercises} {splits} {allDays} {userId} on:saved={handleSaved} />
+    <DayDetail {dateKey} {entry} {activeTags} {activeTasks} {exercises} {splits} {allDays} {userId} editOnly={true} on:saved={handleSaved} />
   </div>
 </div>
