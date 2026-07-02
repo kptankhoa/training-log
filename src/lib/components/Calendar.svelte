@@ -50,7 +50,7 @@
       num: cell,
       colors: (entry?.tags ?? []).map((id) => tagMap[id]).filter(Boolean).map((t) => GRUVBOX_COLORS[t.color]),
       splitColors: (entry?.splitIds ?? []).map((id) => splitMap[id]).filter(Boolean).map((s) => GRUVBOX_COLORS[s.color ?? 'blue']),
-      tagIds: entry?.tags ?? [],
+      tagIds: [...(entry?.tags ?? []), ...(entry?.splitIds ?? [])],
       label: entry?.label ?? '',
       hasNote: !!(entry?.note),
       hasPhotos: !!(entry?.photos?.length),
@@ -89,6 +89,12 @@
     const dy = touch.clientY - touchStartY;
     if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
     dispatch(dx < 0 ? 'nextMonth' : 'prevMonth');
+  }
+
+  function getSelectedIdColor() {
+    if (!selectedTagId) return null;
+    const el = tagMap[selectedTagId] ?? splitMap[selectedTagId];
+    return el ? GRUVBOX_COLORS[el.color] : null;
   }
 </script>
 
@@ -130,7 +136,7 @@
                  {cell.isToday ? 'bg-gb-bg1' : 'bg-gb-bg'}
                  {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
           style={selectedTagId && cell.tagIds.includes(selectedTagId)
-            ? `box-shadow: inset 0 0 0 2px ${GRUVBOX_COLORS[tagMap[selectedTagId]?.color] ?? '#ebdbb2'};`
+            ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? '#ebdbb2'};`
             : cell.isToday ? 'box-shadow: inset 0 0 0 1px #b8bb26;' : ''}
         >
           <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-green glow-green' : 'text-gb-fg2'}">{cell.num}</span>
@@ -166,6 +172,9 @@
 
   {#if tags.filter((t) => !t.deleted).length > 0}
     <div class="mt-4 px-1 flex flex-wrap gap-x-4 gap-y-1">
+    <span class="text-xs text-gb-fg3 font-semibold uppercase tracking-wider">
+      Left:
+    </span>
       {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
         <button
           type="button"
@@ -184,11 +193,20 @@
 
   {#if splits.length > 0}
     <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
+    <span class="text-xs text-gb-fg3 font-semibold uppercase tracking-wider">
+      Right:
+    </span>
       {#each splits as split (split.id)}
-        <span class="flex items-center gap-1.5 text-xs text-gb-fg3">
-          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color ?? 'blue']}"></span>
-          {split.label || 'Untitled'}
-        </span>
+        <button
+          type="button"
+          on:click={() => toggleTagFilter(split.id)}
+          aria-pressed={selectedTagId === split.id}
+          class="flex items-center gap-1.5 text-xs transition
+                 {selectedTagId === split.id ? 'text-gb-fg font-semibold' : 'text-gb-fg3 hover:text-gb-fg'}"
+        >
+          <span class="w-2.5 h-2.5 shrink-0" style="background-color:{GRUVBOX_COLORS[split.color]}"></span>
+          {split.label}
+        </button>
       {/each}
     </div>
   {/if}
