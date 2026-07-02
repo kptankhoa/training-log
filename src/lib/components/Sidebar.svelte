@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { signOut } from '$lib/stores/auth';
   import { icons } from '$lib/icons';
+  import { heading } from '$lib/decorators/heading';
 
   const nav = [
     { href: '/',         label: 'Today',    icon: icons.home     },
@@ -17,9 +18,9 @@
 
 <!-- Desktop left rail -->
 <nav class="hidden md:flex flex-col w-64 min-h-dvh bg-gb-bg0 border-r border-gb-bg2 p-4 gap-1 shrink-0">
-  <div class="text-gb-green font-bold text-lg mb-6 px-2 glow-green flex items-center gap-2">
-    {@html icons.dumbbell}
-    Training Log
+  <div class="mb-6 px-2 flex items-center gap-2">
+    <span class="shrink-0 text-gb-green glow-green">{@html icons.dumbbell}</span>
+    <pre class="text-gb-green glow-green font-mono text-[11px] leading-[1.15] whitespace-pre" aria-label="Training Log">{heading}</pre>
   </div>
   {#each nav as item}
     <a
