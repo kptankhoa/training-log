@@ -56,3 +56,20 @@ export interface BodyMeasurement {
   bfp: number;
   score: number;
 }
+
+export interface BodyMeasurementEntry {
+  id: string; // date key YYYY-MM-DD
+  weight?: number;
+  chest?: number;
+  waist?: number;
+  handles?: number;
+  hip?: number;
+  armL?: number;
+  forearmL?: number;
+  armR?: number;
+  forearmR?: number;
+  thighL?: number;
+  thighR?: number;
+  calfL?: number;
+  calfR?: number;
+}
