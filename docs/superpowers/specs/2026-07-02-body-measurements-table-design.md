@@ -23,9 +23,9 @@ Each component is independently testable, and the page file stops mixing all thr
 
 ## Data Model (Firestore)
 
-New collection, one doc per date, scoped under the user like every other collection in this app:
+New collection, one doc per date, scoped under the user like every other collection in this app. Reuses the `measurements` collection name freed up by the earlier Metrics rename (the old scale-composition backup docs at that path are being manually cleared before this ships, so there's no leftover-field collision).
 
-### `users/{userId}/bodyMeasurements/{YYYY-MM-DD}`
+### `users/{userId}/measurements/{YYYY-MM-DD}`
 ```
 weight?:   number   # kg
 chest?:    number   # cm
@@ -71,7 +71,7 @@ export interface BodyMeasurementEntry {
 
 ## Store (`src/lib/stores/bodyMeasurements.ts`)
 
-Mirrors the shape of `src/lib/stores/measurements.ts`:
+Mirrors the shape of `src/lib/stores/measurements.ts`, but reads/writes the Firestore collection at `users/{userId}/measurements` (the file/export names stay `bodyMeasurements*` for clarity in code — only the Firestore collection string is `'measurements'`):
 
 ```ts
 export const bodyMeasurements: Readable<BodyMeasurementEntry[]>;
@@ -117,6 +117,10 @@ export function deleteBodyMeasurement(userId: string, dateKey: string): Promise<
 - `stats/+page.svelte` doesn't need a test file after the split either — it becomes a thin pill-switch shell with no logic of its own to test.
 
 ---
+
+## Housekeeping (unrelated to the new feature, done alongside it)
+
+The one-time `migrateToMetricsCollection` helper in `src/lib/stores/measurements.ts` (added when Metrics was renamed from the old `measurements` collection) has done its job — the `metrics` collection is confirmed populated — so it and its tests are removed as part of this change, restoring `initMeasurements` to a plain `onSnapshot` subscription.
 
 ## Out of Scope
 
