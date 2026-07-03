@@ -4,6 +4,7 @@
   import { addExercise } from '$lib/stores/exercises';
   import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
   import { showError } from '$lib/stores/toast';
+  import { formatSet } from '$lib/types';
   import type { Exercise, ExerciseEntry, DayEntry } from '$lib/types';
 
   export let exercises: Exercise[] = []; // full catalog, incl. deleted, for name resolution
@@ -38,8 +39,11 @@
   function initDraftFor(exerciseId: string) {
     if (draftWeight[exerciseId] !== undefined) return;
     const last = getLastLoggedSet(allDays, exerciseId, dateKey);
-    draftWeight = { ...draftWeight, [exerciseId]: last?.weight ?? 20 };
-    draftReps = { ...draftReps, [exerciseId]: last?.reps ?? 8 };
+    // Only extract weight/reps from weight-type sets; other types don't have these fields
+    const weight = (last && (last.type === undefined || last.type === 'weight') && 'weight' in last) ? last.weight : 20;
+    const reps = (last && (last.type === undefined || last.type === 'weight') && 'reps' in last) ? last.reps : 8;
+    draftWeight = { ...draftWeight, [exerciseId]: weight };
+    draftReps = { ...draftReps, [exerciseId]: reps };
   }
 
   onMount(() => {
@@ -146,7 +150,7 @@
                 type="button"
                 on:click={() => removeSet(ex.exerciseId, i)}
                 class="text-xs px-2 py-1 bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-red dark:hover:border-gb-red hover:text-gb-light-red dark:hover:text-gb-red transition"
-              >{set.weight}×{set.reps} ✕</button>
+              >{formatSet(set)} ✕</button>
             {/each}
           </div>
         {/if}

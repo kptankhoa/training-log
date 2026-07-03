@@ -2,6 +2,7 @@
   import { slide } from 'svelte/transition';
   import ExerciseEditor from './ExerciseEditor.svelte';
   import { gruvboxColors } from '$lib/gruvbox';
+  import { formatSet } from '$lib/types';
   import type { Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 
   export let splits: Split[];
@@ -51,7 +52,7 @@
           <p class="text-sm text-gb-light-fg dark:text-gb-fg">
             <span class="font-medium">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
             {#if ex.sets.length > 0}
-              <span class="text-gb-light-fg3 dark:text-gb-fg3"> — {ex.sets.map((s) => `${s.weight}×${s.reps}`).join(', ')}</span>
+              <span class="text-gb-light-fg3 dark:text-gb-fg3"> — {ex.sets.map(formatSet).join(', ')}</span>
             {:else}
               <span class="text-gb-light-fg3 dark:text-gb-fg3 italic"> — no sets logged</span>
             {/if}
