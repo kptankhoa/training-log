@@ -14,11 +14,11 @@ const GRUVBOX_DARK: Record<GruvboxColor, string> = {
 
 const GRUVBOX_LIGHT: Record<GruvboxColor, string> = {
   red:    '#9d0006',
-  green:  '#79740e',
-  yellow: '#b57614',
+  green:  '#68630c',
+  yellow: '#86570f',
   blue:   '#076678',
   purple: '#8f3f71',
-  aqua:   '#427b58',
+  aqua:   '#3a6b4d',
   orange: '#af3a03',
 };
 
