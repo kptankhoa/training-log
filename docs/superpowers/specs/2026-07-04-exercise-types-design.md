@@ -44,7 +44,7 @@ export function formatSet(set: ExerciseSet): string {
   switch (resolveSetType(set)) {
     case 'weight': {
       const s = set as { weight: number; reps: number };
-      return `${s.weight}kg×${s.reps}`;
+      return `${s.weight}×${s.reps}`; // matches the existing (pre-this-feature) compact format exactly — no unit
     }
     case 'bodyweight': {
       const s = set as { reps: number };
@@ -57,6 +57,8 @@ export function formatSet(set: ExerciseSet): string {
   }
 }
 ```
+
+Note: this corrects an error in this spec's first draft, which wrote the weight case as `"60kg×8"` — the actual existing compact display (both the set chips in `ExerciseEditor.svelte` and the read-only summary in `DaySplitsExercises.svelte`, confirmed against their current tests) has never included a unit suffix; only the *live editable stepper* shows `"20kg"` as its own separate label. `formatSet` preserves the existing no-unit convention exactly, so no existing weight-set test needs to change.
 
 `Exercise.type` has no equivalent resolver function — it's a single optional field, read inline as `exercise.type ?? 'weight'`, matching the existing `splitIds` precedent exactly.
 
@@ -102,7 +104,7 @@ Drafts extend from today's `draftWeight`/`draftReps` (`Record<string, number>` k
 
 `logSet(exerciseId)` builds the `ExerciseSet` object matching the exercise's current type (reading its type from the `exercises` catalog, same lookup as the stepper), always including the `type` field.
 
-Set chips (the existing tap-to-remove pills showing each logged set) render via the new `formatSet()` helper instead of the hardcoded `${weight}×${reps}` template — `"60kg×8"`, `"×8"`, `"45s"`.
+Set chips (the existing tap-to-remove pills showing each logged set) render via the new `formatSet()` helper instead of the hardcoded `${weight}×${reps}` template — `"60×8"`, `"×8"`, `"45s"`.
 
 The exercise name label in the logging list (not the "+ ExerciseName" pickable buttons, which stay name-only to keep that row compact) gets a muted suffix when type is `weight` and equipment and/or `singleArm` are set: `" · {Equipment}"` and/or `" · single-arm"`, e.g. "Dumbbell Row · Dumbbell · single-arm" or "Bench Press · Barbell". Equipment labels are the capitalized display form (`Barbell`, `Dumbbell`, `Cable`, `Machine`) of the stored lowercase value.
 
