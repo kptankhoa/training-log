@@ -68,7 +68,7 @@
       class="flex items-center justify-between text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider"
     >
       <span>Splits & Exercises</span>
-      <span class="text-sm leading-none">{splitsExpanded ? '−' : '+'}</span>
+      <span class="text-sm leading-none">{splitsExpanded ? '-' : '+'}</span>
     </button>
     {#if splitsExpanded}
       <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>

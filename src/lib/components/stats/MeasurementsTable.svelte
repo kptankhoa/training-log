@@ -127,7 +127,7 @@
       on:click={() => (showAddForm = !showAddForm)}
       class="text-sm text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition self-start"
     >
-      {showAddForm ? '− Cancel' : '+ Add entry'}
+      {showAddForm ? '- Cancel' : '+ Add entry'}
     </button>
 
     {#if showAddForm}

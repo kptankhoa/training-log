@@ -153,7 +153,7 @@
               use:holdRepeat={() => adjustWeight(ex.exerciseId, -2.5)}
               aria-label="Decrease weight"
               class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >−</button>
+            >-</button>
             <span class="text-sm text-gb-light-fg dark:text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
             <button
               type="button"
@@ -168,7 +168,7 @@
               use:holdRepeat={() => adjustReps(ex.exerciseId, -1)}
               aria-label="Decrease reps"
               class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >−</button>
+            >-</button>
             <span class="text-sm text-gb-light-fg dark:text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
             <button
               type="button"

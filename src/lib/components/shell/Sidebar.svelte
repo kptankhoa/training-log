@@ -3,6 +3,7 @@
   import { signOut } from '$lib/stores/auth';
   import { icons } from '$lib/icons';
   import { heading } from '$lib/decorators/heading';
+  import { navColorClasses } from '$lib/navColors';
 
   const nav = [
     { href: '/',         label: 'Today',    icon: icons.home     },
@@ -27,7 +28,7 @@
       href={item.href}
       class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors
              {path === item.href
-               ? 'bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-green dark:text-gb-green font-semibold glow-green'
+               ? `bg-gb-light-bg2 dark:bg-gb-bg2 font-semibold ${navColorClasses(item.href)}`
                : 'text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2'}"
     >
       <span class="shrink-0">{@html item.icon}</span>
@@ -54,7 +55,7 @@
     <a
       href={item.href}
       class="flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors
-             {path === item.href ? 'text-gb-light-green dark:text-gb-green glow-green' : 'text-gb-light-fg3 dark:text-gb-fg3'}"
+             {path === item.href ? navColorClasses(item.href) : 'text-gb-light-fg3 dark:text-gb-fg3'}"
     >
       <span class="leading-none">{@html item.icon}</span>
       {item.label}

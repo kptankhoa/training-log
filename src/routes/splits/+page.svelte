@@ -6,6 +6,7 @@
   import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
   import { icons } from '$lib/icons';
   import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
+  import { navColorClasses } from '$lib/navColors';
   import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Split, GruvboxColor, Exercise } from '$lib/types';
@@ -134,7 +135,7 @@
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
   <div class="flex items-center justify-between">
-    <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Split Design</h1>
+    <h1 class="text-2xl font-bold {navColorClasses('/splits')}">Split Design</h1>
     <button
       type="button"
       on:click={handleAdd}

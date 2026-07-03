@@ -4,6 +4,7 @@
   import LineChart from './LineChart.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import FormField from '$lib/components/shared/FormField.svelte';
+  import { navBorderClass, navTextClass } from '$lib/navColors';
   import type { BodyMeasurement } from '$lib/types';
 
   export let userId: string;
@@ -73,12 +74,12 @@
 
 <div class="flex flex-col gap-6">
   <!-- Metric tabs -->
-  <div class="flex gap-2 overflow-x-auto pb-1">
+  <div class="flex gap-2 overflow-x-auto pb-2">
     <button
       type="button"
       on:click={() => (activeMetric = 'all')}
       class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-             {activeMetric === 'all' ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
+             {activeMetric === 'all' ? `${navBorderClass('/stats')} ${navTextClass('/stats')} bg-gb-light-bg1 dark:bg-gb-bg1` : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
     >
       All
     </button>
@@ -87,7 +88,7 @@
         type="button"
         on:click={() => (activeMetric = m.key)}
         class="px-3 py-1.5 text-sm whitespace-nowrap border transition shrink-0
-               {activeMetric === m.key ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg1 dark:bg-gb-bg1' : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
+               {activeMetric === m.key ? `${navBorderClass('/stats')} ${navTextClass('/stats')} bg-gb-light-bg1 dark:bg-gb-bg1` : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg2 dark:text-gb-fg2 hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1'}"
       >
         {m.label}
       </button>
@@ -139,7 +140,7 @@
       on:click={() => (showAddForm = !showAddForm)}
       class="text-sm text-gb-light-blue dark:text-gb-blue hover:text-gb-light-fg dark:hover:text-gb-fg transition self-start"
     >
-      {showAddForm ? '− Cancel' : '+ Add entry'}
+      {showAddForm ? '- Cancel' : '+ Add entry'}
     </button>
 
     {#if showAddForm}

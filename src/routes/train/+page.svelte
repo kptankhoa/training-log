@@ -7,6 +7,7 @@
   import { exercises } from '$lib/stores/exercises';
   import { user } from '$lib/stores/auth';
   import { gruvboxColors } from '$lib/gruvbox';
+  import { navColorClasses } from '$lib/navColors';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import ExerciseEditor from '$lib/components/day-detail/ExerciseEditor.svelte';
   import RestTimer from '$lib/components/train/RestTimer.svelte';
@@ -71,7 +72,7 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-6">
-  <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Train</h1>
+  <h1 class="text-2xl font-bold {navColorClasses('/train')}">Train</h1>
 
   <!-- Split picker -->
   <section class="flex flex-col gap-2">
@@ -125,7 +126,7 @@
       class="flex items-center justify-between text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider"
     >
       <span>Exercises</span>
-      <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '−' : '+'}</span>
+      <span class="text-sm leading-none normal-case tracking-normal">{exercisesExpanded ? '-' : '+'}</span>
     </button>
     {#if exercisesExpanded}
       <div class="flex flex-col gap-3" transition:slide={{ duration: 200 }}>

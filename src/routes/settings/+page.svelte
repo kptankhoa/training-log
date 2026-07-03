@@ -8,6 +8,7 @@
   import { splits } from '$lib/stores/splits';
   import { theme, setTheme } from '$lib/stores/theme';
   import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
+  import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Exercise, GruvboxColor } from '$lib/types';
 
@@ -111,7 +112,7 @@
 </script>
 
 <div class="p-4 md:p-8 max-w-2xl mx-auto flex flex-col gap-10">
-  <h1 class="text-gb-light-green dark:text-gb-green text-2xl font-bold glow-green">Settings</h1>
+  <h1 class="text-2xl font-bold {navColorClasses('/settings')}">Settings</h1>
 
   <section class="flex flex-col gap-4">
     <button
@@ -120,7 +121,7 @@
       class="flex items-center justify-between w-full text-left text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2"
     >
       <span>Training Types</span>
-      <span class="text-sm leading-none">{tagsExpanded ? '−' : '+'}</span>
+      <span class="text-sm leading-none">{tagsExpanded ? '-' : '+'}</span>
     </button>
 
     {#if tagsExpanded}
@@ -177,7 +178,7 @@
       class="flex items-center justify-between w-full text-left text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2"
     >
       <span>Daily Tasks</span>
-      <span class="text-sm leading-none">{tasksExpanded ? '−' : '+'}</span>
+      <span class="text-sm leading-none">{tasksExpanded ? '-' : '+'}</span>
     </button>
 
     {#if tasksExpanded}
@@ -227,7 +228,7 @@
       class="flex items-center justify-between w-full text-left text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2"
     >
       <span>Exercises</span>
-      <span class="text-sm leading-none">{exercisesExpanded ? '−' : '+'}</span>
+      <span class="text-sm leading-none">{exercisesExpanded ? '-' : '+'}</span>
     </button>
 
     {#if exercisesExpanded}
@@ -310,7 +311,7 @@
         on:click={() => handleSetTheme('dark')}
         class="px-4 py-2 text-sm border transition
                {$theme === 'dark'
-                 ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                 ? `${navBorderClass('/settings')} ${navTextClass('/settings')} bg-gb-light-bg2 dark:bg-gb-bg2`
                  : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue hover:text-gb-light-blue dark:hover:border-gb-blue dark:hover:text-gb-blue'}"
       >Dark</button>
       <button
@@ -318,7 +319,7 @@
         on:click={() => handleSetTheme('light')}
         class="px-4 py-2 text-sm border transition
                {$theme === 'light'
-                 ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                 ? `${navBorderClass('/settings')} ${navTextClass('/settings')} bg-gb-light-bg2 dark:bg-gb-bg2`
                  : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue hover:text-gb-light-blue dark:hover:border-gb-blue dark:hover:text-gb-blue'}"
       >Light</button>
     </div>

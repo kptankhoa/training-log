@@ -3,6 +3,7 @@
   import { gruvboxColors } from '$lib/gruvbox';
   import { theme } from '$lib/stores/theme';
   import { icons } from '$lib/icons';
+  import { navColorClasses } from '$lib/navColors';
   import type { TrainingTag, Split, DayEntry } from '$lib/types';
 
   export let year: number;
@@ -103,7 +104,7 @@
   <div class="flex items-center justify-between mb-3 px-1">
     <button aria-label="Previous month" on:click={() => dispatch('prevMonth')}
       class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">‹</button>
-    <h2 class="text-gb-light-green dark:text-gb-green font-semibold text-lg glow-green">{MONTHS[month - 1]} {year}</h2>
+    <h2 class="font-semibold text-lg {navColorClasses('/calendar')}">{MONTHS[month - 1]} {year}</h2>
     <button aria-label="Next month" on:click={() => dispatch('nextMonth')}
       class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">›</button>
   </div>
@@ -138,9 +139,9 @@
                  {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
           style={selectedTagId && cell.tagIds.includes(selectedTagId)
             ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? ($theme === 'dark' ? '#ebdbb2' : '#3c3836')};`
-            : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#b8bb26' : '#79740e'};` : ''}
+            : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#83a598' : '#076678'};` : ''}
         >
-          <span class="text-xs font-medium leading-none {cell.isToday ? 'text-gb-light-green dark:text-gb-green glow-green' : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
+          <span class="text-xs font-medium leading-none {cell.isToday ? navColorClasses('/calendar') : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
           <div class="flex items-center gap-1.5">
             {#if cell.hasNote}
               <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
@@ -174,7 +175,7 @@
   {#if tags.filter((t) => !t.deleted).length > 0}
     <div class="mt-4 px-1 flex flex-wrap gap-x-4 gap-y-1">
     <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 font-semibold uppercase tracking-wider">
-      Left:
+      Tags:
     </span>
       {#each tags.filter((t) => !t.deleted) as tag (tag.id)}
         <button
@@ -195,7 +196,7 @@
   {#if splits.length > 0}
     <div class="mt-2 px-1 flex flex-wrap gap-x-4 gap-y-1">
     <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 font-semibold uppercase tracking-wider">
-      Right:
+      Splits:
     </span>
       {#each splits as split (split.id)}
         <button
