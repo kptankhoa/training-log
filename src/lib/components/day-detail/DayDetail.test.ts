@@ -198,7 +198,7 @@ describe('DayDetail — exercises and splits integration', () => {
       'user1',
       '2026-06-10',
       expect.objectContaining({
-        exercises: [{ exerciseId: 'bench', sets: [{ weight: 20, reps: 8 }] }]
+        exercises: [{ exerciseId: 'bench', sets: [{ type: 'weight', weight: 20, reps: 8 }] }]
       })
     );
   });
