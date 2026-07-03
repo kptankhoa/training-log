@@ -104,6 +104,13 @@
 }
 
 @layer utilities {
+  /* For SVG strokes (drop-shadow, not text-shadow) — follows currentColor so
+     it automatically matches whatever functional state color is already set
+     (e.g. the rest timer ring's green/red), rather than a fixed hue. */
+  .glow-ring {
+    filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 10px currentColor);
+  }
+
   .glow-green {
     text-shadow:
       0 0 8px rgba(121, 116, 14, 0.6),
