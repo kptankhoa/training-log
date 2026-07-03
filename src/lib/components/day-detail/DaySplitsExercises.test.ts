@@ -89,14 +89,25 @@ describe('DaySplitsExercises — edit mode', () => {
     expect(getByText('+ Bench Press')).toBeInTheDocument();
   });
 
-  it('toggling a split chip selects it', async () => {
+  it('a split chip is transparent with the split\'s color as text/border when unselected', async () => {
+    const { getByText } = render(DaySplitsExercises, {
+      props: { splits, selectedSplitIds: new Set<string>(), exerciseEntries: [], readonly: false, dateKey: '2026-06-10', userId: 'user1' }
+    });
+    await fireEvent.click(getByText('Splits & Exercises'));
+    const pushChip = getByText('Push Day');
+    expect(pushChip.style.backgroundColor).toBe('transparent');
+    expect(pushChip.style.color).toBe('rgb(131, 165, 152)'); // Push Day's color: blue
+  });
+
+  it('toggling a split chip fills it with the split\'s own color', async () => {
     const { getByText } = render(DaySplitsExercises, {
       props: { splits, selectedSplitIds: new Set<string>(), exerciseEntries: [], readonly: false, dateKey: '2026-06-10', userId: 'user1' }
     });
     await fireEvent.click(getByText('Splits & Exercises'));
     const pushChip = getByText('Push Day');
     await fireEvent.click(pushChip);
-    expect(pushChip.className).toContain('border-gb-green');
+    expect(pushChip.style.backgroundColor).toBe('rgb(131, 165, 152)'); // Push Day's color: blue
+    expect(pushChip.style.color).toBe('rgb(40, 40, 40)');
   });
 
   it('picking a split narrows the exercise picker', async () => {

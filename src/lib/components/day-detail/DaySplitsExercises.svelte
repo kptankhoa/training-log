@@ -77,13 +77,12 @@
           <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Splits</span>
           <div class="flex flex-wrap gap-2">
             {#each splits as split (split.id)}
+              {@const hex = $gruvboxColors[split.color ?? 'blue']}
               <button
                 type="button"
                 on:click={() => toggleSplit(split.id)}
-                class="px-3 py-1 rounded-full border text-sm transition
-                       {selectedSplitIds.has(split.id)
-                         ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
-                         : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
+                style="background-color: {selectedSplitIds.has(split.id) ? hex : 'transparent'}; border-color: {hex}; color: {selectedSplitIds.has(split.id) ? '#282828' : hex};"
+                class="px-3 py-1 rounded-full border text-sm font-medium transition-colors cursor-pointer"
               >{split.label || 'Untitled'}</button>
             {/each}
           </div>
