@@ -9,6 +9,7 @@
   import { initSplits } from '$lib/stores/splits';
   import { initGeneralRules } from '$lib/stores/generalRules';
   import { theme, initTheme } from '$lib/stores/theme';
+  import { restTimerSound, initRestTimerSound } from '$lib/stores/restTimerSound';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
@@ -34,6 +35,7 @@
       unsubs.push(initSplits(u.uid));
       unsubs.push(initGeneralRules(u.uid));
       unsubs.push(initTheme(u.uid));
+      unsubs.push(initRestTimerSound(u.uid));
     });
     return () => {
       unsubUser();
@@ -47,6 +49,10 @@
   $: if (browser) {
     document.documentElement.classList.toggle('dark', $theme === 'dark');
     localStorage.setItem('theme', $theme);
+  }
+
+  $: if (browser) {
+    localStorage.setItem('restTimerSound', $restTimerSound);
   }
 
   $: showShell = $authReady && $user !== null && $page.url.pathname !== '/login';

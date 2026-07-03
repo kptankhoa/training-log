@@ -7,6 +7,7 @@
   import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits } from '$lib/stores/exercises';
   import { splits } from '$lib/stores/splits';
   import { theme, setTheme } from '$lib/stores/theme';
+  import { restTimerSound, setRestTimerSound, playRestTimerSound, SOUND_OPTIONS, type RestTimerSound } from '$lib/stores/restTimerSound';
   import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
   import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
   import Spinner from '$lib/components/shared/Spinner.svelte';
@@ -18,6 +19,7 @@
   let tagsExpanded = false;
   let tasksExpanded = false;
   let exercisesExpanded = false;
+  let restTimerSoundExpanded = false;
 
   let expandedExerciseId: string | null = null;
 
@@ -108,6 +110,11 @@
   async function handleSetTheme(value: 'dark' | 'light') {
     if (!userId) return;
     await setTheme(userId, value);
+  }
+
+  function handleSelectRestTimerSound(value: RestTimerSound) {
+    playRestTimerSound(value); // preview immediately so picking a sound is self-explanatory
+    if (userId) setRestTimerSound(userId, value);
   }
 </script>
 
@@ -299,6 +306,34 @@
             class="bg-gb-light-blue dark:bg-gb-blue text-gb-light-bg dark:text-gb-bg font-semibold px-4 py-2 hover:opacity-90 transition text-sm"
           >Add</button>
         </div>
+      </div>
+    {/if}
+  </section>
+
+  <section class="flex flex-col gap-4">
+    <button
+      type="button"
+      on:click={() => (restTimerSoundExpanded = !restTimerSoundExpanded)}
+      class="flex items-center justify-between w-full text-left text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2"
+    >
+      <span>Rest Timer Sound</span>
+      <span class="text-sm leading-none">{restTimerSoundExpanded ? '-' : '+'}</span>
+    </button>
+
+    {#if restTimerSoundExpanded}
+      <div class="flex gap-2" transition:slide={{ duration: 200 }}>
+        {#each SOUND_OPTIONS as opt}
+          <button
+            type="button"
+            on:click={() => handleSelectRestTimerSound(opt.value)}
+            aria-label="Preview and select sound {opt.label}"
+            aria-pressed={$restTimerSound === opt.value}
+            class="px-4 py-2 text-sm border transition
+                   {$restTimerSound === opt.value
+                     ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                     : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue hover:text-gb-light-blue dark:hover:border-gb-blue dark:hover:text-gb-blue'}"
+          >{opt.label}</button>
+        {/each}
       </div>
     {/if}
   </section>

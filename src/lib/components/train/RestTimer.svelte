@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { restTimerSound, playRestTimerSound } from '$lib/stores/restTimerSound';
 
   const PRESETS = [30, 60, 75, 90, 120];
 
@@ -87,6 +88,7 @@
       running = false;
       finished = true;
       animateRingTo(0, 0.5); // "time's up" flourish
+      playRestTimerSound($restTimerSound);
     }
   }
 

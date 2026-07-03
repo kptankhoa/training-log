@@ -16,6 +16,14 @@ if (!Element.prototype.animate) {
   };
 }
 
+// jsdom doesn't implement HTMLMediaElement playback (calling .play() logs a
+// "Not implemented" error to the console) — stub it so the rest timer's
+// finish sound doesn't spam test output.
+if (typeof HTMLMediaElement !== 'undefined') {
+  HTMLMediaElement.prototype.play = () => Promise.resolve();
+  HTMLMediaElement.prototype.pause = () => {};
+}
+
 // jsdom localStorage polyfill for vitest
 if (!globalThis.localStorage) {
   const store: Record<string, string> = {};

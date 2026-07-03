@@ -178,7 +178,7 @@ describe('RestTimer ring sweep', () => {
 
     const [keyframes, options] = lastAnimateCall();
     expect(keyframes[1]).toEqual({ strokeDashoffset: 0 });
-    expect(options).toMatchObject({ duration: 1000, easing: 'linear', fill: 'forwards' });
+    expect(options).toMatchObject({ duration: 500, easing: 'linear', fill: 'forwards' });
     expect(Number(getProgressCircle(container).getAttribute('stroke-dashoffset'))).toBe(0);
   });
 
@@ -190,7 +190,38 @@ describe('RestTimer ring sweep', () => {
     expect(getByText('Go!')).toBeInTheDocument();
     const [keyframes, options] = lastAnimateCall();
     expect(keyframes[1]).toEqual({ strokeDashoffset: 0 });
-    expect(options).toMatchObject({ duration: 800, easing: 'linear', fill: 'forwards' });
+    expect(options).toMatchObject({ duration: 500, easing: 'linear', fill: 'forwards' });
     expect(Number(getProgressCircle(container).getAttribute('stroke-dashoffset'))).toBe(0);
+  });
+});
+
+describe('RestTimer finish sound', () => {
+  let playSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    playSpy = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    playSpy.mockRestore();
+  });
+
+  it('plays the rest timer sound once the countdown finishes', async () => {
+    const { getByText } = render(RestTimer);
+    await fireEvent.click(getByText('Start'));
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    expect(getByText('Go!')).toBeInTheDocument();
+    expect(playSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not play a sound before the countdown finishes', async () => {
+    const { getByText } = render(RestTimer);
+    await fireEvent.click(getByText('Start'));
+    await vi.advanceTimersByTimeAsync(30_000);
+
+    expect(playSpy).not.toHaveBeenCalled();
   });
 });
