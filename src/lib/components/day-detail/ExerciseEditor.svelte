@@ -5,7 +5,7 @@
   import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
   import { showError } from '$lib/stores/toast';
   import { formatSet } from '$lib/types';
-  import type { Exercise, ExerciseEntry, DayEntry } from '$lib/types';
+  import type { Exercise, ExerciseEntry, ExerciseSet, ExerciseType, DayEntry } from '$lib/types';
 
   export let exercises: Exercise[] = []; // full catalog, incl. deleted, for name resolution
   export let allDays: Record<string, DayEntry> = {};
@@ -18,7 +18,7 @@
   export let daySplitIds: string[] = [];
 
   $: activeExerciseCatalog = exercises.filter((e) => !e.deleted);
-  $: exerciseNameById = Object.fromEntries(exercises.map((e) => [e.id, e.name]));
+  $: exerciseById = Object.fromEntries(exercises.map((e) => [e.id, e])) as Record<string, Exercise>;
   $: pickableExercises = activeExerciseCatalog.filter((ex) => {
     if (entries.some((e) => e.exerciseId === ex.id)) return false;
     if (daySplitIds.length === 0) return true;
@@ -29,6 +29,7 @@
 
   let draftWeight: Record<string, number> = {};
   let draftReps: Record<string, number> = {};
+  let draftSeconds: Record<string, number> = {};
   let addingExercise = false;
   let newExerciseName = '';
 
@@ -36,14 +37,32 @@
   let confirmingExerciseId: string | null = null;
   let confirmExerciseTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  // The exercise catalog's own type decides what a set for it looks like —
+  // never the type of any set already logged — so changing an exercise's
+  // type in Settings only ever affects sets logged from that point on.
+  function typeOf(exerciseId: string): ExerciseType {
+    return exerciseById[exerciseId]?.type ?? 'weight';
+  }
+
+  function exerciseLabel(exerciseId: string): string {
+    const exercise = exerciseById[exerciseId];
+    if (!exercise) return 'Unknown exercise';
+    if ((exercise.type ?? 'weight') !== 'weight') return exercise.name;
+    const parts: string[] = [];
+    if (exercise.equipment) parts.push(exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1));
+    if (exercise.singleArm) parts.push('single-arm');
+    return parts.length > 0 ? `${exercise.name} · ${parts.join(' · ')}` : exercise.name;
+  }
+
   function initDraftFor(exerciseId: string) {
     if (draftWeight[exerciseId] !== undefined) return;
     const last = getLastLoggedSet(allDays, exerciseId, dateKey);
-    // Only extract weight/reps from weight-type sets; other types don't have these fields
-    const weight = (last && (last.type === undefined || last.type === 'weight') && 'weight' in last) ? last.weight : 20;
-    const reps = (last && (last.type === undefined || last.type === 'weight') && 'reps' in last) ? last.reps : 8;
-    draftWeight = { ...draftWeight, [exerciseId]: weight };
-    draftReps = { ...draftReps, [exerciseId]: reps };
+    const lastWeight = last && 'weight' in last ? last.weight : undefined;
+    const lastReps = last && 'reps' in last ? last.reps : undefined;
+    const lastSeconds = last && 'seconds' in last ? last.seconds : undefined;
+    draftWeight = { ...draftWeight, [exerciseId]: lastWeight ?? 20 };
+    draftReps = { ...draftReps, [exerciseId]: lastReps ?? 8 };
+    draftSeconds = { ...draftSeconds, [exerciseId]: lastSeconds ?? 30 };
   }
 
   onMount(() => {
@@ -70,11 +89,23 @@
     draftReps = { ...draftReps, [exerciseId]: next };
   }
 
+  function adjustSeconds(exerciseId: string, delta: number) {
+    const next = Math.max(0, (draftSeconds[exerciseId] ?? 0) + delta);
+    draftSeconds = { ...draftSeconds, [exerciseId]: next };
+  }
+
   function logSet(exerciseId: string) {
-    const weight = draftWeight[exerciseId] ?? 0;
-    const reps = draftReps[exerciseId] ?? 0;
+    const type = typeOf(exerciseId);
+    let set: ExerciseSet;
+    if (type === 'bodyweight') {
+      set = { type: 'bodyweight', reps: draftReps[exerciseId] ?? 0 };
+    } else if (type === 'time') {
+      set = { type: 'time', seconds: draftSeconds[exerciseId] ?? 0 };
+    } else {
+      set = { type: 'weight', weight: draftWeight[exerciseId] ?? 0, reps: draftReps[exerciseId] ?? 0 };
+    }
     entries = entries.map((e) =>
-      e.exerciseId === exerciseId ? { ...e, sets: [...e.sets, { weight, reps }] } : e
+      e.exerciseId === exerciseId ? { ...e, sets: [...e.sets, set] } : e
     );
   }
 
@@ -131,9 +162,10 @@
 {#if entries.length > 0}
   <div class="max-h-72 overflow-y-auto flex flex-col gap-2 pr-1">
     {#each entries as ex (ex.exerciseId)}
+      {@const exType = typeOf(ex.exerciseId)}
       <div class="bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 p-3 flex flex-col gap-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-semibold text-gb-light-fg dark:text-gb-fg">{exerciseNameById[ex.exerciseId] ?? 'Unknown exercise'}</span>
+          <span class="text-sm font-semibold text-gb-light-fg dark:text-gb-fg">{exerciseLabel(ex.exerciseId)}</span>
           <button
             type="button"
             on:click={() => handleRemoveExerciseClick(ex.exerciseId)}
@@ -156,36 +188,57 @@
         {/if}
 
         <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1">
-            <button
-              type="button"
-              use:holdRepeat={() => adjustWeight(ex.exerciseId, -2.5)}
-              aria-label="Decrease weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >-</button>
-            <span class="text-sm text-gb-light-fg dark:text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
-            <button
-              type="button"
-              use:holdRepeat={() => adjustWeight(ex.exerciseId, 2.5)}
-              aria-label="Increase weight"
-              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >+</button>
-          </div>
-          <div class="flex items-center gap-1">
-            <button
-              type="button"
-              use:holdRepeat={() => adjustReps(ex.exerciseId, -1)}
-              aria-label="Decrease reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >-</button>
-            <span class="text-sm text-gb-light-fg dark:text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
-            <button
-              type="button"
-              use:holdRepeat={() => adjustReps(ex.exerciseId, 1)}
-              aria-label="Increase reps"
-              class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
-            >+</button>
-          </div>
+          {#if exType === 'weight'}
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                use:holdRepeat={() => adjustWeight(ex.exerciseId, -2.5)}
+                aria-label="Decrease weight"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >-</button>
+              <span class="text-sm text-gb-light-fg dark:text-gb-fg w-14 text-center tabular-nums">{draftWeight[ex.exerciseId] ?? 0}kg</span>
+              <button
+                type="button"
+                use:holdRepeat={() => adjustWeight(ex.exerciseId, 2.5)}
+                aria-label="Increase weight"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >+</button>
+            </div>
+          {/if}
+          {#if exType === 'weight' || exType === 'bodyweight'}
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                use:holdRepeat={() => adjustReps(ex.exerciseId, -1)}
+                aria-label="Decrease reps"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >-</button>
+              <span class="text-sm text-gb-light-fg dark:text-gb-fg w-8 text-center tabular-nums">{draftReps[ex.exerciseId] ?? 0}</span>
+              <button
+                type="button"
+                use:holdRepeat={() => adjustReps(ex.exerciseId, 1)}
+                aria-label="Increase reps"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >+</button>
+            </div>
+          {/if}
+          {#if exType === 'time'}
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                use:holdRepeat={() => adjustSeconds(ex.exerciseId, -5)}
+                aria-label="Decrease duration"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >-</button>
+              <span class="text-sm text-gb-light-fg dark:text-gb-fg w-14 text-center tabular-nums">{draftSeconds[ex.exerciseId] ?? 0}s</span>
+              <button
+                type="button"
+                use:holdRepeat={() => adjustSeconds(ex.exerciseId, 5)}
+                aria-label="Increase duration"
+                class="w-7 h-7 flex items-center justify-center bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-blue dark:hover:border-gb-blue transition select-none"
+              >+</button>
+            </div>
+          {/if}
           <button
             type="button"
             on:click={() => logSet(ex.exerciseId)}

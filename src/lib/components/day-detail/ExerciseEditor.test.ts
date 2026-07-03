@@ -200,3 +200,91 @@ describe('ExerciseEditor — filtering by the day\'s selected splits', () => {
     expect(getByText('+ Deadlift')).toBeInTheDocument();
   });
 });
+
+describe('ExerciseEditor — exercise types', () => {
+  const bodyweightExercise: Exercise[] = [
+    { id: 'pushup', name: 'Push-up', deleted: false, type: 'bodyweight' },
+  ];
+  const timeExercise: Exercise[] = [
+    { id: 'plank', name: 'Plank', deleted: false, type: 'time' },
+  ];
+  const weightWithEquipment: Exercise[] = [
+    { id: 'row', name: 'Dumbbell Row', deleted: false, type: 'weight', equipment: 'dumbbell', singleArm: true },
+  ];
+
+  it('a bodyweight exercise shows only a reps stepper, no weight stepper', async () => {
+    const { getByText, getByLabelText, queryByLabelText } = render(ExerciseEditor, {
+      props: { exercises: bodyweightExercise, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Push-up'));
+    expect(getByLabelText('Increase reps')).toBeInTheDocument();
+    expect(queryByLabelText('Increase weight')).not.toBeInTheDocument();
+  });
+
+  it('logging a bodyweight set records reps only, formatted as ×N', async () => {
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: bodyweightExercise, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Push-up'));
+    await fireEvent.click(getByText('Log Set'));
+    expect(getByText('×8 ✕')).toBeInTheDocument();
+  });
+
+  it('a time exercise shows only a duration stepper, no weight or reps stepper', async () => {
+    const { getByText, getByLabelText, queryByLabelText } = render(ExerciseEditor, {
+      props: { exercises: timeExercise, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Plank'));
+    expect(getByLabelText('Increase duration')).toBeInTheDocument();
+    expect(queryByLabelText('Increase weight')).not.toBeInTheDocument();
+    expect(queryByLabelText('Increase reps')).not.toBeInTheDocument();
+  });
+
+  it('logging a time set records seconds, formatted as Ns', async () => {
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: timeExercise, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Plank'));
+    await fireEvent.click(getByText('Log Set'));
+    expect(getByText('30s ✕')).toBeInTheDocument();
+  });
+
+  it('the duration stepper steps by 5 seconds', async () => {
+    const { getByText, getByLabelText } = render(ExerciseEditor, {
+      props: { exercises: timeExercise, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Plank'));
+    await fireEvent.click(getByLabelText('Increase duration'));
+    expect(getByText('35s')).toBeInTheDocument();
+  });
+
+  it('pre-fills the duration draft from the last logged time set', async () => {
+    const allDays: Record<string, DayEntry> = {
+      '2026-06-05': { tags: [], label: '', note: '', exercises: [{ exerciseId: 'plank', sets: [{ type: 'time', seconds: 60 }] }] },
+    };
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: timeExercise, allDays, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Plank'));
+    expect(getByText('60s')).toBeInTheDocument();
+  });
+
+  it('shows equipment and single-arm as a suffix on the logged exercise name', async () => {
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: weightWithEquipment, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Dumbbell Row'));
+    expect(getByText('Dumbbell Row · Dumbbell · single-arm')).toBeInTheDocument();
+  });
+
+  it('does not add an equipment/single-arm suffix for a plain weight exercise', async () => {
+    const plainWeightExercises: Exercise[] = [
+      { id: 'bench', name: 'Bench Press', deleted: false },
+    ];
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises: plainWeightExercises, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Bench Press'));
+    expect(getByText('Bench Press')).toBeInTheDocument();
+  });
+});
