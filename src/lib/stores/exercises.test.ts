@@ -78,4 +78,35 @@ describe('exercises store', () => {
     expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { splitIds: ['split1', 'split2'] });
     expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
   });
+
+  it('updateExerciseType calls updateDoc with the new type', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateExerciseType } = await import('./exercises');
+    await updateExerciseType('user1', 'ex1', 'bodyweight');
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { type: 'bodyweight' });
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
+  });
+
+  it('updateExerciseEquipment calls updateDoc with the new equipment', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateExerciseEquipment } = await import('./exercises');
+    await updateExerciseEquipment('user1', 'ex1', 'dumbbell');
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { equipment: 'dumbbell' });
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
+  });
+
+  it('updateExerciseEquipment clears equipment when passed null', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateExerciseEquipment } = await import('./exercises');
+    await updateExerciseEquipment('user1', 'ex1', null);
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { equipment: null });
+  });
+
+  it('updateExerciseSingleArm calls updateDoc with the new flag', async () => {
+    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateExerciseSingleArm } = await import('./exercises');
+    await updateExerciseSingleArm('user1', 'ex1', true);
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { singleArm: true });
+    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
+  });
 });

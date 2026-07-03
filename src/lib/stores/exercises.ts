@@ -1,7 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import { db } from '$lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
-import type { Exercise } from '$lib/types';
+import type { Exercise, ExerciseType, Equipment } from '$lib/types';
 
 const _exercises = writable<Exercise[]>([]);
 const _exercisesLoading = writable<boolean>(true);
@@ -29,4 +29,16 @@ export async function deleteExercise(userId: string, exerciseId: string): Promis
 
 export async function updateExerciseSplits(userId: string, exerciseId: string, splitIds: string[]): Promise<void> {
   await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { splitIds });
+}
+
+export async function updateExerciseType(userId: string, exerciseId: string, type: ExerciseType): Promise<void> {
+  await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { type });
+}
+
+export async function updateExerciseEquipment(userId: string, exerciseId: string, equipment: Equipment | null): Promise<void> {
+  await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { equipment });
+}
+
+export async function updateExerciseSingleArm(userId: string, exerciseId: string, singleArm: boolean): Promise<void> {
+  await updateDoc(doc(db, 'users', userId, 'exercises', exerciseId), { singleArm });
 }
