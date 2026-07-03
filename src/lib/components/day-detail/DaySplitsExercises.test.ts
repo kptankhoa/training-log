@@ -44,6 +44,25 @@ describe('DaySplitsExercises — readonly mode', () => {
     expect(getByText('Bench Press')).toBeInTheDocument();
     expect(getByText(/80×8, 80×6/)).toBeInTheDocument();
   });
+
+  it('shows bodyweight and time sets in the readonly summary with their own formats', () => {
+    const mixedExercises: Exercise[] = [
+      { id: 'pushup', name: 'Push-up', deleted: false, type: 'bodyweight' },
+      { id: 'plank', name: 'Plank', deleted: false, type: 'time' },
+    ];
+    const { getByText } = render(DaySplitsExercises, {
+      props: {
+        splits, exercises: mixedExercises, selectedSplitIds: new Set<string>(),
+        exerciseEntries: [
+          { exerciseId: 'pushup', sets: [{ type: 'bodyweight', reps: 20 }] },
+          { exerciseId: 'plank', sets: [{ type: 'time', seconds: 45 }] },
+        ],
+        readonly: true
+      }
+    });
+    expect(getByText(/×20/)).toBeInTheDocument();
+    expect(getByText(/45s/)).toBeInTheDocument();
+  });
 });
 
 describe('DaySplitsExercises — edit mode', () => {
