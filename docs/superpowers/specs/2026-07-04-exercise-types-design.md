@@ -27,38 +27,30 @@ export interface Exercise {
 }
 
 export type ExerciseSet =
-  | { type: 'weight'; weight: number; reps: number }
+  | { type?: 'weight'; weight: number; reps: number }
   | { type: 'bodyweight'; reps: number }
   | { type: 'time'; seconds: number };
 
 // Every set logged before this shipped is a bare `{ weight, reps }` with no
-// `type` field. Rather than migrating stored documents, resolve the type at
-// read time — the same pattern this codebase already uses for
-// `exercise.splitIds ?? []`. Every newly logged set always writes a real
-// `type`, so this fallback only ever matters for pre-existing history.
+// `type` field at all. Rather than migrating stored documents or force-casting
+// legacy literals, `type` is optional specifically on the weight variant —
+// `{ weight: 60, reps: 8 }` is a genuinely valid ExerciseSet with no cast
+// needed, so every existing test file's set literals keep type-checking
+// unmodified. Every newly logged set still always writes a real `type`
+// explicitly (see the logging changes below); the optional case only ever
+// matters for reading pre-existing history.
 export function resolveSetType(set: ExerciseSet): ExerciseType {
-  return (set as { type?: ExerciseType }).type ?? 'weight';
+  return set.type ?? 'weight';
 }
 
 export function formatSet(set: ExerciseSet): string {
-  switch (resolveSetType(set)) {
-    case 'weight': {
-      const s = set as { weight: number; reps: number };
-      return `${s.weight}×${s.reps}`; // matches the existing (pre-this-feature) compact format exactly — no unit
-    }
-    case 'bodyweight': {
-      const s = set as { reps: number };
-      return `×${s.reps}`;
-    }
-    case 'time': {
-      const s = set as { seconds: number };
-      return `${s.seconds}s`;
-    }
-  }
+  if (set.type === 'bodyweight') return `×${set.reps}`;
+  if (set.type === 'time') return `${set.seconds}s`;
+  return `${set.weight}×${set.reps}`; // 'weight', or legacy data with no type field at all
 }
 ```
 
-Note: this corrects an error in this spec's first draft, which wrote the weight case as `"60kg×8"` — the actual existing compact display (both the set chips in `ExerciseEditor.svelte` and the read-only summary in `DaySplitsExercises.svelte`, confirmed against their current tests) has never included a unit suffix; only the *live editable stepper* shows `"20kg"` as its own separate label. `formatSet` preserves the existing no-unit convention exactly, so no existing weight-set test needs to change.
+Two corrections from this spec's first draft: the weight case is `"60×8"`, not `"60kg×8"` — the actual existing compact display (both the set chips in `ExerciseEditor.svelte` and the read-only summary in `DaySplitsExercises.svelte`, confirmed against their current tests) has never included a unit suffix; only the *live editable stepper* shows `"20kg"` as its own separate label. And `type` is optional on the weight variant (not required on all three) for the backward-compatibility reason described above — this was caught during implementation planning, when it became clear a strictly-required `type` would force edits to dozens of unrelated existing test literals across the codebase just to keep them compiling.
 
 `Exercise.type` has no equivalent resolver function — it's a single optional field, read inline as `exercise.type ?? 'weight'`, matching the existing `splitIds` precedent exactly.
 
