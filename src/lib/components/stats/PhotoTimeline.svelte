@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { getPhotoUrl, getPhotoSize } from '$lib/stores/photos';
+  import { onDestroy } from 'svelte';
+  import { getPhotoUrl, getPhotoSize, deletePhoto } from '$lib/stores/photos';
+  import { saveDay } from '$lib/stores/days';
   import type { DayEntry } from '$lib/types';
 
   export let days: Record<string, DayEntry> = {};
+  export let userId: string = '';
 
   $: entries = Object.entries(days)
     .filter(([, e]) => (e.photos?.length ?? 0) > 0)
@@ -50,6 +53,39 @@
   }
 
   let lightboxUrl: string | null = null;
+
+  async function removePhoto(dateKey: string, path: string) {
+    const entry = days[dateKey];
+    if (!entry) return;
+    await saveDay(userId, dateKey, { ...entry, photos: (entry.photos ?? []).filter((p) => p !== path) });
+    try {
+      await deletePhoto(path);
+    } catch (err) {
+      // The Firestore reference is already gone, so the photo won't show up
+      // again regardless — a failed blob delete just leaks storage, not UI state.
+      console.error('[PhotoTimeline] failed to delete photo blob:', err);
+    }
+  }
+
+  // "Click again to confirm" delete pattern — arms for 3s, then auto-reverts.
+  let confirmingPhotoPath: string | null = null;
+  let confirmPhotoTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function handleRemovePhotoClick(dateKey: string, path: string) {
+    if (confirmingPhotoPath === path) {
+      if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
+      confirmingPhotoPath = null;
+      removePhoto(dateKey, path);
+      return;
+    }
+    confirmingPhotoPath = path;
+    if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
+    confirmPhotoTimeout = setTimeout(() => { confirmingPhotoPath = null; }, 3000);
+  }
+
+  onDestroy(() => {
+    if (confirmPhotoTimeout) clearTimeout(confirmPhotoTimeout);
+  });
 </script>
 
 {#if entries.length === 0}
@@ -63,18 +99,28 @@
         <div class="flex flex-wrap gap-2">
           {#each entry.paths as path (path)}
             <div class="flex flex-col items-center gap-1 w-20 shrink-0">
-              <button
-                type="button"
-                on:click={() => (lightboxUrl = urls[path] ?? null)}
-                disabled={!urls[path]}
-                class="w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 overflow-hidden flex items-center justify-center"
-              >
-                {#if urls[path]}
-                  <img src={urls[path]} alt="Training day snapshot" class="w-full h-full object-cover" />
-                {:else}
-                  <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
-                {/if}
-              </button>
+              <div class="relative w-20 h-20 shrink-0">
+                <button
+                  type="button"
+                  on:click={() => (lightboxUrl = urls[path] ?? null)}
+                  disabled={!urls[path]}
+                  class="w-full h-full bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 overflow-hidden flex items-center justify-center"
+                >
+                  {#if urls[path]}
+                    <img src={urls[path]} alt="Training day snapshot" class="w-full h-full object-cover" draggable="false" on:contextmenu|preventDefault />
+                  {:else}
+                    <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
+                  {/if}
+                </button>
+                <button
+                  type="button"
+                  on:click={() => handleRemovePhotoClick(entry.dateKey, path)}
+                  aria-label={confirmingPhotoPath === path ? 'Confirm remove photo' : 'Remove photo'}
+                  class="absolute -top-1.5 -right-1.5 flex items-center justify-center
+                         bg-gb-light-red dark:bg-gb-red text-white leading-none transition-all
+                         {confirmingPhotoPath === path ? 'px-1.5 h-5 text-[10px] font-semibold' : 'w-5 h-5 text-xs'}"
+                >{confirmingPhotoPath === path ? 'Sure?' : '✕'}</button>
+              </div>
               {#if sizes[path] !== undefined}
                 <span class="text-[10px] text-gb-light-fg3 dark:text-gb-fg3">{formatSize(sizes[path])}</span>
               {/if}
@@ -95,7 +141,7 @@
     aria-modal="true"
     tabindex="-1"
   >
-    <img src={lightboxUrl} alt="Training day snapshot" class="max-w-full max-h-full object-contain" />
+    <img src={lightboxUrl} alt="Training day snapshot" class="max-w-full max-h-full object-contain" draggable="false" on:contextmenu|preventDefault />
     <button
       type="button"
       on:click={() => (lightboxUrl = null)}

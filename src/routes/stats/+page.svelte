@@ -51,6 +51,6 @@
     <MeasurementsTable {userId} />
   </div>
   <div class:hidden={activeSection !== 'photos'}>
-    <PhotoTimeline days={$allDays} />
+    <PhotoTimeline days={$allDays} {userId} />
   </div>
 </div>

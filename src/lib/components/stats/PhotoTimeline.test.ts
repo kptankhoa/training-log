@@ -1,12 +1,18 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent, waitFor } from '@testing-library/svelte';
 import PhotoTimeline from './PhotoTimeline.svelte';
-import { getPhotoSize } from '$lib/stores/photos';
+import { getPhotoSize, deletePhoto } from '$lib/stores/photos';
+import { saveDay } from '$lib/stores/days';
 import type { DayEntry } from '$lib/types';
 
 vi.mock('$lib/stores/photos', () => ({
   getPhotoUrl: vi.fn((path: string) => Promise.resolve(`https://example.com/${path}`)),
   getPhotoSize: vi.fn(() => Promise.resolve(2_097_152)),
+  deletePhoto: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('$lib/stores/days', () => ({
+  saveDay: vi.fn().mockResolvedValue(undefined),
 }));
 
 const days: Record<string, DayEntry> = {
@@ -14,6 +20,10 @@ const days: Record<string, DayEntry> = {
   '2026-06-20': { tags: [], label: '', note: '', photos: ['b.jpg', 'c.jpg'] },
   '2026-06-15': { tags: [], label: '', note: '' }, // no photos — should be excluded
 };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe('PhotoTimeline', () => {
   it('shows an empty message when there are no photos', () => {
@@ -63,5 +73,50 @@ describe('PhotoTimeline', () => {
     await waitFor(() => expect(getByRole('dialog')).toBeInTheDocument());
     await fireEvent.click(getByLabelText('Close'));
     expect(queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows a remove button on each thumbnail', async () => {
+    const { findAllByLabelText } = render(PhotoTimeline, { props: { days, userId: 'user1' } });
+    expect(await findAllByLabelText('Remove photo')).toHaveLength(3);
+  });
+
+  it('a single click on a remove button arms confirmation without deleting', async () => {
+    const { findAllByLabelText, getByLabelText } = render(PhotoTimeline, { props: { days, userId: 'user1' } });
+    const removeButtons = await findAllByLabelText('Remove photo');
+    await fireEvent.click(removeButtons[0]);
+
+    expect(getByLabelText('Confirm remove photo')).toBeInTheDocument();
+    expect(saveDay).not.toHaveBeenCalled();
+    expect(deletePhoto).not.toHaveBeenCalled();
+  });
+
+  it('confirming delete persists the day without that photo and deletes the storage blob', async () => {
+    const { findAllByLabelText, getByLabelText } = render(PhotoTimeline, { props: { days, userId: 'user1' } });
+    const removeButtons = await findAllByLabelText('Remove photo');
+    // Thumbnails render newest-first: 2026-06-20's b.jpg, then c.jpg, then 2026-06-10's a.jpg
+    await fireEvent.click(removeButtons[0]);
+    await fireEvent.click(getByLabelText('Confirm remove photo'));
+
+    await waitFor(() => expect(saveDay).toHaveBeenCalledWith('user1', '2026-06-20', {
+      ...days['2026-06-20'],
+      photos: ['c.jpg'],
+    }));
+    expect(deletePhoto).toHaveBeenCalledWith('b.jpg');
+  });
+
+  it('reflects a photo removal once the days store re-supplies updated props', async () => {
+    // PhotoTimeline's `days` prop is read-only — deleting persists via saveDay,
+    // and the real app's $allDays store re-renders this component with fresh
+    // props once Firestore's listener picks up the change. Simulate that here
+    // rather than expecting the component to locally mutate a prop it doesn't own.
+    const { findAllByLabelText, getByLabelText, findAllByAltText, rerender } = render(PhotoTimeline, { props: { days, userId: 'user1' } });
+    const removeButtons = await findAllByLabelText('Remove photo');
+    await fireEvent.click(removeButtons[0]);
+    await fireEvent.click(getByLabelText('Confirm remove photo'));
+    await waitFor(() => expect(saveDay).toHaveBeenCalled());
+
+    await rerender({ days: { ...days, '2026-06-20': { ...days['2026-06-20'], photos: ['c.jpg'] } }, userId: 'user1' });
+
+    expect(await findAllByAltText('Training day snapshot')).toHaveLength(2);
   });
 });

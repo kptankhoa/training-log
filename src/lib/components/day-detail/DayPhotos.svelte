@@ -86,7 +86,7 @@
             class="w-20 h-20 shrink-0 bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg3 dark:border-gb-bg3 overflow-hidden flex items-center justify-center"
           >
             {#if photoUrls[path]}
-              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
+              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" draggable="false" on:contextmenu|preventDefault />
             {:else}
               <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
             {/if}
@@ -108,7 +108,7 @@
             class="w-full h-full overflow-hidden flex items-center justify-center"
           >
             {#if photoUrls[path]}
-              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" />
+              <img src={photoUrls[path]} alt="Training day snapshot" class="w-full h-full object-cover blur-md scale-110" draggable="false" on:contextmenu|preventDefault />
             {:else}
               <span class="w-4 h-4 rounded-full border-2 border-gb-light-bg3 dark:border-gb-bg3 border-t-gb-light-green dark:border-t-gb-green animate-spin"></span>
             {/if}
@@ -163,7 +163,7 @@
     aria-modal="true"
     tabindex="-1"
   >
-    <img src={lightboxUrl} alt="Training day snapshot" class="max-w-full max-h-full object-contain" />
+    <img src={lightboxUrl} alt="Training day snapshot" class="max-w-full max-h-full object-contain" draggable="false" on:contextmenu|preventDefault />
     <button
       type="button"
       on:click={() => (lightboxUrl = null)}

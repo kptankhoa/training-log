@@ -93,6 +93,14 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
+  /* Deter casual saving of progress photos — not real protection (still
+     visible in dev tools/network tab), just removes the one-tap save path */
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 @layer utilities {
