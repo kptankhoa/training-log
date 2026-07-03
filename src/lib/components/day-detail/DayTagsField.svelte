@@ -2,6 +2,7 @@
   import TagChip from './TagChip.svelte';
   import { addTag } from '$lib/stores/tags';
   import { gruvboxColors } from '$lib/gruvbox';
+  import { showError } from '$lib/stores/toast';
   import type { TrainingTag } from '$lib/types';
 
   export let activeTags: TrainingTag[];
@@ -23,9 +24,13 @@
 
   async function commitNewTag() {
     if (!newTagName.trim()) { addingTag = false; return; }
-    await addTag(userId, newTagName.trim());
-    newTagName = '';
-    addingTag = false;
+    try {
+      await addTag(userId, newTagName.trim());
+      newTagName = '';
+      addingTag = false;
+    } catch {
+      showError();
+    }
   }
 
   function autofocus(el: HTMLInputElement) {

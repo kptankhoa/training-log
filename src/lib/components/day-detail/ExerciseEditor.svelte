@@ -3,6 +3,7 @@
   import { holdRepeat } from '$lib/actions/holdRepeat';
   import { addExercise } from '$lib/stores/exercises';
   import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
+  import { showError } from '$lib/stores/toast';
   import type { Exercise, ExerciseEntry, DayEntry } from '$lib/types';
 
   export let exercises: Exercise[] = []; // full catalog, incl. deleted, for name resolution
@@ -102,8 +103,12 @@
     if (!name) { addingExercise = false; return; }
     newExerciseName = '';
     addingExercise = false;
-    const id = await addExercise(userId, name);
-    addExerciseToLog(id);
+    try {
+      const id = await addExercise(userId, name);
+      addExerciseToLog(id);
+    } catch {
+      showError();
+    }
   }
 
   function autofocus(el: HTMLInputElement) {

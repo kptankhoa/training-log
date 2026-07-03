@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 import {
   PUBLIC_FIREBASE_API_KEY,
   PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,7 +10,10 @@ import {
   PUBLIC_FIREBASE_APP_ID,
 } from '$env/static/public';
 
-const app = initializeApp({
+// Exported so photos.ts can lazily construct a Storage instance without
+// firebase/storage's SDK code being pulled into every route's bundle —
+// Storage is only ever needed on the day-detail/photo-timeline screens.
+export const app = initializeApp({
   apiKey:            PUBLIC_FIREBASE_API_KEY,
   authDomain:        PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId:         PUBLIC_FIREBASE_PROJECT_ID,
@@ -27,4 +29,3 @@ export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
 });
-export const storage = getStorage(app);

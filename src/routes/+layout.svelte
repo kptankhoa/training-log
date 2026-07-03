@@ -10,10 +10,12 @@
   import { initGeneralRules } from '$lib/stores/generalRules';
   import { theme, initTheme } from '$lib/stores/theme';
   import { restTimerSound, initRestTimerSound } from '$lib/stores/restTimerSound';
+  import { restTimerMuted, initRestTimerMuted } from '$lib/stores/restTimerMuted';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
   import Sidebar from '$lib/components/shell/Sidebar.svelte';
+  import Toast from '$lib/components/shared/Toast.svelte';
 
   $: if (browser && $authReady && $user === null && $page.url.pathname !== '/login') {
     goto('/login');
@@ -36,6 +38,7 @@
       unsubs.push(initGeneralRules(u.uid));
       unsubs.push(initTheme(u.uid));
       unsubs.push(initRestTimerSound(u.uid));
+      unsubs.push(initRestTimerMuted(u.uid));
     });
     return () => {
       unsubUser();
@@ -53,6 +56,10 @@
 
   $: if (browser) {
     localStorage.setItem('restTimerSound', $restTimerSound);
+  }
+
+  $: if (browser) {
+    localStorage.setItem('restTimerMuted', String($restTimerMuted));
   }
 
   $: showShell = $authReady && $user !== null && $page.url.pathname !== '/login';
@@ -76,3 +83,5 @@
 {:else}
   <slot />
 {/if}
+
+<Toast />

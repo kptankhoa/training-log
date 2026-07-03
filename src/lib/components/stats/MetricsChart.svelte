@@ -5,6 +5,7 @@
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import FormField from '$lib/components/shared/FormField.svelte';
   import { navBorderClass, navTextClass } from '$lib/navColors';
+  import { showError } from '$lib/stores/toast';
   import type { BodyMeasurement } from '$lib/types';
 
   export let userId: string;
@@ -61,14 +62,22 @@
       bfp: Number(draftBfp) || 0,
       score: Number(draftScore) || 0,
     };
-    await saveMeasurement(userId, draftDate, data);
-    resetDraft();
-    showAddForm = false;
+    try {
+      await saveMeasurement(userId, draftDate, data);
+      resetDraft();
+      showAddForm = false;
+    } catch {
+      showError();
+    }
   }
 
   async function handleDelete(id: string) {
     if (!userId) return;
-    await deleteMeasurement(userId, id);
+    try {
+      await deleteMeasurement(userId, id);
+    } catch {
+      showError();
+    }
   }
 </script>
 

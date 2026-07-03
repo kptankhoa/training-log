@@ -7,6 +7,7 @@
   import { icons } from '$lib/icons';
   import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
   import { navColorClasses } from '$lib/navColors';
+  import { showError } from '$lib/stores/toast';
   import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Split, GruvboxColor, Exercise } from '$lib/types';
@@ -59,17 +60,25 @@
 
   async function handleSave(splitId: string) {
     if (!draft || !userId) return;
-    await saveSplit(userId, splitId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content, color: draft.color });
-    editingId = null;
-    draft = null;
+    try {
+      await saveSplit(userId, splitId, { label: draft.label, sortOrder: Number(draft.sortOrder), content: draft.content, color: draft.color });
+      editingId = null;
+      draft = null;
+    } catch {
+      showError();
+    }
   }
 
   async function handleDelete(splitId: string) {
     if (!userId) return;
-    await deleteSplit(userId, splitId);
-    expandedId = null;
-    editingId = null;
-    draft = null;
+    try {
+      await deleteSplit(userId, splitId);
+      expandedId = null;
+      editingId = null;
+      draft = null;
+    } catch {
+      showError();
+    }
   }
 
   function handleDeleteClick(splitId: string) {
@@ -85,7 +94,11 @@
 
   async function handleAdd() {
     if (!userId) return;
-    await addSplit(userId);
+    try {
+      await addSplit(userId);
+    } catch {
+      showError();
+    }
   }
 
   function isExerciseTied(exercise: Exercise, splitId: string): boolean {
@@ -97,7 +110,11 @@
     const next = isExerciseTied(exercise, splitId)
       ? current.filter((id) => id !== splitId)
       : [...current, splitId];
-    await updateExerciseSplits(userId, exercise.id, next);
+    try {
+      await updateExerciseSplits(userId, exercise.id, next);
+    } catch {
+      showError();
+    }
   }
 
   // General Rules — a single global note, view mode by default once loaded
@@ -127,6 +144,8 @@
     try {
       await saveGeneralRules(userId, rulesDraft);
       rulesMode = 'view';
+    } catch {
+      showError();
     } finally {
       savingRules = false;
     }

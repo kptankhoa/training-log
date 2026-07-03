@@ -225,3 +225,53 @@ describe('RestTimer finish sound', () => {
     expect(playSpy).not.toHaveBeenCalled();
   });
 });
+
+describe('RestTimer mute toggle', () => {
+  let playSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    playSpy = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+  });
+
+  afterEach(async () => {
+    // Reset the shared restTimerMuted store back to its default so later
+    // tests in this file (or a future re-ordering) aren't affected.
+    const { setRestTimerMuted } = await import('$lib/stores/restTimerMuted');
+    setRestTimerMuted('', false);
+    vi.useRealTimers();
+    playSpy.mockRestore();
+  });
+
+  it('shows the unmuted icon by default', () => {
+    const { getByLabelText } = render(RestTimer);
+    expect(getByLabelText('Mute rest timer sound')).toBeInTheDocument();
+  });
+
+  it('clicking the icon mutes and relabels the button', async () => {
+    const { getByLabelText } = render(RestTimer);
+    await fireEvent.click(getByLabelText('Mute rest timer sound'));
+
+    expect(getByLabelText('Unmute rest timer sound')).toBeInTheDocument();
+  });
+
+  it('does not play a sound when finishing while muted', async () => {
+    const { getByLabelText, getByText } = render(RestTimer);
+    await fireEvent.click(getByLabelText('Mute rest timer sound'));
+    await fireEvent.click(getByText('Start'));
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    expect(getByText('Go!')).toBeInTheDocument();
+    expect(playSpy).not.toHaveBeenCalled();
+  });
+
+  it('plays a sound again after unmuting', async () => {
+    const { getByLabelText, getByText } = render(RestTimer);
+    await fireEvent.click(getByLabelText('Mute rest timer sound')); // mute
+    await fireEvent.click(getByLabelText('Unmute rest timer sound')); // unmute
+    await fireEvent.click(getByText('Start'));
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    expect(playSpy).toHaveBeenCalledTimes(1);
+  });
+});

@@ -9,6 +9,7 @@
   } from '$lib/stores/bodyMeasurements';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import FormField from '$lib/components/shared/FormField.svelte';
+  import { showError } from '$lib/stores/toast';
   import type { BodyMeasurementEntry } from '$lib/types';
 
   export let userId: string;
@@ -46,7 +47,11 @@
 
   async function handleDelete(id: string) {
     if (!userId) return;
-    await deleteBodyMeasurement(userId, id);
+    try {
+      await deleteBodyMeasurement(userId, id);
+    } catch {
+      showError();
+    }
   }
 
   // Add entry form
@@ -72,9 +77,13 @@
       const parsed = Number(raw);
       if (raw !== '' && Number.isFinite(parsed)) data[key] = parsed;
     }
-    await saveBodyMeasurement(userId, draftDate, data);
-    resetDraft();
-    showAddForm = false;
+    try {
+      await saveBodyMeasurement(userId, draftDate, data);
+      resetDraft();
+      showAddForm = false;
+    } catch {
+      showError();
+    }
   }
 </script>
 

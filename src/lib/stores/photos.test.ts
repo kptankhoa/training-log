@@ -5,9 +5,11 @@ const mockGetDownloadURL = vi.fn();
 const mockGetMetadata = vi.fn();
 const mockDeleteObject = vi.fn();
 const mockRef = vi.fn((_storage, path: string) => ({ path }));
+const mockGetStorage = vi.fn(() => ({}));
 
-vi.mock('$lib/firebase', () => ({ storage: {} }));
+vi.mock('$lib/firebase', () => ({ app: {} }));
 vi.mock('firebase/storage', () => ({
+  getStorage: mockGetStorage,
   ref: mockRef,
   uploadBytes: mockUploadBytes,
   getDownloadURL: mockGetDownloadURL,

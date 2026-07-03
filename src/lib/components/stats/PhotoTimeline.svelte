@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte';
   import { getPhotoUrl, getPhotoSize, deletePhoto } from '$lib/stores/photos';
   import { saveDay } from '$lib/stores/days';
+  import { showError } from '$lib/stores/toast';
   import type { DayEntry } from '$lib/types';
 
   export let days: Record<string, DayEntry> = {};
@@ -57,7 +58,12 @@
   async function removePhoto(dateKey: string, path: string) {
     const entry = days[dateKey];
     if (!entry) return;
-    await saveDay(userId, dateKey, { ...entry, photos: (entry.photos ?? []).filter((p) => p !== path) });
+    try {
+      await saveDay(userId, dateKey, { ...entry, photos: (entry.photos ?? []).filter((p) => p !== path) });
+    } catch {
+      showError();
+      return; // don't attempt the blob delete if the reference removal failed
+    }
     try {
       await deletePhoto(path);
     } catch (err) {

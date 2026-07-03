@@ -10,6 +10,7 @@
   import { restTimerSound, setRestTimerSound, playRestTimerSound, SOUND_OPTIONS, type RestTimerSound } from '$lib/stores/restTimerSound';
   import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
   import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
+  import { showError } from '$lib/stores/toast';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Exercise, GruvboxColor } from '$lib/types';
 
@@ -30,7 +31,11 @@
   async function toggleExerciseSplit(exercise: Exercise, splitId: string) {
     const current = exercise.splitIds ?? [];
     const next = current.includes(splitId) ? current.filter((id) => id !== splitId) : [...current, splitId];
-    await updateExerciseSplits(userId, exercise.id, next);
+    try {
+      await updateExerciseSplits(userId, exercise.id, next);
+    } catch {
+      showError();
+    }
   }
 
   let newTagName = '';
@@ -49,7 +54,7 @@
     if (confirmingTagId === tagId) {
       if (confirmTagTimeout) clearTimeout(confirmTagTimeout);
       confirmingTagId = null;
-      deleteTag(userId, tagId);
+      deleteTag(userId, tagId).catch(() => showError());
       return;
     }
     confirmingTagId = tagId;
@@ -61,7 +66,7 @@
     if (confirmingTaskId === taskId) {
       if (confirmTaskTimeout) clearTimeout(confirmTaskTimeout);
       confirmingTaskId = null;
-      deleteTask(userId, taskId);
+      deleteTask(userId, taskId).catch(() => showError());
       return;
     }
     confirmingTaskId = taskId;
@@ -73,7 +78,7 @@
     if (confirmingExerciseId === exerciseId) {
       if (confirmExerciseTimeout) clearTimeout(confirmExerciseTimeout);
       confirmingExerciseId = null;
-      deleteExercise(userId, exerciseId);
+      deleteExercise(userId, exerciseId).catch(() => showError());
       return;
     }
     confirmingExerciseId = exerciseId;
@@ -85,36 +90,56 @@
     const name = newTagName.trim();
     if (!name) return;
     newTagName = '';
-    await addTag(userId, name);
+    try {
+      await addTag(userId, name);
+    } catch {
+      showError();
+    }
   }
 
   async function handleAddTask() {
     const name = newTaskName.trim();
     if (!name) return;
     newTaskName = '';
-    await addTask(userId, name);
+    try {
+      await addTask(userId, name);
+    } catch {
+      showError();
+    }
   }
 
   async function handleAddExercise() {
     const name = newExerciseName.trim();
     if (!name) return;
     newExerciseName = '';
-    await addExercise(userId, name);
+    try {
+      await addExercise(userId, name);
+    } catch {
+      showError();
+    }
   }
 
   function cycleColor(tagId: string, current: GruvboxColor) {
     const next = COLOR_ORDER[(COLOR_ORDER.indexOf(current) + 1) % COLOR_ORDER.length];
-    updateTagColor(userId, tagId, next);
+    updateTagColor(userId, tagId, next).catch(() => showError());
   }
 
   async function handleSetTheme(value: 'dark' | 'light') {
     if (!userId) return;
-    await setTheme(userId, value);
+    try {
+      await setTheme(userId, value);
+    } catch {
+      showError();
+    }
   }
 
   function handleSelectRestTimerSound(value: RestTimerSound) {
     playRestTimerSound(value); // preview immediately so picking a sound is self-explanatory
-    if (userId) setRestTimerSound(userId, value);
+    if (userId) setRestTimerSound(userId, value).catch(() => showError());
+  }
+
+  function handleSignOut() {
+    signOut().catch(() => showError('Failed to sign out — check your connection.'));
   }
 </script>
 
@@ -364,7 +389,7 @@
     <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2">Account</h2>
     <button
       type="button"
-      on:click={signOut}
+      on:click={handleSignOut}
       class="flex items-center gap-3 px-4 py-3 bg-gb-light-bg1 dark:bg-gb-bg1 text-gb-light-fg3 dark:text-gb-fg3
              hover:text-gb-light-red dark:hover:text-gb-red hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition-colors text-sm w-full text-left"
     >

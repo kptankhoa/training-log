@@ -2,14 +2,22 @@
   import { signInWithGoogle, user } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { showError } from '$lib/stores/toast';
 
   onMount(() => {
     return user.subscribe((u) => { if (u) goto('/'); });
   });
 
   async function handleSignIn() {
-    await signInWithGoogle();
-    goto('/');
+    try {
+      await signInWithGoogle();
+      goto('/');
+    } catch (err) {
+      // Don't alarm the user over their own cancellation of the popup.
+      const code = (err as { code?: string })?.code;
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return;
+      showError('Sign-in failed — check your connection and try again.');
+    }
   }
 </script>
 

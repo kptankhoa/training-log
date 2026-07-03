@@ -4,6 +4,11 @@
   import { icons } from '$lib/icons';
   import { heading } from '$lib/decorators/heading';
   import { navColorClasses } from '$lib/navColors';
+  import { showError } from '$lib/stores/toast';
+
+  function handleSignOut() {
+    signOut().catch(() => showError('Failed to sign out — check your connection.'));
+  }
 
   const nav = [
     { href: '/',         label: 'Today',    icon: icons.home     },
@@ -39,7 +44,7 @@
   <div class="mt-auto pt-4 border-t border-gb-light-bg2 dark:border-gb-bg2">
     <button
       type="button"
-      on:click={signOut}
+      on:click={handleSignOut}
       class="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-gb-light-fg3 dark:text-gb-fg3
              hover:text-gb-light-red dark:hover:text-gb-red hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition-colors"
     >

@@ -20,6 +20,8 @@ const PATHS = {
   note: `<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z"/>`,
   home: `<path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>`,
   pencil: `<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>`,
+  volumeOn: `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`,
+  volumeOff: `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`,
 };
 
 export const icons = {
@@ -35,4 +37,6 @@ export const icons = {
   cameraSm:  fillIcon(10, PATHS.camera),
   noteSm:    fillIcon(10, PATHS.note),
   pencilSm:  fillIcon(14, PATHS.pencil),
+  volumeOn:  strokeIcon(16, PATHS.volumeOn),
+  volumeOff: strokeIcon(16, PATHS.volumeOff),
 };

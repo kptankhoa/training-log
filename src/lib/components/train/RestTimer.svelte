@@ -1,8 +1,17 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { user } from '$lib/stores/auth';
   import { restTimerSound, playRestTimerSound } from '$lib/stores/restTimerSound';
+  import { restTimerMuted, setRestTimerMuted } from '$lib/stores/restTimerMuted';
+  import { icons } from '$lib/icons';
 
   const PRESETS = [30, 60, 75, 90, 120];
+
+  $: userId = $user?.uid ?? '';
+
+  function toggleMute() {
+    setRestTimerMuted(userId, !$restTimerMuted);
+  }
 
   // Circumference for the SVG ring
   const R = 54;
@@ -88,7 +97,7 @@
       running = false;
       finished = true;
       animateRingTo(0, 0.5); // "time's up" flourish
-      playRestTimerSound($restTimerSound);
+      if (!$restTimerMuted) playRestTimerSound($restTimerSound);
     }
   }
 
@@ -174,7 +183,16 @@
 <svelte:document on:visibilitychange={handleVisibilityChange} />
 
 <section class="flex flex-col gap-4">
-  <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Rest Timer</h2>
+  <div class="flex items-center justify-between border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2">
+    <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold text-sm uppercase tracking-wider">Rest Timer</h2>
+    <button
+      type="button"
+      on:click={toggleMute}
+      aria-label={$restTimerMuted ? 'Unmute rest timer sound' : 'Mute rest timer sound'}
+      aria-pressed={$restTimerMuted}
+      class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-fg dark:hover:text-gb-fg transition"
+    >{@html $restTimerMuted ? icons.volumeOff : icons.volumeOn}</button>
+  </div>
 
   <!-- Ring + time display -->
   <div class="flex flex-col items-center gap-6">
