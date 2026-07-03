@@ -4,7 +4,16 @@
   import { icons } from '$lib/icons';
   import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor } from '$lib/stores/tags';
   import { activeTasks, tasksLoading, addTask, deleteTask } from '$lib/stores/tasks';
-  import { activeExercises, exercisesLoading, addExercise, deleteExercise, updateExerciseSplits } from '$lib/stores/exercises';
+  import {
+    activeExercises,
+    exercisesLoading,
+    addExercise,
+    deleteExercise,
+    updateExerciseSplits,
+    updateExerciseType,
+    updateExerciseEquipment,
+    updateExerciseSingleArm,
+  } from '$lib/stores/exercises';
   import { splits } from '$lib/stores/splits';
   import { theme, setTheme } from '$lib/stores/theme';
   import { restTimerSound, setRestTimerSound, playRestTimerSound, SOUND_OPTIONS, type RestTimerSound } from '$lib/stores/restTimerSound';
@@ -12,7 +21,7 @@
   import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
   import { showError } from '$lib/stores/toast';
   import Spinner from '$lib/components/shared/Spinner.svelte';
-  import type { Exercise, GruvboxColor } from '$lib/types';
+  import type { Exercise, GruvboxColor, ExerciseType, Equipment } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
 
@@ -23,6 +32,32 @@
   let restTimerSoundExpanded = false;
 
   let expandedExerciseId: string | null = null;
+
+  const EXERCISE_TYPES: { value: ExerciseType; label: string }[] = [
+    { value: 'weight', label: 'Weight' },
+    { value: 'bodyweight', label: 'Bodyweight' },
+    { value: 'time', label: 'Time' },
+  ];
+
+  const EQUIPMENT_OPTIONS: { value: Equipment; label: string }[] = [
+    { value: 'barbell', label: 'Barbell' },
+    { value: 'dumbbell', label: 'Dumbbell' },
+    { value: 'cable', label: 'Cable' },
+    { value: 'machine', label: 'Machine' },
+  ];
+
+  function handleSetExerciseType(exercise: Exercise, type: ExerciseType) {
+    updateExerciseType(userId, exercise.id, type).catch(() => showError());
+  }
+
+  function handleSetExerciseEquipment(exercise: Exercise, equipment: Equipment) {
+    const next = exercise.equipment === equipment ? null : equipment;
+    updateExerciseEquipment(userId, exercise.id, next).catch(() => showError());
+  }
+
+  function handleToggleSingleArm(exercise: Exercise) {
+    updateExerciseSingleArm(userId, exercise.id, !exercise.singleArm).catch(() => showError());
+  }
 
   function toggleExerciseExpand(exerciseId: string) {
     expandedExerciseId = expandedExerciseId === exerciseId ? null : exerciseId;
@@ -292,6 +327,46 @@
                 </div>
                 {#if expandedExerciseId === exercise.id}
                   <div class="px-4 pb-3 flex flex-col gap-2">
+                    <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Type</span>
+                    <div class="flex flex-wrap gap-2">
+                      {#each EXERCISE_TYPES as opt}
+                        <button
+                          type="button"
+                          on:click={() => handleSetExerciseType(exercise, opt.value)}
+                          class="px-3 py-1 text-xs border transition
+                                 {(exercise.type ?? 'weight') === opt.value
+                                   ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                                   : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
+                        >{opt.label}</button>
+                      {/each}
+                    </div>
+
+                    {#if (exercise.type ?? 'weight') === 'weight'}
+                      <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Equipment</span>
+                      <div class="flex flex-wrap gap-2">
+                        {#each EQUIPMENT_OPTIONS as opt}
+                          <button
+                            type="button"
+                            on:click={() => handleSetExerciseEquipment(exercise, opt.value)}
+                            class="px-3 py-1 text-xs border transition
+                                   {exercise.equipment === opt.value
+                                     ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                                     : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
+                          >{opt.label}</button>
+                        {/each}
+                      </div>
+
+                      <label class="flex items-center gap-2 text-xs text-gb-light-fg3 dark:text-gb-fg3">
+                        <input
+                          type="checkbox"
+                          checked={exercise.singleArm ?? false}
+                          on:change={() => handleToggleSingleArm(exercise)}
+                          class="accent-gb-light-green dark:accent-gb-green"
+                        />
+                        Single-arm
+                      </label>
+                    {/if}
+
                     <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Tied to splits (none = always available)</span>
                     {#if $splits.length === 0}
                       <p class="text-gb-light-fg3 dark:text-gb-fg3 text-xs italic">No splits yet — add one in Split Design.</p>
