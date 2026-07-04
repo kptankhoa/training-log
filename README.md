@@ -1,42 +1,38 @@
-# sv
+# Training Log
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A personal, mobile-first training log built with SvelteKit. Track workouts on a calendar (training-type color coding, splits, exercises/sets), body metrics and measurements, and progress photos — all scoped to a single Google-authenticated account per user.
 
-## Creating a project
+## Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- SvelteKit 2, deployed as a static SPA (`ssr = false`) to Cloudflare Pages
+- Svelte 5 (legacy component syntax)
+- Firebase: Auth (Google Sign-In), Firestore (with offline persistence), Storage (progress photos)
+- Tailwind CSS with a Gruvbox Dark/Light palette
+- Chart.js for the Stats page, Vitest + @testing-library/svelte for tests
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --types ts --install npm .
-```
+See `CLAUDE.md` for architecture notes and conventions.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies, then start the dev server:
 
 ```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# or: npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
+## Testing & type-checking
 
 ```sh
-npm run build
+npm run test:run   # full test suite (or `npm test` to watch)
+npm run check      # svelte-check type-checking; must be 0 errors before committing
 ```
 
-You can preview the production build with `npm run preview`.
+## Building & deploying
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+npm run build     # production build (adapter-cloudflare)
+npm run preview   # build, then serve via `wrangler pages dev`
+npm run deploy    # build, then `wrangler pages deploy`
+```

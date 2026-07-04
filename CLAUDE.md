@@ -47,6 +47,16 @@ Every Firestore-backed store in `src/lib/stores/` follows the same shape: a writ
 
 **Numeric text input gotcha:** Svelte's `bind:value` on `<input type="number">` silently coerces the bound value to `number | null` (never a string) via its own `to_number()` — clearing the field produces `null`, not `''`. Fields that need to distinguish "never entered" from "cleared" (like measurement/metric drafts) use `type="text" inputmode="decimal"` instead, keeping the bound value a genuine string, and guard parsed values with `Number.isFinite(...)` before saving (see `MeasurementsTable.svelte`, `MetricsChart.svelte`).
 
+### Error handling
+
+Firestore writes are fire-and-forget from the UI's perspective (offline persistence means most succeed eventually even without awaiting), but real failures (e.g. permissions, quota) were previously silent. `src/lib/stores/toast.ts` exports `showError(message?)` / `dismissToast(id)` backed by a simple auto-dismissing (5s) writable array, rendered by `src/lib/components/shared/Toast.svelte` (mounted once in `+layout.svelte`). Call sites that `await` a store write wrap it in `.catch(() => showError())` (default message covers the common "probably offline" case); don't add per-call-site custom copy unless the failure mode is actually distinguishable to the user.
+
+### Exercise types
+
+`Exercise` has an optional `type?: ExerciseType` (`'weight' | 'bodyweight' | 'time'`, undefined = legacy/`'weight'`), plus `equipment?: Equipment` (`'barbell' | 'dumbbell' | 'cable' | 'machine'`) and `singleArm?: boolean` — both only meaningful when type is `'weight'`. `ExerciseSet` (`src/lib/types.ts`) is a discriminated union on `type`, deliberately optional **only** on the `weight` variant (`{ type?: 'weight'; weight: number; reps: number } | { type: 'bodyweight'; reps: number } | { type: 'time'; seconds: number }`) so every pre-existing bare `{weight, reps}` literal across the codebase (including test fixtures — `svelte-check` type-checks `.test.ts` files too) remains valid without edits. Use `resolveSetType(set)` / `formatSet(set)` from `types.ts` rather than reading `set.type` or a numeric field directly — `formatSet` renders `20×8` (weight/legacy), `×20` (bodyweight), `45s` (time), with no unit suffix.
+
+A set's type is fixed forever once logged (no in-place editing — delete and re-log to change it); changing an exercise's *current* type in Settings only affects sets logged after the change, since the logging UI (`ExerciseEditor.svelte`) always reads the exercise's type from the catalog, never from an already-logged set. There is no Firestore migration for legacy data — everything resolves via `?? 'weight'` fallbacks at read time.
+
 ### Terminology note
 
 "Splits" (a training split like Push/Pull/Legs) were originally modeled as generic "plan notes" — the type is now `Split` and the store is `src/lib/stores/splits.ts`, but the underlying Firestore collection is still literally named `notes` (a deferred migration, tracked via a comment in `splits.ts`). Don't be surprised by `'notes'` string literals inside `splits.ts` — that's intentional, not a bug.
