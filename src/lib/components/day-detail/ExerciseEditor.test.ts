@@ -339,4 +339,15 @@ describe('ExerciseEditor — exercise types', () => {
     await fireEvent.click(getByText('Log Set'));
     expect(getByText('80×8 BB ✕')).toBeInTheDocument();
   });
+
+  it('logging a weight set with NO equipment selected renders without equipment suffix', async () => {
+    const { getByText } = render(ExerciseEditor, {
+      props: { exercises, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Bench Press'));
+    // Don't select any equipment, just log the set directly
+    await fireEvent.click(getByText('Log Set'));
+    // Should render as "20×8 ✕" with no equipment abbreviation
+    expect(getByText('20×8 ✕')).toBeInTheDocument();
+  });
 });

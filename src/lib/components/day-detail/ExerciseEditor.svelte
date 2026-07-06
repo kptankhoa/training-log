@@ -114,11 +114,12 @@
     } else if (type === 'time') {
       set = { type: 'time', seconds: draftSeconds[exerciseId] ?? 0 };
     } else {
+      const equipment = draftEquipment[exerciseId];
       set = {
         type: 'weight',
         weight: draftWeight[exerciseId] ?? 0,
         reps: draftReps[exerciseId] ?? 0,
-        equipment: draftEquipment[exerciseId],
+        ...(equipment ? { equipment } : {}),
       };
     }
     entries = entries.map((e) =>
