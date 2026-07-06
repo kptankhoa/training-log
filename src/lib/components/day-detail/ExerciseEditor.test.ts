@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import ExerciseEditor from './ExerciseEditor.svelte';
+import ExerciseEditorTest from './ExerciseEditorTest.svelte';
 import type { Exercise, DayEntry } from '$lib/types';
 
 vi.mock('$lib/stores/exercises', () => ({
@@ -349,5 +350,30 @@ describe('ExerciseEditor — exercise types', () => {
     await fireEvent.click(getByText('Log Set'));
     // Should render as "20×8 ✕" with no equipment abbreviation
     expect(getByText('20×8 ✕')).toBeInTheDocument();
+  });
+
+  it('logging a weight set with NO equipment selected produces a set object with no "equipment" key at all', async () => {
+    const { getByText, component } = render(ExerciseEditorTest, {
+      props: { exercises, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Bench Press'));
+    // Don't select any equipment, just log the set directly
+    await fireEvent.click(getByText('Log Set'));
+
+    const entries = component.entries;
+    expect('equipment' in entries[0].sets[0]).toBe(false);
+  });
+
+  it('logging a weight set WITH equipment selected produces a set object with an "equipment" key', async () => {
+    const { getByText, component } = render(ExerciseEditorTest, {
+      props: { exercises, dateKey: '2026-06-10', userId: 'user1', entries: [] }
+    });
+    await fireEvent.click(getByText('+ Bench Press'));
+    await fireEvent.click(getByText('Dumbbell'));
+    await fireEvent.click(getByText('Log Set'));
+
+    const entries = component.entries;
+    const loggedSet = entries[0].sets[0];
+    expect('equipment' in loggedSet && loggedSet.equipment).toBe('dumbbell');
   });
 });
