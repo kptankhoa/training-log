@@ -26,7 +26,6 @@ export interface Exercise {
   deleted: boolean;
   splitIds?: string[]; // splits this exercise belongs to; empty/undefined = available for any split
   type?: ExerciseType; // undefined = 'weight' (every exercise created before this field existed)
-  equipment?: Equipment; // only meaningful when type is 'weight'; optional even then
   singleArm?: boolean; // only meaningful when type is 'weight'; purely descriptive
 }
 

@@ -87,21 +87,6 @@ describe('exercises store', () => {
     expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
   });
 
-  it('updateExerciseEquipment calls updateDoc with the new equipment', async () => {
-    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
-    const { updateExerciseEquipment } = await import('./exercises');
-    await updateExerciseEquipment('user1', 'ex1', 'dumbbell');
-    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { equipment: 'dumbbell' });
-    expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'users', 'user1', 'exercises', 'ex1');
-  });
-
-  it('updateExerciseEquipment clears equipment when passed null', async () => {
-    mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
-    const { updateExerciseEquipment } = await import('./exercises');
-    await updateExerciseEquipment('user1', 'ex1', null);
-    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { equipment: null });
-  });
-
   it('updateExerciseSingleArm calls updateDoc with the new flag', async () => {
     mockOnSnapshot.mockImplementation((_ref, cb) => { cb({ docs: [] }); return () => {}; });
     const { updateExerciseSingleArm } = await import('./exercises');

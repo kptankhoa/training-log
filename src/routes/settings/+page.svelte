@@ -11,7 +11,6 @@
     deleteExercise,
     updateExerciseSplits,
     updateExerciseType,
-    updateExerciseEquipment,
     updateExerciseSingleArm,
   } from '$lib/stores/exercises';
   import { splits } from '$lib/stores/splits';
@@ -21,7 +20,7 @@
   import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
   import { showError } from '$lib/stores/toast';
   import Spinner from '$lib/components/shared/Spinner.svelte';
-  import type { Exercise, GruvboxColor, ExerciseType, Equipment } from '$lib/types';
+  import type { Exercise, GruvboxColor, ExerciseType } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
 
@@ -39,20 +38,8 @@
     { value: 'time', label: 'Time' },
   ];
 
-  const EQUIPMENT_OPTIONS: { value: Equipment; label: string }[] = [
-    { value: 'barbell', label: 'Barbell' },
-    { value: 'dumbbell', label: 'Dumbbell' },
-    { value: 'cable', label: 'Cable' },
-    { value: 'machine', label: 'Machine' },
-  ];
-
   function handleSetExerciseType(exercise: Exercise, type: ExerciseType) {
     updateExerciseType(userId, exercise.id, type).catch(() => showError());
-  }
-
-  function handleSetExerciseEquipment(exercise: Exercise, equipment: Equipment) {
-    const next = exercise.equipment === equipment ? null : equipment;
-    updateExerciseEquipment(userId, exercise.id, next).catch(() => showError());
   }
 
   function handleToggleSingleArm(exercise: Exercise) {
@@ -342,20 +329,6 @@
                     </div>
 
                     {#if (exercise.type ?? 'weight') === 'weight'}
-                      <span class="text-xs text-gb-light-fg3 dark:text-gb-fg3 uppercase tracking-wider">Equipment</span>
-                      <div class="flex flex-wrap gap-2">
-                        {#each EQUIPMENT_OPTIONS as opt}
-                          <button
-                            type="button"
-                            on:click={() => handleSetExerciseEquipment(exercise, opt.value)}
-                            class="px-3 py-1 text-xs border transition
-                                   {exercise.equipment === opt.value
-                                     ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
-                                     : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
-                          >{opt.label}</button>
-                        {/each}
-                      </div>
-
                       <label class="flex items-center gap-2 text-xs text-gb-light-fg3 dark:text-gb-fg3">
                         <input
                           type="checkbox"
