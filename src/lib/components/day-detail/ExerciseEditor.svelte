@@ -5,7 +5,7 @@
   import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
   import { showError } from '$lib/stores/toast';
   import { formatSet } from '$lib/types';
-  import type { Exercise, ExerciseEntry, ExerciseSet, ExerciseType, DayEntry } from '$lib/types';
+  import type { Exercise, ExerciseEntry, ExerciseSet, ExerciseType, Equipment, DayEntry } from '$lib/types';
 
   export let exercises: Exercise[] = []; // full catalog, incl. deleted, for name resolution
   export let allDays: Record<string, DayEntry> = {};
@@ -27,9 +27,17 @@
   });
   $: lastSessionExercises = getLastSessionExercises(allDays, dateKey);
 
+  const EQUIPMENT_OPTIONS: { value: Equipment; label: string }[] = [
+    { value: 'barbell', label: 'Barbell' },
+    { value: 'dumbbell', label: 'Dumbbell' },
+    { value: 'cable', label: 'Cable' },
+    { value: 'machine', label: 'Machine' },
+  ];
+
   let draftWeight: Record<string, number> = {};
   let draftReps: Record<string, number> = {};
   let draftSeconds: Record<string, number> = {};
+  let draftEquipment: Record<string, Equipment | undefined> = {};
   let addingExercise = false;
   let newExerciseName = '';
 
@@ -47,11 +55,8 @@
   function exerciseLabel(exerciseId: string): string {
     const exercise = exerciseById[exerciseId];
     if (!exercise) return 'Unknown exercise';
-    if ((exercise.type ?? 'weight') !== 'weight') return exercise.name;
-    const parts: string[] = [];
-    if (exercise.equipment) parts.push(exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1));
-    if (exercise.singleArm) parts.push('single-arm');
-    return parts.length > 0 ? `${exercise.name} · ${parts.join(' · ')}` : exercise.name;
+    const isWeightType = (exercise.type ?? 'weight') === 'weight';
+    return isWeightType && exercise.singleArm ? `${exercise.name} · single-arm` : exercise.name;
   }
 
   function initDraftFor(exerciseId: string) {
@@ -60,9 +65,11 @@
     const lastWeight = last && 'weight' in last ? last.weight : undefined;
     const lastReps = last && 'reps' in last ? last.reps : undefined;
     const lastSeconds = last && 'seconds' in last ? last.seconds : undefined;
+    const lastEquipment = last && 'equipment' in last ? last.equipment : undefined;
     draftWeight = { ...draftWeight, [exerciseId]: lastWeight ?? 20 };
     draftReps = { ...draftReps, [exerciseId]: lastReps ?? 8 };
     draftSeconds = { ...draftSeconds, [exerciseId]: lastSeconds ?? 30 };
+    draftEquipment = { ...draftEquipment, [exerciseId]: lastEquipment };
   }
 
   onMount(() => {
@@ -94,6 +101,11 @@
     draftSeconds = { ...draftSeconds, [exerciseId]: next };
   }
 
+  function toggleEquipment(exerciseId: string, equipment: Equipment) {
+    const next = draftEquipment[exerciseId] === equipment ? undefined : equipment;
+    draftEquipment = { ...draftEquipment, [exerciseId]: next };
+  }
+
   function logSet(exerciseId: string) {
     const type = typeOf(exerciseId);
     let set: ExerciseSet;
@@ -102,7 +114,12 @@
     } else if (type === 'time') {
       set = { type: 'time', seconds: draftSeconds[exerciseId] ?? 0 };
     } else {
-      set = { type: 'weight', weight: draftWeight[exerciseId] ?? 0, reps: draftReps[exerciseId] ?? 0 };
+      set = {
+        type: 'weight',
+        weight: draftWeight[exerciseId] ?? 0,
+        reps: draftReps[exerciseId] ?? 0,
+        equipment: draftEquipment[exerciseId],
+      };
     }
     entries = entries.map((e) =>
       e.exerciseId === exerciseId ? { ...e, sets: [...e.sets, set] } : e
@@ -183,6 +200,22 @@
                 on:click={() => removeSet(ex.exerciseId, i)}
                 class="text-xs px-2 py-1 bg-gb-light-bg1 dark:bg-gb-bg1 border border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg dark:text-gb-fg hover:border-gb-light-red dark:hover:border-gb-red hover:text-gb-light-red dark:hover:text-gb-red transition"
               >{formatSet(set)} ✕</button>
+            {/each}
+          </div>
+        {/if}
+
+        {#if exType === 'weight'}
+          <div class="flex flex-wrap gap-1.5">
+            {#each EQUIPMENT_OPTIONS as opt}
+              <button
+                type="button"
+                on:click={() => toggleEquipment(ex.exerciseId, opt.value)}
+                aria-pressed={draftEquipment[ex.exerciseId] === opt.value}
+                class="px-2 py-1 text-xs border transition
+                       {draftEquipment[ex.exerciseId] === opt.value
+                         ? 'border-gb-light-green dark:border-gb-green text-gb-light-green dark:text-gb-green bg-gb-light-bg2 dark:bg-gb-bg2'
+                         : 'border-gb-light-bg3 dark:border-gb-bg3 text-gb-light-fg3 dark:text-gb-fg3 hover:border-gb-light-blue dark:hover:border-gb-blue hover:text-gb-light-blue dark:hover:text-gb-blue'}"
+              >{opt.label}</button>
             {/each}
           </div>
         {/if}
