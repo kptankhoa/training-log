@@ -31,7 +31,7 @@ export interface Exercise {
 }
 
 export type ExerciseSet =
-  | { type?: 'weight'; weight: number; reps: number }
+  | { type?: 'weight'; weight: number; reps: number; equipment?: Equipment }
   | { type: 'bodyweight'; reps: number }
   | { type: 'time'; seconds: number };
 
@@ -52,10 +52,18 @@ export function resolveSetType(set: ExerciseSet): ExerciseType {
 // so the two formats can't drift apart. Narrows on `set.type` directly
 // (rather than switching on resolveSetType's return value) so each branch
 // gets real property access with no casts.
+const EQUIPMENT_ABBR: Record<Equipment, string> = {
+  barbell: 'BB',
+  dumbbell: 'DB',
+  cable: 'CB',
+  machine: 'MC',
+};
+
 export function formatSet(set: ExerciseSet): string {
   if (set.type === 'bodyweight') return `×${set.reps}`;
   if (set.type === 'time') return `${set.seconds}s`;
-  return `${set.weight}×${set.reps}`; // 'weight', or legacy data with no type field at all
+  const base = `${set.weight}×${set.reps}`; // 'weight', or legacy data with no type field at all
+  return set.equipment ? `${base} ${EQUIPMENT_ABBR[set.equipment]}` : base;
 }
 
 export interface ExerciseEntry {

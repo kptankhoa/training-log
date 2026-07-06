@@ -63,6 +63,22 @@ describe('DaySplitsExercises — readonly mode', () => {
     expect(getByText(/×20/)).toBeInTheDocument();
     expect(getByText(/45s/)).toBeInTheDocument();
   });
+
+  it('shows equipment abbreviation on a weight set in the readonly summary', () => {
+    const weightExercise: Exercise[] = [
+      { id: 'bench', name: 'Bench Press', deleted: false },
+    ];
+    const { getByText } = render(DaySplitsExercises, {
+      props: {
+        splits, exercises: weightExercise, selectedSplitIds: new Set<string>(),
+        exerciseEntries: [
+          { exerciseId: 'bench', sets: [{ type: 'weight', weight: 80, reps: 8, equipment: 'dumbbell' }] },
+        ],
+        readonly: true
+      }
+    });
+    expect(getByText(/80×8 DB/)).toBeInTheDocument();
+  });
 });
 
 describe('DaySplitsExercises — edit mode', () => {

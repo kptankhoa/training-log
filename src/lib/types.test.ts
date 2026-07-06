@@ -21,6 +21,13 @@ describe('formatSet', () => {
     expect(formatSet({ type: 'weight', weight: 60, reps: 8 })).toBe('60×8');
   });
 
+  it('formats a weight set with equipment as "weight×reps EQUIP"', () => {
+    expect(formatSet({ type: 'weight', weight: 60, reps: 8, equipment: 'barbell' })).toBe('60×8 BB');
+    expect(formatSet({ type: 'weight', weight: 60, reps: 8, equipment: 'dumbbell' })).toBe('60×8 DB');
+    expect(formatSet({ type: 'weight', weight: 60, reps: 8, equipment: 'cable' })).toBe('60×8 CB');
+    expect(formatSet({ type: 'weight', weight: 60, reps: 8, equipment: 'machine' })).toBe('60×8 MC');
+  });
+
   it('formats a legacy set with no type field the same as a weight set', () => {
     const legacySet: ExerciseSet = { weight: 60, reps: 8 };
     expect(formatSet(legacySet)).toBe('60×8');
