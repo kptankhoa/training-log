@@ -27,3 +27,6 @@ vite.config.ts.timestamp-*
 !.dev.vars.example
 
 *.build.log
+
+# Superpowers scratch (SDD progress ledger, brainstorming mockups)
+.superpowers/
