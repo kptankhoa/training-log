@@ -150,6 +150,35 @@ describe('Calendar', () => {
     expect(queryByText('Old Sport')).not.toBeInTheDocument();
   });
 
+  it("shows a corner ribbon on the cell matching a tag's latest subscription period end date", () => {
+    const tagsWithSub: TrainingTag[] = [
+      { id: 'tag1', name: 'Boxing', color: 'red', deleted: false, subscriptionPeriods: [{ startDate: '2026-06-01', endDate: '2026-06-15' }] },
+    ];
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags: tagsWithSub } });
+    const day15 = getByText('15', { exact: true }).closest('button');
+    const day14 = getByText('14', { exact: true }).closest('button');
+    expect(day15?.querySelector('[data-ending-count]')).not.toBeNull();
+    expect(day14?.querySelector('[data-ending-count]')).toBeNull();
+  });
+
+  it("shows data-ending-count of 2 when two tags' latest periods end on the same day", () => {
+    const tagsWithSub: TrainingTag[] = [
+      { id: 'tag1', name: 'Boxing', color: 'red', deleted: false, subscriptionPeriods: [{ startDate: '2026-06-01', endDate: '2026-06-15' }] },
+      { id: 'tag2', name: 'Weights', color: 'blue', deleted: false, subscriptionPeriods: [{ startDate: '2026-06-02', endDate: '2026-06-15' }] },
+    ];
+    const { getByText } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags: tagsWithSub } });
+    const day15 = getByText('15', { exact: true }).closest('button');
+    expect(day15?.querySelector('[data-ending-count]')?.getAttribute('data-ending-count')).toBe('2');
+  });
+
+  it('does not show a ribbon for an ongoing period with no end date', () => {
+    const tagsOngoing: TrainingTag[] = [
+      { id: 'tag1', name: 'Boxing', color: 'red', deleted: false, subscriptionPeriods: [{ startDate: '2026-06-01' }] },
+    ];
+    const { container } = render(Calendar, { props: { year: 2026, month: 6, days: {}, tags: tagsOngoing } });
+    expect(container.querySelector('[data-ending-count]')).toBeNull();
+  });
+
   it('shows split legend with labels and no count', () => {
     const splits = [
       { id: 'split1', label: 'Push Day', sortOrder: 1, content: '', color: 'blue' as const },

@@ -3,6 +3,7 @@
   import { fly } from 'svelte/transition';
   import { theme } from '$lib/stores/theme';
   import { gruvboxColors, icons, navColorClasses } from '$lib/theme';
+  import { getEndingColorsByDate } from '$lib/domain';
   import type { TrainingTag, Split, DayEntry } from '$lib/types';
 
   export let year: number;
@@ -19,6 +20,7 @@
 
   $: tagMap = Object.fromEntries(tags.map((t) => [t.id, t]));
   $: splitMap = Object.fromEntries(splits.map((s) => [s.id, s]));
+  $: endingColorsByDate = getEndingColorsByDate(tags);
 
   $: gridCells = (() => {
     const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun
@@ -71,7 +73,7 @@
 
   type CellData = { null: true } | {
     num: number; colors: string[]; splitColors: string[]; tagIds: string[]; label: string;
-    hasNote: boolean; hasPhotos: boolean; isToday: boolean;
+    hasNote: boolean; hasPhotos: boolean; isToday: boolean; endingColors: string[];
   };
 
   $: cellData = gridCells.map((cell): CellData => {
@@ -86,6 +88,7 @@
       hasNote: !!(entry?.note),
       hasPhotos: !!(entry?.photos?.length),
       isToday: key(cell) === todayKey,
+      endingColors: (endingColorsByDate[key(cell)] ?? []).map((c) => $gruvboxColors[c]),
     };
   });
 
@@ -186,7 +189,7 @@
               data-has-photos={cell.hasPhotos ? '' : undefined}
               data-today={cell.isToday ? '' : undefined}
               data-tag-match={selectedTagId && cell.tagIds.includes(selectedTagId) ? '' : undefined}
-              class="hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
+              class="relative hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
                      flex flex-col items-start gap-1 text-left
                      {cell.isToday ? 'bg-gb-light-bg1 dark:bg-gb-bg1' : 'bg-gb-light-bg dark:bg-gb-bg'}
                      {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
@@ -194,6 +197,13 @@
                 ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? ($theme === 'dark' ? '#ebdbb2' : '#3c3836')};`
                 : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#83a598' : '#076678'};` : ''}
             >
+              {#if cell.endingColors.length > 0}
+                <div class="absolute top-0 right-0 flex pointer-events-none" data-ending-count={cell.endingColors.length}>
+                  {#each cell.endingColors as color}
+                    <div style="width:0;height:0;border-style:solid;border-width:0 14px 14px 0;border-color:transparent {color} transparent transparent;"></div>
+                  {/each}
+                </div>
+              {/if}
               <span class="text-xs font-medium leading-none {cell.isToday ? navColorClasses('/calendar') : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
               <div class="flex items-center gap-1.5">
                 {#if cell.hasNote}
