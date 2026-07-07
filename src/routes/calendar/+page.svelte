@@ -7,6 +7,7 @@
   import { splits } from '$lib/stores/splits';
   import { computeStreaks } from '$lib/domain';
   import Calendar from '$lib/components/calendar/Calendar.svelte';
+  import SubscriptionReminders from '$lib/components/calendar/SubscriptionReminders.svelte';
   import DayModal from '$lib/components/day-detail/DayModal.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
 
@@ -39,6 +40,7 @@
   {#if $tagsLoading || $daysLoading}
     <Spinner />
   {:else}
+    <SubscriptionReminders tags={$tags} {userId} />
     <Calendar
       year={viewYear}
       month={viewMonth}
