@@ -38,6 +38,7 @@
   }
 
   function updateField(index: number, field: 'startDate' | 'endDate' | 'note', value: string) {
+    if (field === 'startDate' && !value.trim()) return;
     const next = periods.map((p, i) => {
       if (i !== index) return p;
       if (field === 'startDate') return { ...p, startDate: value };

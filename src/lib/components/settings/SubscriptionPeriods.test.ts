@@ -56,6 +56,13 @@ describe('SubscriptionPeriods', () => {
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
+  it("does not save when an existing period's start date is cleared", async () => {
+    const tag = baseTag({ subscriptionPeriods: [{ startDate: '2026-01-01', endDate: '2026-03-31' }] });
+    const { getByDisplayValue } = render(SubscriptionPeriods, { props: { tag, userId: 'user1' } });
+    await fireEvent.change(getByDisplayValue('2026-01-01'), { target: { value: '' } });
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
   it("editing an existing period's end date calls the store with the new value and clears dismissed", async () => {
     const tag = baseTag({ subscriptionPeriods: [{ startDate: '2026-01-01', endDate: '2026-03-31', dismissed: true }] });
     const { getByDisplayValue } = render(SubscriptionPeriods, { props: { tag, userId: 'user1' } });
