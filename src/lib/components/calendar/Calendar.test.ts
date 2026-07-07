@@ -275,4 +275,73 @@ describe('Calendar', () => {
       expect(getByTestId('next-month-count').textContent).toBe('1');
     });
   });
+
+  describe('wheel scroll', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('a downward wheel scroll past the threshold dispatches nextMonth', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: 60 });
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+    });
+
+    it('an upward wheel scroll past the threshold dispatches prevMonth', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: -60 });
+      expect(getByTestId('prev-month-count').textContent).toBe('1');
+    });
+
+    it('a wheel event below the threshold does not switch months', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: 20 });
+      expect(getByTestId('next-month-count').textContent).toBe('0');
+      expect(getByTestId('prev-month-count').textContent).toBe('0');
+    });
+
+    it('accumulates deltaY across multiple wheel events until crossing the threshold', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: 30 });
+      expect(getByTestId('next-month-count').textContent).toBe('0');
+      await fireEvent.wheel(grid, { deltaY: 30 });
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+    });
+
+    it('ignores further wheel input during the post-dispatch cooldown', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: 60 });
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+      await fireEvent.wheel(grid, { deltaY: 60 });
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+    });
+
+    it('accepts wheel input again once the cooldown expires (500ms)', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      await fireEvent.wheel(grid, { deltaY: 60 });
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+      await vi.advanceTimersByTimeAsync(500);
+      await fireEvent.wheel(grid, { deltaY: 60 });
+      expect(getByTestId('next-month-count').textContent).toBe('2');
+    });
+
+    it('calls preventDefault on every wheel event over the grid so the page itself never scrolls', async () => {
+      const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
+      const grid = getByTestId('calendar-grid');
+      const event = new WheelEvent('wheel', { deltaY: 10, cancelable: true, bubbles: true });
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+      await fireEvent(grid, event);
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+  });
 });

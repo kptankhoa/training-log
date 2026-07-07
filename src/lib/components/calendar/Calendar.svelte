@@ -101,6 +101,24 @@
   let touchStartX = 0;
   let touchStartY = 0;
 
+  const WHEEL_THRESHOLD = 50;
+  const WHEEL_COOLDOWN_MS = 500;
+  let wheelDelta = 0;
+  let wheelLocked = false;
+
+  function handleWheel(e: WheelEvent) {
+    e.preventDefault();
+    if (isTransitioning || wheelLocked) return;
+
+    wheelDelta += e.deltaY;
+    if (Math.abs(wheelDelta) < WHEEL_THRESHOLD) return;
+
+    dispatch(wheelDelta > 0 ? 'nextMonth' : 'prevMonth');
+    wheelDelta = 0;
+    wheelLocked = true;
+    setTimeout(() => { wheelLocked = false; }, WHEEL_COOLDOWN_MS);
+  }
+
   function handleTouchStart(e: TouchEvent) {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
@@ -145,6 +163,7 @@
         class="absolute inset-0 grid grid-cols-7 gap-px bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg2 dark:border-gb-bg2 rounded-lg overflow-hidden"
         on:touchstart={handleTouchStart}
         on:touchend={handleTouchEnd}
+        on:wheel={handleWheel}
         in:fly={{ x: `${direction * 100}%`, duration: mounted ? 250 : 0 }}
         out:fly={{ x: `${-direction * 100}%`, duration: mounted ? 250 : 0 }}
       >
