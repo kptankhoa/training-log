@@ -1,10 +1,18 @@
 export type GruvboxColor = 'red' | 'green' | 'yellow' | 'blue' | 'purple' | 'aqua' | 'orange';
 
+export interface SubscriptionPeriod {
+  startDate: string;    // YYYY-MM-DD
+  endDate?: string;     // YYYY-MM-DD; undefined = ongoing, end not known yet
+  note?: string;        // freeform: gym/location, price, etc.
+  dismissed?: boolean;  // reminder banner dismissed for this period
+}
+
 export interface TrainingTag {
   id: string;
   name: string;
   color: GruvboxColor;
   deleted: boolean;
+  subscriptionPeriods?: SubscriptionPeriod[];
 }
 
 export interface DayEntry {

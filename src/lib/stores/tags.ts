@@ -2,7 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { db } from '$lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { nextColor } from '$lib/theme';
-import type { TrainingTag, GruvboxColor } from '$lib/types';
+import type { TrainingTag, GruvboxColor, SubscriptionPeriod } from '$lib/types';
 
 const _tags = writable<TrainingTag[]>([]);
 const _tagsLoading = writable<boolean>(true);
@@ -30,4 +30,12 @@ export async function deleteTag(userId: string, tagId: string): Promise<void> {
 
 export async function updateTagColor(userId: string, tagId: string, color: GruvboxColor): Promise<void> {
   await updateDoc(doc(db, 'users', userId, 'tags', tagId), { color });
+}
+
+export async function updateTagSubscriptionPeriods(
+  userId: string,
+  tagId: string,
+  periods: SubscriptionPeriod[]
+): Promise<void> {
+  await updateDoc(doc(db, 'users', userId, 'tags', tagId), { subscriptionPeriods: periods });
 }

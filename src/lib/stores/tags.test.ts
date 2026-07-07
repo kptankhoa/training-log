@@ -83,4 +83,12 @@ describe('tags store', () => {
     await updateTagColor('user1', 'tag1', 'purple');
     expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { color: 'purple' });
   });
+
+  it('updateTagSubscriptionPeriods calls updateDoc with the given periods array', async () => {
+    mockOnSnapshot.mockImplementation((_q, cb) => { cb({ docs: [] }); return () => {}; });
+    const { updateTagSubscriptionPeriods } = await import('./tags');
+    const periods = [{ startDate: '2026-01-01', endDate: '2026-03-31' }];
+    await updateTagSubscriptionPeriods('user1', 'tag1', periods);
+    expect(mockUpdateDoc).toHaveBeenCalledWith(expect.anything(), { subscriptionPeriods: periods });
+  });
 });
