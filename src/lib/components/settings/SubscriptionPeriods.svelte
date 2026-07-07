@@ -73,7 +73,7 @@
           <div class="flex items-center gap-2">
             <input
               type="date"
-              aria-label="Start date"
+              aria-label="Start date for period starting {periods[index].startDate}"
               value={periods[index].startDate}
               on:change={(e) => updateField(index, 'startDate', e.currentTarget.value)}
               class="bg-gb-light-bg1 dark:bg-gb-bg1 text-gb-light-fg dark:text-gb-fg text-sm px-2 py-1 border border-gb-light-bg3 dark:border-gb-bg3 focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue"
@@ -81,7 +81,7 @@
             <span class="text-gb-light-fg3 dark:text-gb-fg3 text-xs">&rarr;</span>
             <input
               type="date"
-              aria-label="End date (blank = ongoing)"
+              aria-label="End date (blank = ongoing) for period starting {periods[index].startDate}"
               value={periods[index].endDate ?? ''}
               on:change={(e) => updateField(index, 'endDate', e.currentTarget.value)}
               class="bg-gb-light-bg1 dark:bg-gb-bg1 text-gb-light-fg dark:text-gb-fg text-sm px-2 py-1 border border-gb-light-bg3 dark:border-gb-bg3 focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue"
@@ -89,14 +89,16 @@
             <button
               type="button"
               on:click={() => handleDeleteClick(index)}
-              aria-label={confirmingIndex === index ? 'Confirm delete period' : 'Delete period'}
+              aria-label={confirmingIndex === index
+                ? `Confirm delete period starting ${periods[index].startDate}`
+                : `Delete period starting ${periods[index].startDate}`}
               class="text-xs font-medium px-2 py-1 transition-colors shrink-0
                      {confirmingIndex === index ? 'text-white bg-gb-light-red dark:bg-gb-red' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red'}"
             >{confirmingIndex === index ? 'Confirm?' : '✕'}</button>
           </div>
           <input
             type="text"
-            aria-label="Note"
+            aria-label="Note for period starting {periods[index].startDate}"
             placeholder="Gym / location / price"
             value={periods[index].note ?? ''}
             on:change={(e) => updateField(index, 'note', e.currentTarget.value)}

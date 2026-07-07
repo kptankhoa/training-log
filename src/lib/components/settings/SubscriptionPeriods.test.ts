@@ -83,15 +83,30 @@ describe('SubscriptionPeriods', () => {
   it('clicking delete twice removes the period', async () => {
     const tag = baseTag({ subscriptionPeriods: [{ startDate: '2026-01-01', endDate: '2026-03-31' }] });
     const { getByLabelText } = render(SubscriptionPeriods, { props: { tag, userId: 'user1' } });
-    await fireEvent.click(getByLabelText('Delete period'));
-    await fireEvent.click(getByLabelText('Confirm delete period'));
+    await fireEvent.click(getByLabelText('Delete period starting 2026-01-01'));
+    await fireEvent.click(getByLabelText('Confirm delete period starting 2026-01-01'));
     expect(mockUpdate).toHaveBeenCalledWith('user1', 'tag1', []);
   });
 
   it('a single click on delete does not remove the period yet', async () => {
     const tag = baseTag({ subscriptionPeriods: [{ startDate: '2026-01-01', endDate: '2026-03-31' }] });
     const { getByLabelText } = render(SubscriptionPeriods, { props: { tag, userId: 'user1' } });
-    await fireEvent.click(getByLabelText('Delete period'));
+    await fireEvent.click(getByLabelText('Delete period starting 2026-01-01'));
     expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('gives delete buttons distinct labels when a tag has multiple periods, so they can be targeted independently', async () => {
+    const tag = baseTag({
+      subscriptionPeriods: [
+        { startDate: '2026-01-01', endDate: '2026-03-31' },
+        { startDate: '2026-04-01', endDate: '2026-06-30' },
+      ],
+    });
+    const { getByLabelText } = render(SubscriptionPeriods, { props: { tag, userId: 'user1' } });
+    await fireEvent.click(getByLabelText('Delete period starting 2026-04-01'));
+    await fireEvent.click(getByLabelText('Confirm delete period starting 2026-04-01'));
+    expect(mockUpdate).toHaveBeenCalledWith('user1', 'tag1', [
+      { startDate: '2026-01-01', endDate: '2026-03-31' },
+    ]);
   });
 });
