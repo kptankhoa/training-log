@@ -111,8 +111,8 @@
   let touchStartX = 0;
   let touchStartY = 0;
 
-  const WHEEL_THRESHOLD = 50;
-  const WHEEL_COOLDOWN_MS = 500;
+  const WHEEL_THRESHOLD = 15;
+  const WHEEL_COOLDOWN_MS = 200;
   let wheelDelta = 0;
   let wheelLocked = false;
 
