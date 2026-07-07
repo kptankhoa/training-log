@@ -18,6 +18,7 @@
   import { icons, gruvboxColors, COLOR_ORDER, navColorClasses, navBorderClass, navTextClass } from '$lib/theme';
   import { showError } from '$lib/stores/toast';
   import Spinner from '$lib/components/shared/Spinner.svelte';
+  import SubscriptionPeriods from '$lib/components/settings/SubscriptionPeriods.svelte';
   import type { Exercise, GruvboxColor, ExerciseType } from '$lib/types';
 
   $: userId = $user?.uid ?? '';
@@ -29,6 +30,11 @@
   let restTimerSoundExpanded = false;
 
   let expandedExerciseId: string | null = null;
+  let expandedTagId: string | null = null;
+
+  function toggleTagExpand(tagId: string) {
+    expandedTagId = expandedTagId === tagId ? null : tagId;
+  }
 
   const EXERCISE_TYPES: { value: ExerciseType; label: string }[] = [
     { value: 'weight', label: 'Weight' },
@@ -183,22 +189,36 @@
         {:else}
           <ul class="flex flex-col gap-2">
             {#each $activeTags as tag (tag.id)}
-              <li class="flex items-center gap-3 bg-gb-light-bg1 dark:bg-gb-bg1 px-4 py-3">
-                <button
-                  type="button"
-                  on:click={() => cycleColor(tag.id, tag.color)}
-                  style="background-color: {$gruvboxColors[tag.color]}"
-                  class="w-5 h-5 shrink-0 border-2 border-gb-light-bg3 dark:border-gb-bg3 hover:scale-110 transition-transform"
-                  title="Click to change color"
-                ></button>
-                <span class="flex-1 text-gb-light-fg dark:text-gb-fg text-sm">{tag.name}</span>
-                <button
-                  type="button"
-                  on:click={() => handleDeleteTagClick(tag.id)}
-                  aria-label={confirmingTagId === tag.id ? `Confirm delete ${tag.name}` : `Delete ${tag.name}`}
-                  class="text-xs font-medium px-2 py-1 transition-colors shrink-0
-                         {confirmingTagId === tag.id ? 'text-white bg-gb-light-red dark:bg-gb-red' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red'}"
-                >{confirmingTagId === tag.id ? 'Confirm?' : '✕'}</button>
+              <li class="flex flex-col bg-gb-light-bg1 dark:bg-gb-bg1">
+                <div class="flex items-center gap-3 px-4 py-3">
+                  <button
+                    type="button"
+                    on:click={() => cycleColor(tag.id, tag.color)}
+                    style="background-color: {$gruvboxColors[tag.color]}"
+                    class="w-5 h-5 shrink-0 border-2 border-gb-light-bg3 dark:border-gb-bg3 hover:scale-110 transition-transform"
+                    title="Click to change color"
+                  ></button>
+                  <span class="flex-1 text-gb-light-fg dark:text-gb-fg text-sm">{tag.name}</span>
+                  <button
+                    type="button"
+                    on:click={() => toggleTagExpand(tag.id)}
+                    aria-label="Manage subscription for {tag.name}"
+                    aria-expanded={expandedTagId === tag.id}
+                    class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-blue dark:hover:text-gb-blue transition-colors shrink-0"
+                  >{@html icons.calendar}</button>
+                  <button
+                    type="button"
+                    on:click={() => handleDeleteTagClick(tag.id)}
+                    aria-label={confirmingTagId === tag.id ? `Confirm delete ${tag.name}` : `Delete ${tag.name}`}
+                    class="text-xs font-medium px-2 py-1 transition-colors shrink-0
+                           {confirmingTagId === tag.id ? 'text-white bg-gb-light-red dark:bg-gb-red' : 'text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red'}"
+                  >{confirmingTagId === tag.id ? 'Confirm?' : '✕'}</button>
+                </div>
+                {#if expandedTagId === tag.id}
+                  <div transition:slide={{ duration: 200 }}>
+                    <SubscriptionPeriods {tag} {userId} />
+                  </div>
+                {/if}
               </li>
             {/each}
           </ul>
