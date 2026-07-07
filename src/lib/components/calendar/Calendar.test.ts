@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import Calendar from './Calendar.svelte';
 import CalendarTest from './CalendarTest.svelte';
@@ -226,5 +226,53 @@ describe('Calendar', () => {
     await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 160, clientY: 250 }] });
     expect(getByTestId('next-month-count').textContent).toBe('0');
     expect(getByTestId('prev-month-count').textContent).toBe('0');
+  });
+
+  describe('month transition guard', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('ignores a second next-month click fired immediately after the first (mid-transition)', async () => {
+      const { getByLabelText, getByTestId } = render(CalendarTest, {
+        props: { year: 2026, month: 6, days: {}, tags: [] }
+      });
+      const nextBtn = getByLabelText('Next month');
+      await fireEvent.click(nextBtn);
+      await fireEvent.click(nextBtn);
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+    });
+
+    it('accepts a next-month click again once the transition settles (250ms)', async () => {
+      const { getByLabelText, getByTestId } = render(CalendarTest, {
+        props: { year: 2026, month: 6, days: {}, tags: [] }
+      });
+      const nextBtn = getByLabelText('Next month');
+      await fireEvent.click(nextBtn);
+      await vi.advanceTimersByTimeAsync(250);
+      await fireEvent.click(nextBtn);
+      expect(getByTestId('next-month-count').textContent).toBe('2');
+    });
+
+    it('ignores a swipe fired during an active transition triggered by a button click', async () => {
+      const { getByLabelText, getAllByTestId, getByTestId } = render(CalendarTest, {
+        props: { year: 2026, month: 6, days: {}, tags: [] }
+      });
+      await fireEvent.click(getByLabelText('Next month'));
+
+      // Mid-transition, both the outgoing (June) and incoming (July) grid
+      // elements exist in the DOM at once (Svelte keeps an out:transitioning
+      // element mounted until its animation finishes) — target the newest one.
+      const grids = getAllByTestId('calendar-grid');
+      const grid = grids[grids.length - 1];
+      await fireEvent.touchStart(grid, { touches: [{ clientX: 200, clientY: 100 }] });
+      await fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 100, clientY: 100 }] });
+
+      expect(getByTestId('next-month-count').textContent).toBe('1');
+    });
   });
 });

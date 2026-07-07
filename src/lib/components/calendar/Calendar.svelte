@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
   import { gruvboxColors } from '$lib/gruvbox';
   import { theme } from '$lib/stores/theme';
   import { icons } from '$lib/icons';
@@ -32,6 +33,26 @@
       ...Array(tailing).fill(null)
     ] as (number | null)[];
   })();
+
+  $: rows = gridCells.length / 7;
+
+  let mounted = false;
+  onMount(() => { mounted = true; });
+
+  let prevOrdinal = year * 12 + month;
+  let direction = 1; // 1 = forward (new month enters from the right), -1 = backward
+
+  let isTransitioning = false;
+
+  $: {
+    const ordinal = year * 12 + month;
+    if (ordinal !== prevOrdinal) {
+      direction = ordinal > prevOrdinal ? 1 : -1;
+      prevOrdinal = ordinal;
+      isTransitioning = true;
+      setTimeout(() => { isTransitioning = false; }, 250);
+    }
+  }
 
   function key(d: number) {
     return `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -86,6 +107,7 @@
   }
 
   function handleTouchEnd(e: TouchEvent) {
+    if (isTransitioning) return;
     const touch = e.changedTouches[0];
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
@@ -102,10 +124,10 @@
 
 <div class="select-none">
   <div class="flex items-center justify-between mb-3 px-1">
-    <button aria-label="Previous month" on:click={() => dispatch('prevMonth')}
+    <button aria-label="Previous month" on:click={() => { if (!isTransitioning) dispatch('prevMonth'); }}
       class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">‹</button>
     <h2 class="font-semibold text-lg {navColorClasses('/calendar')}">{MONTHS[month - 1]} {year}</h2>
-    <button aria-label="Next month" on:click={() => dispatch('nextMonth')}
+    <button aria-label="Next month" on:click={() => { if (!isTransitioning) dispatch('nextMonth'); }}
       class="text-gb-light-fg2 dark:text-gb-fg2 hover:text-gb-light-fg dark:hover:text-gb-fg px-2 py-1 rounded hover:bg-gb-light-bg2 dark:hover:bg-gb-bg2 transition text-xl leading-none">›</button>
   </div>
 
@@ -115,61 +137,67 @@
     {/each}
   </div>
 
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    data-testid="calendar-grid"
-    class="grid grid-cols-7 gap-px bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg2 dark:border-gb-bg2 rounded-lg overflow-hidden"
-    on:touchstart={handleTouchStart}
-    on:touchend={handleTouchEnd}
-  >
-    {#each cellData as cell}
-      {#if 'null' in cell}
-        <div class="bg-gb-light-bg3 dark:bg-gb-bg3 min-h-[4.5rem]"></div>
-      {:else}
-        <button
-          type="button"
-          on:click={() => dispatch('selectDay', key(cell.num))}
-          data-has-note={cell.hasNote ? '' : undefined}
-          data-has-photos={cell.hasPhotos ? '' : undefined}
-          data-today={cell.isToday ? '' : undefined}
-          data-tag-match={selectedTagId && cell.tagIds.includes(selectedTagId) ? '' : undefined}
-          class="hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
-                 flex flex-col items-start gap-1 text-left
-                 {cell.isToday ? 'bg-gb-light-bg1 dark:bg-gb-bg1' : 'bg-gb-light-bg dark:bg-gb-bg'}
-                 {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
-          style={selectedTagId && cell.tagIds.includes(selectedTagId)
-            ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? ($theme === 'dark' ? '#ebdbb2' : '#3c3836')};`
-            : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#83a598' : '#076678'};` : ''}
-        >
-          <span class="text-xs font-medium leading-none {cell.isToday ? navColorClasses('/calendar') : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
-          <div class="flex items-center gap-1.5">
-            {#if cell.hasNote}
-              <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
-            {/if}
-            {#if cell.hasPhotos}
-              <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
-            {/if}
-          </div>
+  <div class="relative overflow-hidden" style="height: {rows * 4.5}rem">
+    {#key `${year}-${month}`}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        data-testid="calendar-grid"
+        class="absolute inset-0 grid grid-cols-7 gap-px bg-gb-light-bg2 dark:bg-gb-bg2 border border-gb-light-bg2 dark:border-gb-bg2 rounded-lg overflow-hidden"
+        on:touchstart={handleTouchStart}
+        on:touchend={handleTouchEnd}
+        in:fly={{ x: `${direction * 100}%`, duration: mounted ? 250 : 0 }}
+        out:fly={{ x: `${-direction * 100}%`, duration: mounted ? 250 : 0 }}
+      >
+        {#each cellData as cell}
+          {#if 'null' in cell}
+            <div class="bg-gb-light-bg3 dark:bg-gb-bg3 min-h-[4.5rem]"></div>
+          {:else}
+            <button
+              type="button"
+              on:click={() => dispatch('selectDay', key(cell.num))}
+              data-has-note={cell.hasNote ? '' : undefined}
+              data-has-photos={cell.hasPhotos ? '' : undefined}
+              data-today={cell.isToday ? '' : undefined}
+              data-tag-match={selectedTagId && cell.tagIds.includes(selectedTagId) ? '' : undefined}
+              class="hover:bg-gb-light-bg1 dark:hover:bg-gb-bg1 transition min-h-[4.5rem] p-1.5
+                     flex flex-col items-start gap-1 text-left
+                     {cell.isToday ? 'bg-gb-light-bg1 dark:bg-gb-bg1' : 'bg-gb-light-bg dark:bg-gb-bg'}
+                     {selectedTagId && !cell.tagIds.includes(selectedTagId) ? 'opacity-30' : ''}"
+              style={selectedTagId && cell.tagIds.includes(selectedTagId)
+                ? `box-shadow: inset 0 0 0 2px ${getSelectedIdColor() ?? ($theme === 'dark' ? '#ebdbb2' : '#3c3836')};`
+                : cell.isToday ? `box-shadow: inset 0 0 0 1px ${$theme === 'dark' ? '#83a598' : '#076678'};` : ''}
+            >
+              <span class="text-xs font-medium leading-none {cell.isToday ? navColorClasses('/calendar') : 'text-gb-light-fg2 dark:text-gb-fg2'}">{cell.num}</span>
+              <div class="flex items-center gap-1.5">
+                {#if cell.hasNote}
+                  <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has note">{@html icons.noteSm}</span>
+                {/if}
+                {#if cell.hasPhotos}
+                  <span class="text-gb-light-fg3 dark:text-gb-fg3 shrink-0" title="Has photos">{@html icons.cameraSm}</span>
+                {/if}
+              </div>
 
-          {#if cell.label}
-            <span class="text-[10px] text-gb-light-fg3 dark:text-gb-fg3 leading-tight truncate w-full">{cell.label}</span>
+              {#if cell.label}
+                <span class="text-[10px] text-gb-light-fg3 dark:text-gb-fg3 leading-tight truncate w-full">{cell.label}</span>
+              {/if}
+
+              <div class="flex items-center justify-between w-full mt-auto">
+                <div class="flex flex-wrap gap-0.5">
+                  {#each cell.colors as color}
+                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
+                  {/each}
+                </div>
+                <div class="flex flex-wrap gap-0.5">
+                  {#each cell.splitColors as color}
+                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
+                  {/each}
+                </div>
+              </div>
+            </button>
           {/if}
-
-          <div class="flex items-center justify-between w-full mt-auto">
-            <div class="flex flex-wrap gap-0.5">
-              {#each cell.colors as color}
-                <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
-              {/each}
-            </div>
-            <div class="flex flex-wrap gap-0.5">
-              {#each cell.splitColors as color}
-                <span class="w-2 h-2 rounded-full shrink-0" style="background-color:{color}"></span>
-              {/each}
-            </div>
-          </div>
-        </button>
-      {/if}
-    {/each}
+        {/each}
+      </div>
+    {/key}
   </div>
 
   {#if tags.filter((t) => !t.deleted).length > 0}
