@@ -18,8 +18,8 @@ A personal training log — a mobile-first SvelteKit SPA for tracking workouts, 
 
 - **SvelteKit 2** (adapter-cloudflare, `ssr = false` / `prerender = false` in `src/routes/+layout.ts` — this is a pure client-side SPA)
 - **Svelte 5 legacy component syntax** everywhere (`export let`, `on:click`, `$:` reactive statements, `createEventDispatcher`) — not runes mode
-- **Firebase**: Auth (Google Sign-In), Firestore (with offline persistence enabled via `persistentLocalCache` in `src/lib/firebase.ts`), Storage (progress photos)
-- **Tailwind CSS** with a Gruvbox Dark palette (`src/lib/gruvbox.ts`, `text-gb-*`/`bg-gb-*` utility classes)
+- **Firebase**: Auth (Google Sign-In), Firestore (with offline persistence enabled via `persistentLocalCache` in `src/lib/firebase/index.ts`), Storage (progress photos)
+- **Tailwind CSS** with a Gruvbox Dark palette (`src/lib/theme/gruvbox.ts`, `text-gb-*`/`bg-gb-*` utility classes)
 - **Chart.js** (via `LineChart.svelte`) for the Metrics chart
 - **Vitest + @testing-library/svelte** for tests
 - Deployed to **Cloudflare Pages** (`wrangler.jsonc`)
@@ -37,6 +37,10 @@ A personal training log — a mobile-first SvelteKit SPA for tracking workouts, 
 
 Every Firestore-backed store in `src/lib/stores/` follows the same shape: a writable + a `*Loading` writable, an `init*(userId)` function that returns an `onSnapshot` unsubscribe, and plain async `save*`/`add*`/`delete*` functions. Stores shared across multiple pages (`tags`, `days`, `tasks`, `exercises`, `splits`, `generalRules`) are subscribed **once**, in `src/routes/+layout.svelte`'s `onMount`, keyed off the `user` store — not per-page. This was a deliberate fix for redundant re-reads; don't add per-page `onMount` subscriptions for these stores. Page-specific stores (`measurements`, `bodyMeasurements`) still subscribe in their own page/component.
 
+### `src/lib/` top-level structure
+
+`src/lib/` has no loose files at its top level — everything lives in a folder. Single-purpose foundational modules with no natural sibling get a folder of their own named after themselves, with the module at `index.ts` (`types/index.ts`, `firebase/index.ts`) — this is a plain Vite/SvelteKit directory-index resolution, so `$lib/types` and `$lib/firebase` keep working as import paths unchanged, no different from importing a file directly. Modules that do share a theme get grouped together with a barrel `index.ts` re-exporting the group, so callers import from the folder rather than reaching into a specific file: `theme/` (`gruvbox.ts`, `navColors.ts`, `icons.ts` — styling/presentation helpers used across many components) and `domain/` (`streaks.ts`, `exerciseHistory.ts` — pure calculation helpers with no UI or Firestore dependency). Prefer `import { gruvboxColors, icons } from '$lib/theme'` over reaching into `$lib/theme/gruvbox` directly; add a new file to an existing barrel's `export *` line when it belongs there, rather than deep-importing around it.
+
 ### Component folder structure
 
 `src/lib/components/` is grouped by feature, not flat: `day-detail/` (DayDetail and everything it composes — DayDetailView, DayDetailEditForm, DayPhotos, DayTagsField, DaySplitsExercises, DayModal, ExerciseEditor, TagChip), `calendar/`, `stats/`, `shared/` (FormField, MarkdownEditor, Spinner — used from multiple feature folders), `shell/` (Sidebar). No per-component subfolders — components already share a name prefix with their test/wrapper file, so a flat feature folder keeps them adjacent without adding directory depth. When adding a component, put it in the feature folder it belongs to; only promote something to `shared/` once a second, unrelated feature actually needs it.
@@ -53,7 +57,7 @@ Firestore writes are fire-and-forget from the UI's perspective (offline persiste
 
 ### Exercise types
 
-`Exercise` has an optional `type?: ExerciseType` (`'weight' | 'bodyweight' | 'time'`, undefined = legacy/`'weight'`), plus `equipment?: Equipment` (`'barbell' | 'dumbbell' | 'cable' | 'machine'`) and `singleArm?: boolean` — both only meaningful when type is `'weight'`. `ExerciseSet` (`src/lib/types.ts`) is a discriminated union on `type`, deliberately optional **only** on the `weight` variant (`{ type?: 'weight'; weight: number; reps: number } | { type: 'bodyweight'; reps: number } | { type: 'time'; seconds: number }`) so every pre-existing bare `{weight, reps}` literal across the codebase (including test fixtures — `svelte-check` type-checks `.test.ts` files too) remains valid without edits. Use `resolveSetType(set)` / `formatSet(set)` from `types.ts` rather than reading `set.type` or a numeric field directly — `formatSet` renders `20×8` (weight/legacy), `×20` (bodyweight), `45s` (time), with no unit suffix.
+`Exercise` has an optional `type?: ExerciseType` (`'weight' | 'bodyweight' | 'time'`, undefined = legacy/`'weight'`), plus `equipment?: Equipment` (`'barbell' | 'dumbbell' | 'cable' | 'machine'`) and `singleArm?: boolean` — both only meaningful when type is `'weight'`. `ExerciseSet` (`src/lib/types/index.ts`) is a discriminated union on `type`, deliberately optional **only** on the `weight` variant (`{ type?: 'weight'; weight: number; reps: number } | { type: 'bodyweight'; reps: number } | { type: 'time'; seconds: number }`) so every pre-existing bare `{weight, reps}` literal across the codebase (including test fixtures — `svelte-check` type-checks `.test.ts` files too) remains valid without edits. Use `resolveSetType(set)` / `formatSet(set)` from `types.ts` rather than reading `set.type` or a numeric field directly — `formatSet` renders `20×8` (weight/legacy), `×20` (bodyweight), `45s` (time), with no unit suffix.
 
 A set's type is fixed forever once logged (no in-place editing — delete and re-log to change it); changing an exercise's *current* type in Settings only affects sets logged after the change, since the logging UI (`ExerciseEditor.svelte`) always reads the exercise's type from the catalog, never from an already-logged set. There is no Firestore migration for legacy data — everything resolves via `?? 'weight'` fallbacks at read time.
 

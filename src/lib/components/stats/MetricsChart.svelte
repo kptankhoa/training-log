@@ -4,7 +4,7 @@
   import LineChart from './LineChart.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import FormField from '$lib/components/shared/FormField.svelte';
-  import { navBorderClass, navTextClass } from '$lib/navColors';
+  import { navBorderClass, navTextClass } from '$lib/theme';
   import { showError } from '$lib/stores/toast';
   import type { BodyMeasurement } from '$lib/types';
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSetType, formatSet, type ExerciseSet } from './types';
+import { resolveSetType, formatSet, type ExerciseSet } from './index';
 
 describe('resolveSetType', () => {
   it('returns the type field when present', () => {

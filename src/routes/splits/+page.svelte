@@ -4,9 +4,7 @@
   import { splits, splitsLoading, addSplit, saveSplit, deleteSplit } from '$lib/stores/splits';
   import { activeExercises, updateExerciseSplits } from '$lib/stores/exercises';
   import { generalRules, generalRulesLoading, saveGeneralRules } from '$lib/stores/generalRules';
-  import { icons } from '$lib/icons';
-  import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
-  import { navColorClasses } from '$lib/navColors';
+  import { icons, gruvboxColors, COLOR_ORDER, navColorClasses } from '$lib/theme';
   import { showError } from '$lib/stores/toast';
   import MarkdownEditor from '$lib/components/shared/MarkdownEditor.svelte';
   import Spinner from '$lib/components/shared/Spinner.svelte';

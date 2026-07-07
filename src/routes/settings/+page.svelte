@@ -1,7 +1,6 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
   import { user, signOut } from '$lib/stores/auth';
-  import { icons } from '$lib/icons';
   import { activeTags, tagsLoading, addTag, deleteTag, updateTagColor } from '$lib/stores/tags';
   import { activeTasks, tasksLoading, addTask, deleteTask } from '$lib/stores/tasks';
   import {
@@ -16,8 +15,7 @@
   import { splits } from '$lib/stores/splits';
   import { theme, setTheme } from '$lib/stores/theme';
   import { restTimerSound, setRestTimerSound, playRestTimerSound, SOUND_OPTIONS, type RestTimerSound } from '$lib/stores/restTimerSound';
-  import { gruvboxColors, COLOR_ORDER } from '$lib/gruvbox';
-  import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
+  import { icons, gruvboxColors, COLOR_ORDER, navColorClasses, navBorderClass, navTextClass } from '$lib/theme';
   import { showError } from '$lib/stores/toast';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import type { Exercise, GruvboxColor, ExerciseType } from '$lib/types';

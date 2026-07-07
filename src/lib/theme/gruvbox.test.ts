@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { get } from 'svelte/store';
 import { nextColor } from './gruvbox';
-import type { GruvboxColor } from './types';
+import type { GruvboxColor } from '../types';
 
 describe('nextColor', () => {
   it('returns red when no colors are used', () => {
@@ -25,7 +25,7 @@ describe('nextColor', () => {
 });
 
 const mocks = vi.hoisted(() => ({ theme: 'dark' as 'dark' | 'light' }));
-vi.mock('./stores/theme', () => ({
+vi.mock('../stores/theme', () => ({
   theme: { subscribe: (cb: (v: 'dark' | 'light') => void) => { cb(mocks.theme); return () => {}; } }
 }));
 

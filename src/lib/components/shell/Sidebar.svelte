@@ -1,9 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { signOut } from '$lib/stores/auth';
-  import { icons } from '$lib/icons';
+  import { icons, navColorClasses } from '$lib/theme';
   import { heading } from '$lib/decorators/heading';
-  import { navColorClasses } from '$lib/navColors';
   import { showError } from '$lib/stores/toast';
 
   function handleSignOut() {

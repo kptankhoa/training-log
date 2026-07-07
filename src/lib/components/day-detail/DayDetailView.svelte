@@ -4,7 +4,7 @@
   import DayTagsField from './DayTagsField.svelte';
   import DaySplitsExercises from './DaySplitsExercises.svelte';
   import DayPhotos from './DayPhotos.svelte';
-  import { icons } from '$lib/icons';
+  import { icons } from '$lib/theme';
   import type { TrainingTag, DailyTask, Exercise, ExerciseEntry, Split } from '$lib/types';
 
   export let activeTags: TrainingTag[];

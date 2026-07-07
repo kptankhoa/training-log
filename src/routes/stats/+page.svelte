@@ -4,7 +4,7 @@
   import MetricsChart from '$lib/components/stats/MetricsChart.svelte';
   import MeasurementsTable from '$lib/components/stats/MeasurementsTable.svelte';
   import PhotoTimeline from '$lib/components/stats/PhotoTimeline.svelte';
-  import { navColorClasses, navBorderClass, navTextClass } from '$lib/navColors';
+  import { navColorClasses, navBorderClass, navTextClass } from '$lib/theme';
 
   $: userId = $user?.uid ?? '';
 

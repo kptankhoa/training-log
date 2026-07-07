@@ -1,7 +1,7 @@
 <script lang="ts">
   import TagChip from './TagChip.svelte';
   import { addTag } from '$lib/stores/tags';
-  import { gruvboxColors } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/theme';
   import { showError } from '$lib/stores/toast';
   import type { TrainingTag } from '$lib/types';
 

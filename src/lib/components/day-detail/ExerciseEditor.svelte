@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { holdRepeat } from '$lib/actions/holdRepeat';
   import { addExercise } from '$lib/stores/exercises';
-  import { getLastLoggedSet, getLastSessionExercises } from '$lib/exerciseHistory';
+  import { getLastLoggedSet, getLastSessionExercises } from '$lib/domain';
   import { showError } from '$lib/stores/toast';
   import { formatSet } from '$lib/types';
   import type { Exercise, ExerciseEntry, ExerciseSet, ExerciseType, Equipment, DayEntry } from '$lib/types';

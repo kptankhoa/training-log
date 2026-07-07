@@ -9,7 +9,7 @@ const mockCollection = vi.fn(() => ({}));
 const mockQuery = vi.fn((ref) => ref);
 
 vi.mock('$lib/firebase', () => ({ db: {} }));
-vi.mock('$lib/gruvbox', () => ({
+vi.mock('$lib/theme', () => ({
   nextColor: vi.fn(() => 'red'),
   COLOR_ORDER: ['red', 'green', 'yellow', 'blue', 'purple', 'aqua', 'orange'],
 }));

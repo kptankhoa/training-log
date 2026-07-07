@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { gruvboxColors } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/theme';
   import type { TrainingTag } from '$lib/types';
 
   export let tag: TrainingTag;

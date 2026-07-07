@@ -6,8 +6,7 @@
   import { allDays, daysLoading, saveDay } from '$lib/stores/days';
   import { exercises } from '$lib/stores/exercises';
   import { user } from '$lib/stores/auth';
-  import { gruvboxColors } from '$lib/gruvbox';
-  import { navColorClasses } from '$lib/navColors';
+  import { gruvboxColors, navColorClasses } from '$lib/theme';
   import Spinner from '$lib/components/shared/Spinner.svelte';
   import ExerciseEditor from '$lib/components/day-detail/ExerciseEditor.svelte';
   import RestTimer from '$lib/components/train/RestTimer.svelte';

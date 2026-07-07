@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { db } from '$lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { nextColor } from '$lib/gruvbox';
+import { nextColor } from '$lib/theme';
 import type { Split } from '$lib/types';
 
 // Splits started life as generic "plan notes", so they still live in the

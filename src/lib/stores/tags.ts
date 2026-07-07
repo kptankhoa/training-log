@@ -1,7 +1,7 @@
 import { writable, derived, get } from 'svelte/store';
 import { db } from '$lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
-import { nextColor } from '$lib/gruvbox';
+import { nextColor } from '$lib/theme';
 import type { TrainingTag, GruvboxColor } from '$lib/types';
 
 const _tags = writable<TrainingTag[]>([]);

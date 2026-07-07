@@ -1,10 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { gruvboxColors } from '$lib/gruvbox';
   import { theme } from '$lib/stores/theme';
-  import { icons } from '$lib/icons';
-  import { navColorClasses } from '$lib/navColors';
+  import { gruvboxColors, icons, navColorClasses } from '$lib/theme';
   import type { TrainingTag, Split, DayEntry } from '$lib/types';
 
   export let year: number;

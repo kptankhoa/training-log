@@ -1,7 +1,7 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
   import ExerciseEditor from './ExerciseEditor.svelte';
-  import { gruvboxColors } from '$lib/gruvbox';
+  import { gruvboxColors } from '$lib/theme';
   import { formatSet } from '$lib/types';
   import type { Exercise, ExerciseEntry, Split, DayEntry } from '$lib/types';
 

@@ -1,4 +1,4 @@
-import type { GruvboxColor } from './types';
+import type { GruvboxColor } from '../types';
 
 // Each nav route gets its own accent color — the active nav item and that
 // page's title/heading share it, so the color reads as "which page am I on"

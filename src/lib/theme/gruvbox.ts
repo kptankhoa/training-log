@@ -1,6 +1,6 @@
 import { derived } from 'svelte/store';
-import { theme } from './stores/theme';
-import type { GruvboxColor } from './types';
+import { theme } from '../stores/theme';
+import type { GruvboxColor } from '../types';
 
 const GRUVBOX_DARK: Record<GruvboxColor, string> = {
   red:    '#fb4934',

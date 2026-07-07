@@ -3,7 +3,7 @@
   import { user } from '$lib/stores/auth';
   import { restTimerSound, playRestTimerSound } from '$lib/stores/restTimerSound';
   import { restTimerMuted, setRestTimerMuted } from '$lib/stores/restTimerMuted';
-  import { icons } from '$lib/icons';
+  import { icons } from '$lib/theme';
 
   const PRESETS = [30, 60, 75, 90, 120];
 

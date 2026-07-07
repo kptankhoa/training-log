@@ -319,7 +319,7 @@ describe('Calendar', () => {
     it('a wheel event below the threshold does not switch months', async () => {
       const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
       const grid = getByTestId('calendar-grid');
-      await fireEvent.wheel(grid, { deltaY: 20 });
+      await fireEvent.wheel(grid, { deltaY: 10 });
       expect(getByTestId('next-month-count').textContent).toBe('0');
       expect(getByTestId('prev-month-count').textContent).toBe('0');
     });
@@ -327,9 +327,9 @@ describe('Calendar', () => {
     it('accumulates deltaY across multiple wheel events until crossing the threshold', async () => {
       const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
       const grid = getByTestId('calendar-grid');
-      await fireEvent.wheel(grid, { deltaY: 30 });
+      await fireEvent.wheel(grid, { deltaY: 8 });
       expect(getByTestId('next-month-count').textContent).toBe('0');
-      await fireEvent.wheel(grid, { deltaY: 30 });
+      await fireEvent.wheel(grid, { deltaY: 8 });
       expect(getByTestId('next-month-count').textContent).toBe('1');
     });
 
@@ -342,12 +342,14 @@ describe('Calendar', () => {
       expect(getByTestId('next-month-count').textContent).toBe('1');
     });
 
-    it('accepts wheel input again once the cooldown expires (500ms)', async () => {
+    it('accepts wheel input again once both the cooldown and the animation guard clear', async () => {
+      // WHEEL_COOLDOWN_MS (200ms) is now shorter than the 250ms isTransitioning
+      // guard, so isTransitioning — not wheelLocked — is the binding guard here.
       const { getByTestId } = render(CalendarTest, { props: { year: 2026, month: 6, days: {}, tags: [] } });
       const grid = getByTestId('calendar-grid');
       await fireEvent.wheel(grid, { deltaY: 60 });
       expect(getByTestId('next-month-count').textContent).toBe('1');
-      await vi.advanceTimersByTimeAsync(500);
+      await vi.advanceTimersByTimeAsync(250);
       await fireEvent.wheel(grid, { deltaY: 60 });
       expect(getByTestId('next-month-count').textContent).toBe('2');
     });
