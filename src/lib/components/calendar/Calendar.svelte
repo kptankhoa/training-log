@@ -43,6 +43,10 @@
   let direction = 1; // 1 = forward (new month enters from the right), -1 = backward
 
   let isTransitioning = false;
+  // Starts at 0, not `rows` — `rows` is itself a `$:` value and isn't
+  // computed yet at this point in component initialization; the reactive
+  // block below sets the real value on its first run instead.
+  let displayRows = 0;
 
   $: {
     const ordinal = year * 12 + month;
@@ -50,7 +54,13 @@
       direction = ordinal > prevOrdinal ? 1 : -1;
       prevOrdinal = ordinal;
       isTransitioning = true;
+      // Hold the larger of the outgoing/incoming row counts for the
+      // transition's duration so a 6-week month sliding out isn't clipped
+      // by a 5-week month's shorter wrapper height.
+      displayRows = Math.max(displayRows, rows);
       setTimeout(() => { isTransitioning = false; }, 250);
+    } else if (!isTransitioning) {
+      displayRows = rows;
     }
   }
 
@@ -155,7 +165,7 @@
     {/each}
   </div>
 
-  <div class="relative overflow-hidden" style="height: {rows * 4.5}rem">
+  <div class="relative overflow-hidden" style="height: {displayRows * 4.5}rem">
     {#key `${year}-${month}`}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
