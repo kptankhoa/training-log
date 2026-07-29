@@ -13,7 +13,7 @@ Use Prettier's markdown formatter (`prettier/standalone` + `prettier/plugins/mar
 ```ts
 export async function formatMarkdown(value: string): Promise<string> {
   try {
-    const [{ format }, markdownPlugin] = await Promise.all([
+    const [{ format }, { default: markdownPlugin }] = await Promise.all([
       import('prettier/standalone'),
       import('prettier/plugins/markdown')
     ]);
