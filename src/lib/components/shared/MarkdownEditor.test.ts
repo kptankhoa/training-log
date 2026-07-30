@@ -57,6 +57,6 @@ describe('MarkdownEditor', () => {
     const textarea = getByRole('textbox');
     await fireEvent.input(textarea, { target: { value: '| a | bb |' } });
     await fireEvent.blur(textarea);
-    expect(getByTestId('value')).toHaveTextContent('| a  | bb |');
+    expect(getByTestId('value')).toHaveTextContent('| a  | bb |', { normalizeWhitespace: false });
   });
 });
