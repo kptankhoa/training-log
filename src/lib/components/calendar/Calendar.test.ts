@@ -295,13 +295,13 @@ describe('Calendar', () => {
         props: { year: 2026, month: 3, days: {}, tags: [] }
       });
       const wrapper = getAllByTestId('calendar-grid')[0].parentElement as HTMLElement;
-      expect(wrapper.style.height).toBe('27rem'); // 6 rows
+      expect(wrapper.style.height).toBe('calc(2px + 5px + 27rem)'); // 6 rows
 
       await fireEvent.click(getByLabelText('Next month'));
-      expect(wrapper.style.height).toBe('27rem'); // still holding the taller value mid-transition
+      expect(wrapper.style.height).toBe('calc(2px + 5px + 27rem)'); // still holding the taller value mid-transition
 
       await vi.advanceTimersByTimeAsync(250);
-      expect(wrapper.style.height).toBe('22.5rem'); // settled to April's 5 rows
+      expect(wrapper.style.height).toBe('calc(2px + 4px + 22.5rem)'); // settled to April's 5 rows
     });
 
     it('ignores a swipe fired during an active transition triggered by a button click', async () => {

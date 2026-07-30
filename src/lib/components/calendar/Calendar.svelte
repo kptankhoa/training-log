@@ -166,7 +166,12 @@
     {/each}
   </div>
 
-  <div class="relative overflow-hidden" style="height: {displayRows * 4.5}rem">
+  <!-- Height must also cover the grid's gap-px row gaps and its 1px border (below),
+       or the last row's bottom edge gets sliced off by this wrapper's overflow-hidden. -->
+  <div
+    class="relative overflow-hidden"
+    style="height: calc({displayRows} * 4.5rem + {Math.max(0, displayRows - 1)} * 1px + 2px)"
+  >
     {#key `${year}-${month}`}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
