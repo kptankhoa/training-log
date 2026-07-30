@@ -5,7 +5,7 @@ const format = vi.fn();
 vi.mock('prettier/standalone', () => ({ format }));
 vi.mock('prettier/plugins/markdown', () => ({ default: 'markdown-plugin-stub' }));
 
-import { formatMarkdown } from './formatMarkdown';
+import { formatMarkdown, preloadMarkdownFormatter } from './formatMarkdown';
 
 describe('formatMarkdown', () => {
   beforeEach(() => {
@@ -40,5 +40,9 @@ describe('formatMarkdown', () => {
     const result = await formatMarkdown(input);
 
     expect(result).toBe(input);
+  });
+
+  it('exports a preload function that can be called without throwing', () => {
+    expect(() => preloadMarkdownFormatter()).not.toThrow();
   });
 });
