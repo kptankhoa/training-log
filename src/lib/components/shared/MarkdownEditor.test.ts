@@ -1,8 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import MarkdownEditor from './MarkdownEditor.svelte';
+import MarkdownEditorTest from './MarkdownEditorTest.svelte';
 
 vi.mock('marked', () => ({ marked: (s: string) => `<p>${s}</p>` }));
+
+vi.mock('$lib/domain', () => ({
+  formatMarkdown: vi.fn(async (value: string) =>
+    value.replace('| a | bb |', '| a  | bb |')
+  )
+}));
 
 describe('MarkdownEditor', () => {
   it('renders textarea in edit mode by default', () => {
@@ -41,5 +48,15 @@ describe('MarkdownEditor', () => {
     await fireEvent.click(getByText('Preview'));
     await fireEvent.click(getByText('Edit'));
     expect(getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('formats the value on blur', async () => {
+    const { getByRole, getByTestId } = render(MarkdownEditorTest, {
+      props: { value: '' }
+    });
+    const textarea = getByRole('textbox');
+    await fireEvent.input(textarea, { target: { value: '| a | bb |' } });
+    await fireEvent.blur(textarea);
+    expect(getByTestId('value')).toHaveTextContent('| a  | bb |');
   });
 });

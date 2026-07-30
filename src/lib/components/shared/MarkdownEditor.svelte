@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from 'marked';
+  import { formatMarkdown } from '$lib/domain';
 
   export let value: string = '';
   export let placeholder: string = '';
@@ -12,6 +13,10 @@
 
   function scrollIntoViewOnFocus(el: HTMLTextAreaElement) {
     setTimeout(() => el.scrollIntoView({ block: 'center' }), 300);
+  }
+
+  async function handleBlur() {
+    value = await formatMarkdown(value);
   }
 </script>
 
@@ -37,6 +42,7 @@
       {placeholder}
       {rows}
       on:focus={(e) => scrollIntoViewOnFocus(e.currentTarget)}
+      on:blur={handleBlur}
       class="w-full bg-gb-light-bg2 dark:bg-gb-bg2 text-gb-light-fg dark:text-gb-fg font-mono text-sm rounded-md p-3 resize-y
              border border-gb-light-bg3 dark:border-gb-bg3 focus:outline-none focus:border-gb-light-blue dark:focus:border-gb-blue [caret-shape:block]"
     ></textarea>
