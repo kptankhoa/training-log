@@ -123,21 +123,29 @@
     <!-- Entries list -->
     <section class="flex flex-col gap-2">
       <h2 class="text-gb-light-fg dark:text-gb-fg font-semibold border-b border-gb-light-bg2 dark:border-gb-bg2 pb-2 text-sm uppercase tracking-wider">Entries</h2>
-      <div class="flex flex-col gap-1">
-        {#each [...$measurements].reverse() as entry (entry.id)}
-          <div class="flex items-center gap-3 bg-gb-light-bg1 dark:bg-gb-bg1 px-3 py-2 text-sm">
-            <span class="text-gb-light-fg3 dark:text-gb-fg3 w-24 shrink-0">{formatLabel(entry.id)}</span>
-            <span class="flex-1 text-gb-light-fg dark:text-gb-fg truncate">
-              {entry.weight}kg · {entry.muscleMass}kg MM · {entry.fatMass}kg FM · {entry.bfp}% BF · {entry.score} score
-            </span>
-            <button
-              type="button"
-              on:click={() => handleDelete(entry.id)}
-              aria-label="Delete entry for {entry.id}"
-              class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red transition-colors shrink-0"
-            >✕</button>
-          </div>
-        {/each}
+      <div class="overflow-x-auto bg-gb-light-bg1 dark:bg-gb-bg1 rounded-xl">
+        <table class="text-sm border-collapse w-full">
+          <tbody>
+            {#each [...$measurements].reverse() as entry (entry.id)}
+              <tr class="border-t border-gb-light-bg2 dark:border-gb-bg2 first:border-t-0">
+                <td class="px-3 py-2 text-gb-light-fg3 dark:text-gb-fg3 whitespace-nowrap">{formatLabel(entry.id)}</td>
+                <td class="px-3 py-2 text-right text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{entry.weight}kg</td>
+                <td class="px-3 py-2 text-right text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{entry.muscleMass}kg MM</td>
+                <td class="px-3 py-2 text-right text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{entry.fatMass}kg FM</td>
+                <td class="px-3 py-2 text-right text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{entry.bfp}% BF</td>
+                <td class="px-3 py-2 text-right text-gb-light-fg dark:text-gb-fg whitespace-nowrap">{entry.score} score</td>
+                <td class="px-3 py-2 w-0">
+                  <button
+                    type="button"
+                    on:click={() => handleDelete(entry.id)}
+                    aria-label="Delete entry for {entry.id}"
+                    class="text-gb-light-fg3 dark:text-gb-fg3 hover:text-gb-light-red dark:hover:text-gb-red transition-colors"
+                  >✕</button>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
       </div>
     </section>
   {/if}

@@ -76,8 +76,8 @@ describe('MetricsChart', () => {
       { id: '2026-01-01', weight: 80, muscleMass: 36, fatMass: 16, bfp: 20, score: 80 },
       { id: '2026-02-01', weight: 79, muscleMass: 36, fatMass: 15, bfp: 19, score: 82 },
     ];
-    const { getAllByText } = render(MetricsChart, { props: { userId: 'user1' } });
-    const rows = getAllByText(/kg MM/);
+    const { container } = render(MetricsChart, { props: { userId: 'user1' } });
+    const rows = container.querySelectorAll('tbody tr');
     expect(rows[0].textContent).toContain('79kg');
   });
 
