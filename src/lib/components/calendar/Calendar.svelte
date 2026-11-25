@@ -16,7 +16,7 @@
 
   const MONTHS = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
-  const DAY_HEADERS = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const DAY_HEADERS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
   $: tagMap = Object.fromEntries(tags.map((t) => [t.id, t]));
   $: splitMap = Object.fromEntries(splits.map((s) => [s.id, s]));
@@ -24,7 +24,7 @@
 
   $: gridCells = (() => {
     const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun
-    const leading = (firstDow + 6) % 7; // shift so Mon=0
+    const leading = firstDow; // Sun=0 is the first column
     const count = new Date(year, month, 0).getDate();
     const tailing = (7 - (leading + count) % 7) % 7;
     return [

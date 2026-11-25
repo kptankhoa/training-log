@@ -288,11 +288,11 @@ describe('Calendar', () => {
     });
 
     it('holds the wrapper at the taller row count while a 6-week month slides out to a 5-week month, then settles', async () => {
-      // March 2026 has 6 rows, April 2026 has 5 — the wrapper must not
-      // shrink to April's height until March has finished sliding away,
+      // August 2026 has 6 rows (Sunday-first), September 2026 has 5 — the wrapper must not
+      // shrink to September's height until August has finished sliding away,
       // or the outgoing month's last row gets clipped.
       const { getByLabelText, getAllByTestId } = render(CalendarTest, {
-        props: { year: 2026, month: 3, days: {}, tags: [] }
+        props: { year: 2026, month: 8, days: {}, tags: [] }
       });
       const wrapper = getAllByTestId('calendar-grid')[0].parentElement as HTMLElement;
       expect(wrapper.style.height).toBe('calc(2px + 5px + 27rem)'); // 6 rows
@@ -301,7 +301,7 @@ describe('Calendar', () => {
       expect(wrapper.style.height).toBe('calc(2px + 5px + 27rem)'); // still holding the taller value mid-transition
 
       await vi.advanceTimersByTimeAsync(250);
-      expect(wrapper.style.height).toBe('calc(2px + 4px + 22.5rem)'); // settled to April's 5 rows
+      expect(wrapper.style.height).toBe('calc(2px + 4px + 22.5rem)'); // settled to September's 5 rows
     });
 
     it('ignores a swipe fired during an active transition triggered by a button click', async () => {
